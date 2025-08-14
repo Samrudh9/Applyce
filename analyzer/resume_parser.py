@@ -41,6 +41,17 @@ SKILL_CATEGORIES = {
 }
 
 # Compiled regex patterns for better performance
+# Name validation patterns
+RE_WHITESPACE = re.compile(r'\s+')
+RE_VALID_NAME_CHARS = re.compile(r'^[a-zA-Z\'\.-]+$')
+
+# Name extraction patterns
+RE_IMAGE_MEDIA = re.compile(r'\b(image|media|photo|picture|img)\b', re.IGNORECASE)
+RE_NAME_PATTERN1 = re.compile(r'^\s*([A-Z][a-z]+(?:\s+[A-Z][a-z.]*)+)\s*$')
+RE_NAME_PATTERN2 = re.compile(r'^(?:Mr\.|Ms\.|Mrs\.|Dr\.|Prof\.)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z.]*)+)\s*$')
+RE_NAME_PATTERN3 = re.compile(r'(?:name|candidate)[:\s]*([A-Z][a-z]+(?:\s+[A-Z][a-z.]*)+)', re.IGNORECASE)
+RE_NAME_PATTERN4 = re.compile(r'^\s*([A-Z][a-z]+(?:\s+[A-Z][a-z.]*){1,3})\s*$')
+
 # Job title indicators
 RE_JOB_INDICATORS = [
     re.compile(r'#\s*\w+'),
@@ -107,21 +118,6 @@ RE_SMALLCAPS = re.compile(r'\[\[(\w+)\]\]')
 RE_LINE_CONTINUATIONS = re.compile(r'\\\n')
 RE_BULLET_POINTS = re.compile(r'[•∙⋅⦁◦⟐⟡⟢⟣⟤⟥⟦⟧⟨⟩⟪⟫]')
 RE_DASHES = re.compile(r'[–—−]')
-RE_WHITESPACE = re.compile(r'\s+')
-
-# Enhanced qualification extraction patterns
-RE_QUALIFICATION_PATTERNS = [
-    re.compile(r'(B\.?Tech|Bachelor|M\.?Tech|Master|Ph\.?D|MBA|BCA|MCA|B\.?Sc|M\.?Sc|B\.?E|M\.?E)\s+(?:in|of)?\s+([\w\s]+?)(?:from|at|,|\n)', re.IGNORECASE),
-    re.compile(r'(Diploma|Certificate)\s+(?:in|of)?\s+([\w\s]+?)(?:from|at|,|\n)', re.IGNORECASE),
-    re.compile(r'([\w\s]+?)\s+(?:University|College|Institute|School)', re.IGNORECASE)
-]
-
-# Work experience extraction patterns
-RE_EXPERIENCE_PATTERNS = [
-    re.compile(r'([\w\s]+?)\s+at\s+([\w\s&]+?)(?:,|\s+)(\d{4}|\w+\s+\d{4})(?:\s*[-–]\s*)?(\d{4}|\w+\s+\d{4}|present|current)?', re.IGNORECASE),
-    re.compile(r'(Software Engineer|Developer|Analyst|Manager|Intern|Consultant|Designer)\s+[-–]\s+([\w\s&]+?)(?:,|\n)', re.IGNORECASE),
-    re.compile(r'([\w\s]+?)\s+\|\s+([\w\s&]+?)\s+\|\s+([\d\w\s\-–]+)', re.IGNORECASE)
-]
 
 # ========== PRECISION RESUME PARSING COMPONENTS ==========
 
@@ -201,6 +197,61 @@ def extract_all_text_blocks(doc: Any) -> List[str]:
     
     return text_blocks
 
+def is_valid_name(text: str) -> bool:
+    """
+    Validate if text looks like a person's name with strict criteria.
+    """
+    if not text:
+        return False
+    
+    # Remove extra whitespace and normalize
+    text = RE_WHITESPACE.sub(' ', text.strip())
+    
+    # Split into words
+    words = text.split()
+    
+    # Must have 2-4 words (first, last, optional middle/initial)
+    if len(words) < 2 or len(words) > 4:
+        return False
+    
+    # Section header blacklist
+    blacklist = {
+        'resume', 'cv', 'curriculum vitae', 'phone', 'mobile', 'email', 'e-mail',
+        'address', 'linkedin', 'github', 'objective', 'summary', 'profile', 'contact',
+        'education', 'experience', 'skills', 'projects', 'certifications', 'certificates',
+        'references', 'awards', 'achievements', 'publications', 'languages', 'interests',
+        'hobbies', 'volunteer', 'activities', 'professional', 'personal', 'employment',
+        'work', 'career', 'qualifications', 'competencies', 'expertise', 'background',
+        'training', 'courses', 'coursework', 'portfolio', 'about', 'me', 'myself'
+    }
+    
+    # Check against blacklist (case-insensitive)
+    if any(word.lower() in blacklist for word in words):
+        return False
+    
+    # Validate each word
+    for word in words:
+        # Remove trailing punctuation for validation
+        clean_word = word.rstrip('.,;:')
+        
+        # Must contain only letters, hyphens, apostrophes, periods
+        if not RE_VALID_NAME_CHARS.match(clean_word):
+            return False
+        
+        # Must start with a letter
+        if not clean_word[0].isalpha():
+            return False
+        
+        # Avoid all-caps words (likely section headers)
+        if len(clean_word) > 2 and clean_word.isupper():
+            return False
+        
+        # Avoid single characters (unless it's an initial with period)
+        if len(clean_word) == 1 and not word.endswith('.'):
+            return False
+    
+    return True
+
 def contains_job_title_indicator(text: str) -> bool:
     """
     Check if text contains job title indicators that often appear near names.
@@ -215,18 +266,79 @@ def contains_job_title_indicator(text: str) -> bool:
 
 def extract_name_from_docx_robust(doc: Any) -> str:
     """
-    Placeholder function that no longer extracts names.
-    Returns a default placeholder value.
+    Robust name extraction for complex DOCX layouts using multiple strategies.
+    Looks for the largest/boldest text in first 1000 characters and applies patterns.
     """
-    return "Not provided"
+    # Extract all text blocks
+    text_blocks = extract_all_text_blocks(doc)
+    
+    # Limit to first 15 blocks (first 1/4 of document typically)
+    candidate_blocks = text_blocks[:15]
+    
+    # Use compiled regex patterns for name extraction
+    patterns = [RE_NAME_PATTERN1, RE_NAME_PATTERN2, RE_NAME_PATTERN3, RE_NAME_PATTERN4]
+    
+    candidates = []
+    
+    # Strategy 1: Look for standalone names in early blocks
+    for i, block in enumerate(candidate_blocks):
+        # Skip blocks that look like image/media references
+        if RE_IMAGE_MEDIA.search(block):
+            continue
+        
+        # Skip blocks that are too long (names are typically short)
+        if len(block) > 50:
+            continue
+            
+        # Try each pattern
+        for pattern in patterns:
+            match = pattern.search(block)
+            if match:
+                # Extract the name part
+                if len(match.groups()) > 0:
+                    candidate = match.group(1).strip()
+                else:
+                    candidate = match.group(0).strip()
+                
+                # Validate the candidate
+                if is_valid_name(candidate):
+                    # Calculate scores for ranking
+                    # Position score (earlier is better)
+                    position_score = max(0, 15 - i)
+                    
+                    # Length score (prefer 2-3 word names)
+                    words = candidate.split()
+                    length_score = 5 if 2 <= len(words) <= 3 else 3
+                    
+                    # Capitalization score (prefer properly capitalized names)
+                    cap_score = 5 if all(w[0].isupper() for w in words) else 0
+                    
+                    # Context score (check if next blocks contain job titles/contact info)
+                    context_score = 0
+                    for j in range(i + 1, min(i + 3, len(candidate_blocks))):
+                        if contains_contact_or_title_indicator(candidate_blocks[j]):
+                            context_score += 3
+                            break
+                    
+                    # Calculate total score
+                    total_score = position_score + length_score + cap_score + context_score
+                    candidates.append((candidate, total_score, i))
+    
+    # Strategy 2: Check for font attributes if available (docx only)
+    # This would check for large/bold text but requires paragraph runs analysis
+    
+    # Sort candidates by score (highest first)
+    candidates.sort(key=lambda x: x[1], reverse=True)
+    
+    # Return the best candidate, properly formatted
+    if candidates:
+        best_candidate = candidates[0][0]
+        # Ensure proper title case formatting
+        return ' '.join(word.capitalize() for word in best_candidate.split())
+    
+    return "Not detected"
 
-def is_valid_name(text: str) -> bool:
-    """
-    Placeholder function that always returns False.
-    """
-    return False
-
-def extract_contact_or_title_indicator(text: str) -> bool:
+def contains_contact_or_title_indicator(text: str) -> bool:
     """
     Check if text contains contact info or job title indicators
     that often appear near names.
@@ -887,10 +999,77 @@ def extract_text_forensic(docx_path: str) -> List[str]:
 
 def extract_name_military_grade(lines: List[str]) -> Tuple[str, float]:
     """
-    Placeholder function that no longer extracts names.
-    Returns a default placeholder value with zero confidence.
+    Name detection with 4-layer validation:
+    1. Positional scan (first 3 lines)
+    2. Regex patterns (advanced name recognition)
+    3. NLP validation (if available)
+    4. Contextual blacklist check
+    
+    Returns: (name, confidence_score 0-1)
     """
-    return ("Not provided", 0.0)
+    import unicodedata
+    try:
+        import spacy
+        nlp = spacy.load("en_core_web_sm")
+        NLP_AVAILABLE = True
+    except:
+        NLP_AVAILABLE = False
+
+    blacklist = {"resume", "cv", "curriculum vitae", "contact", "phone", "email", 
+                "github", "summary", "objective", "profile", "experience"}
+                
+    patterns = [
+        re.compile(r'^\s*[A-Z][a-z]+(?:\s+[A-Z][a-z.]*){1,3}\s*$'),  # "Samrudh S Shetty"
+        re.compile(r'^\*{0,2}([A-Z][a-z]+(?:\s+[A-Z][a-z]*)+)\*{0,2}$'),  # "**John Doe**"
+        re.compile(r'^(?:Mr\.|Ms\.|Mrs\.|Dr\.|Prof\.)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z.]*)+)\s*$'),  # "Dr. Jane Smith"
+        re.compile(r'(?:name|candidate)[:\s]*([A-Z][a-z]+(?:\s+[A-Z][a-z.]*)+)', re.IGNORECASE),  # "Name: John Doe"
+    ]
+
+    # 1. Positional scan (first 3 lines)
+    candidates = []
+    for idx, line in enumerate(lines[:5]):
+        line_clean = line.strip()
+        if not line_clean or any(b in line_clean.lower() for b in blacklist):
+            continue
+            
+        # 2. Regex patterns
+        for pat in patterns:
+            m = pat.match(line_clean)
+            if m:
+                name = m.group(1) if m.lastindex else line_clean
+                # Unicode normalization
+                name = unicodedata.normalize("NFKC", name)
+                # Blacklist check
+                if any(b in name.lower() for b in blacklist):
+                    continue
+                    
+                # NLP validation (if available)
+                nlp_score = 0
+                if NLP_AVAILABLE:
+                    doc = nlp(name)
+                    nlp_score = 0.1 if any(ent.label_ == "PERSON" for ent in doc.ents) else 0
+                    
+                # Confidence scoring
+                confidence = 0.9 if idx == 0 else 0.8
+                confidence += nlp_score
+                
+                # Handle special cases
+                if re.search(r"\b(Jr\.|Sr\.|II|III|IV)\b", name) or re.search(r"[^\x00-\x7F]", name):
+                    confidence += 0.05
+                    
+                confidence = min(confidence, 1.0)
+                candidates.append((name, confidence))
+        
+        # Fallback: If line looks like a name (capitalized, 2-4 words)
+        if not candidates and re.match(r"^[A-Z][a-z]+(?:\s+[A-Z][a-z.]*){1,3}$", line_clean):
+            candidates.append((line_clean, 0.7))
+    
+    # Return best candidate
+    if candidates:
+        candidates.sort(key=lambda x: x[1], reverse=True)
+        return candidates[0]
+        
+    return ("Not detected", 0.0)
 
 def extract_contact_zero_false_positives(lines: List[str]) -> Dict[str, Dict[str, Union[str, float]]]:
     """
@@ -1263,8 +1442,7 @@ def parse_resume_atomic(docx_path: str) -> ResumeAnalysis:
     Returns structured ResumeAnalysis with confidence scores and warnings.
     """
     lines = extract_text_forensic(docx_path)
-    name = "Not provided"  # No longer extract name
-    name_conf = 0.0
+    name, name_conf = extract_name_military_grade(lines)
     contact = extract_contact_zero_false_positives(lines)
     education = extract_education_context_aware(lines)
     skills = extract_skills_precision_mapped(lines)
@@ -1272,6 +1450,14 @@ def parse_resume_atomic(docx_path: str) -> ResumeAnalysis:
     
     # Generate warnings
     warnings = []
+    
+    # Low confidence warnings
+    if name_conf < 0.7:
+        warnings.append("Low confidence in name extraction.")
+    
+    for k, v in contact.items():
+        if v["confidence"] < 0.7 and v["value"]:
+            warnings.append(f"Low confidence in {k} extraction: {v['value']}")
     
     # Handle double bracket placeholders
     db_pattern = re.compile(r"\[\[(.*?)\]\]")
@@ -1298,154 +1484,3 @@ def parse_resume_atomic(docx_path: str) -> ResumeAnalysis:
         confidence_scores=confidence_scores,
         warnings=warnings
     )
-
-def extract_qualification_structured(text: str) -> List[Dict[str, str]]:
-    """
-    Extract structured qualification information including degree, major, and institution.
-    """
-    qualifications = []
-    
-    # Find education section first
-    education_section = extract_section(text, "education") or extract_section(text, "academic") or text
-    
-    # Extract qualification patterns
-    for pattern in RE_QUALIFICATION_PATTERNS:
-        matches = pattern.findall(education_section)
-        for match in matches:
-            if len(match) >= 2:
-                degree = match[0].strip()
-                major = match[1].strip()
-                
-                # Look for institution in the same line or nearby lines
-                institution = ""
-                lines = education_section.split('\n')
-                for line in lines:
-                    if degree.lower() in line.lower() and major.lower() in line.lower():
-                        # Extract institution from the same line
-                        inst_match = re.search(r'(?:from|at)\s+([\w\s]+?)(?:,|\n|$)', line, re.IGNORECASE)
-                        if inst_match:
-                            institution = inst_match.group(1).strip()
-                        break
-                
-                qualifications.append({
-                    "degree": degree,
-                    "major": major,
-                    "institution": institution or "Not specified"
-                })
-    
-    return qualifications
-
-def extract_work_experience_structured(text: str) -> List[Dict[str, str]]:
-    """
-    Extract structured work experience including job title, company, and duration.
-    """
-    experiences = []
-    
-    # Find experience section
-    experience_section = extract_section(text, "experience") or extract_section(text, "work") or text
-    
-    # Extract experience patterns
-    for pattern in RE_EXPERIENCE_PATTERNS:
-        matches = pattern.findall(experience_section)
-        for match in matches:
-            if len(match) >= 2:
-                job_title = match[0].strip()
-                company = match[1].strip()
-                start_date = match[2].strip() if len(match) > 2 else ""
-                end_date = match[3].strip() if len(match) > 3 and match[3] else "Present"
-                
-                duration = f"{start_date} - {end_date}" if start_date else "Duration not specified"
-                
-                experiences.append({
-                    "job_title": job_title,
-                    "company": company,
-                    "duration": duration
-                })
-    
-    return experiences
-
-def extract_skills_detailed(text: str) -> Dict[str, List[str]]:
-    """
-    Extract detailed skills categorization with better accuracy.
-    """
-    skills_data = extract_skills_categorized(text)
-    
-    # Also extract skills mentioned in projects and experience sections
-    projects_section = extract_section(text, "projects") or ""
-    experience_section = extract_section(text, "experience") or ""
-    combined_text = f"{text} {projects_section} {experience_section}".lower()
-    
-    # Additional skill extraction from context
-    skill_context_patterns = [
-        r'(?:used|utilizing|working with|experience in|proficient in|skilled in)\s+([\w\s,]+)',
-        r'(?:technologies|tools|frameworks):\s*([\w\s,]+)',
-        r'(?:programming languages):\s*([\w\s,]+)'
-    ]
-    
-    for pattern in skill_context_patterns:
-        matches = re.findall(pattern, combined_text, re.IGNORECASE)
-        for match in matches:
-            skills_in_context = [s.strip() for s in re.split(r'[,&\n]', match) if s.strip()]
-            for skill in skills_in_context:
-                # Categorize the skill
-                skill_lower = skill.lower()
-                for category, known_skills in SKILL_CATEGORIES.items():
-                    if any(known_skill in skill_lower for known_skill in known_skills):
-                        if skill not in skills_data[category]:
-                            skills_data[category].append(skill)
-    
-    return skills_data
-
-def extract_projects_enhanced(text: str) -> List[Dict[str, Any]]:
-    """
-    Enhanced project extraction with title, description, and technologies.
-    """
-    projects = extract_projects(text)
-    
-    # Enhance with better structure
-    enhanced_projects = []
-    for project in projects:
-        if isinstance(project, dict):
-            enhanced_project = {
-                "title": project.get("title", "Untitled Project"),
-                "description": project.get("description", "No description available"),
-                "technologies": project.get("technologies", [])
-            }
-        else:
-            # Handle string format
-            enhanced_project = {
-                "title": "Project",
-                "description": str(project),
-                "technologies": extract_technologies(str(project))
-            }
-        
-        enhanced_projects.append(enhanced_project)
-    
-    return enhanced_projects
-
-def parse_resume_structured(text: str) -> Dict[str, Any]:
-    """
-    Enhanced resume parsing with structured field extraction.
-    """
-    # Clean the text
-    text = clean_text(text)
-    
-    # Extract structured information
-    qualification = extract_qualification_structured(text)
-    work_experience = extract_work_experience_structured(text)
-    skills = extract_skills_detailed(text)
-    projects = extract_projects_enhanced(text)
-    
-    # Extract basic contact information
-    contact = extract_contact_info(text)
-    
-    return {
-        "name": "Not provided",  # Name extraction disabled
-        "contact": contact,
-        "qualification": qualification,
-        "work_experience": work_experience,
-        "skills": skills,
-        "projects": projects,
-        "raw_education": extract_section(text, "education") or "Not detected",
-        "raw_experience": extract_section(text, "experience") or "Not detected"
-    }

@@ -5,46 +5,30 @@ import random
 import tempfile
 import uuid
 import re
-from flask import Flask, request, render_template, jsonify
+from flask import Flask, request, render_template, jsonify, redirect, url_for, flash
 from werkzeug.utils import secure_filename
+import logging
 
-sys.path.append(os.path.abspath(os.path.dirname(__file__)))
-
+# Clean imports - no more try/catch chaos
 from analyzer.resume_parser import extract_text_from_pdf
-# Remove the problematic import and handle it conditionally
-try:
-    from analyzer.resume_analyzer import analyze_resume_for_app
-    ENHANCED_ANALYZER_SUPPORT = True
-except ImportError as e:
-    print(f"Warning: Enhanced resume analyzer not available: {e}")
-    ENHANCED_ANALYZER_SUPPORT = False
-
-# Try to import the enhanced analyzer
-try:
-    from resume_analyzer import ResumeAnalyzer
-    RESUME_ANALYZER_SUPPORT = True
-except ImportError as e:
-    print(f"Warning: ResumeAnalyzer not available: {e}")
-    RESUME_ANALYZER_SUPPORT = False
-
 from analyzer.quality_checker import check_resume_quality
 from analyzer.salary_estimator import salary_est
 
-# Import the career roadmap functionality
-try:
-    from analyzer.career_roadmap import skill_gap_analyzer, roadmap_generator
-    ROADMAP_SUPPORT = True
-except ImportError:
-    ROADMAP_SUPPORT = False
-    print("Warning: Career roadmap functionality not available.")
-
-# Try to import docx support
+# Document support
 try:
     from docx import Document
     DOCX_SUPPORT = True
 except ImportError:
     DOCX_SUPPORT = False
-    print("Warning: python-docx not installed, DOCX extraction will not work.")
+    print("Warning: python-docx not installed")
+
+# Disable problematic features
+ENHANCED_ANALYZER_SUPPORT = False
+RESUME_ANALYZER_SUPPORT = False  
+ROADMAP_SUPPORT = False
+resume_analyzer = None
+
+print("✅ All imports loaded successfully")
 
 app = Flask(__name__)
 
@@ -54,6 +38,11 @@ UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'pdf', 'docx'} if DOCX_SUPPORT else {'pdf'}
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Add configuration flags
+ROADMAP_SUPPORT = config.get('ROADMAP_SUPPORT', True)  # Default to True
+ML_CLASSIFIER_ENABLED = config.get('ML_CLASSIFIER_ENABLED', False)
+GITHUB_INTEGRATION_ENABLED = config.get('GITHUB_INTEGRATION_ENABLED', False)
 
 # Initialize the enhanced resume analyzer if available
 if RESUME_ANALYZER_SUPPORT:
@@ -246,8 +235,23 @@ def upload():
     return render_template('upload_form.html')
 
 @app.route('/resume', methods=['POST'])
+@handle_parsing_errors('upload_handler')
 def handle_resume_upload():
-    resume = request.files['resume']
+    try:
+        # Validate file upload
+        if 'resume' not in request.files:
+            flash('No file selected')
+            return redirect(url_for('upload_form'))
+        
+        file = request.files['resume']
+        
+        # Use the FileValidator for comprehensive validation
+        is_valid, error_message = FileValidator.validate_file_upload(file)
+        if not is_valid:
+            flash(f'File validation failed: {error_message}')
+            return redirect(url_for('upload_form'))
+        
+        resume = file
 
     if not resume or resume.filename == '':
         return "❌ No resume uploaded", 400
@@ -385,72 +389,6 @@ def handle_resume_upload():
                           improvements=quality_tips,
                           predicted_salary=predicted_salary,
                           roadmap_available=ROADMAP_SUPPORT)
-
-@app.route('/roadmap', methods=['GET', 'POST'])
-def generate_roadmap():
-    """Generate personalized career roadmap"""
-    if not ROADMAP_SUPPORT:
-        return "Career roadmap feature is not available. Please check your installation.", 500
-    
-    if request.method == 'POST':
-        # Get form data
-        career = request.form.get('career', '').strip()
-        skills_input = request.form.get('skills', '').strip()
-        time_months = int(request.form.get('time_months', 6))
-        learning_style = request.form.get('learning_style', 'mixed')
-        qualification = request.form.get('qualification', 'bachelors')
-        
-        # Parse skills
-        user_skills = [skill.strip() for skill in skills_input.split(',') if skill.strip()]
-        
-        # Generate roadmap
-        roadmap_data = roadmap_generator.generate_personalized_roadmap(
-            user_skills=user_skills,
-            target_career=career,
-            available_time_months=time_months,
-            learning_style=learning_style,
-            qualification=qualification
-        )
-        
-        return render_template('roadmap_result.html', roadmap=roadmap_data)
-    
-    # Available careers for dropdown
-    available_careers = list(skill_gap_analyzer.career_skills_db.keys())
-    return render_template('roadmap_form.html', careers=available_careers)
-
-@app.route('/skill-gap-analysis', methods=['POST'])
-def analyze_skill_gap():
-    """API endpoint for skill gap analysis"""
-    if not ROADMAP_SUPPORT:
-        return jsonify({"error": "Career roadmap feature not available"}), 500
-        
-    data = request.get_json()
-    
-    user_skills = data.get('skills', [])
-    target_career = data.get('career', '')
-    
-    analysis = skill_gap_analyzer.analyze_skill_gap(user_skills, target_career)
-    
-    return jsonify(analysis)
-
-def format_list_for_display(data_list):
-    """Format list data for better display in template - handle structured data"""
-    if not data_list:
-        return "Not detected"
-    
-    # Check if it's a list of dictionaries (structured format)
-    if isinstance(data_list, list) and len(data_list) > 0:
-        if isinstance(data_list[0], dict):
-            return data_list  # Return as-is for template to handle
-        elif data_list == ["Not detected"]:
-            return "Not detected"
-        elif len(data_list) == 1:
-            return data_list[0]
-        else:
-            return "\n".join([f"• {item}" for item in data_list])
-    
-    return str(data_list)
-
 def create_career_dict(predictions):
     """Create a properly formatted career dictionary for the template"""
     if not predictions:
