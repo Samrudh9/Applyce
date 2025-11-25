@@ -6,6 +6,7 @@ import tempfile
 import uuid
 import re
 import functools
+from typing import List
 from flask import Flask, request, render_template, jsonify, redirect, url_for, flash
 from werkzeug.utils import secure_filename
 import logging
@@ -716,7 +717,7 @@ def extract_certifications_basic(text):
     return certifications if certifications else ["Not detected"]
 
 
-def generate_improvement_suggestions(analysis_result: dict, extracted_text: str) -> list:
+def generate_improvement_suggestions(analysis_result: dict, extracted_text: str) -> List[str]:
     """
     Generate personalized resume improvement suggestions based on analysis results.
     
