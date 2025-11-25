@@ -7,6 +7,19 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
+    :root {
+      --bg-color: #0a0b0f;
+      --card-bg: #1a1b22;
+      --text-color: #e0e0e0;
+      --text-muted: #888;
+      --accent: #00c2ff;
+      --accent-secondary: #00ffe0;
+      --success: #00ff88;
+      --warning: #ffaa00;
+      --error: #ff4444;
+      --border-color: rgba(255, 255, 255, 0.1);
+    }
+
     * {
       margin: 0;
       padding: 0;
@@ -15,27 +28,33 @@
 
     body {
       font-family: 'Inter', sans-serif;
-      background: #f5f7fb;
-      color: #333;
+      background-color: var(--bg-color);
+      color: var(--text-color);
       min-height: 100vh;
       padding-bottom: 3rem;
+      line-height: 1.6;
     }
 
     .header {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
+      background: var(--card-bg);
+      color: var(--text-color);
       padding: 2rem;
       text-align: center;
+      border-bottom: 1px solid var(--border-color);
     }
 
     .header h1 {
       font-size: 2rem;
       font-weight: 700;
       margin-bottom: 0.5rem;
+      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .header p {
-      opacity: 0.9;
+      color: var(--text-muted);
     }
 
     .container {
@@ -48,7 +67,7 @@
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      color: #667eea;
+      color: var(--accent);
       text-decoration: none;
       font-weight: 500;
       margin-bottom: 1.5rem;
@@ -56,15 +75,16 @@
     }
 
     .back-link:hover {
-      color: #764ba2;
+      color: var(--accent-secondary);
     }
 
     .section {
-      background: white;
+      background: var(--card-bg);
       border-radius: 16px;
       padding: 1.5rem;
       margin-bottom: 1.5rem;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border-color);
     }
 
     .section-header {
@@ -73,25 +93,25 @@
       gap: 0.75rem;
       margin-bottom: 1rem;
       padding-bottom: 0.75rem;
-      border-bottom: 2px solid #f0f0f0;
+      border-bottom: 1px solid var(--border-color);
     }
 
     .section-icon {
       width: 40px;
       height: 40px;
-      background: linear-gradient(135deg, #667eea, #764ba2);
+      background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
       border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: white;
+      color: #000;
       font-size: 1.1rem;
     }
 
     .section-header h2 {
       font-size: 1.25rem;
       font-weight: 600;
-      color: #333;
+      color: var(--text-color);
     }
 
     .info-row {
@@ -102,12 +122,12 @@
 
     .info-label {
       font-weight: 600;
-      color: #667eea;
+      color: var(--accent);
       min-width: 100px;
     }
 
     .info-value {
-      color: #333;
+      color: var(--text-color);
     }
 
     /* Career Cards */
@@ -117,56 +137,65 @@
     }
 
     .career-card {
-      background: linear-gradient(135deg, #f8f9ff 0%, #f0f2ff 100%);
-      border: 1px solid #e0e5ff;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color);
       border-radius: 12px;
       padding: 1.25rem;
+      transition: all 0.3s ease;
+    }
+
+    .career-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(0, 194, 255, 0.15);
     }
 
     .career-card.primary {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
+      background: linear-gradient(135deg, rgba(0, 194, 255, 0.15) 0%, rgba(0, 255, 224, 0.15) 100%);
+      border: 1px solid var(--accent);
     }
 
     .career-card.primary .career-title {
-      color: white;
+      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .career-card.primary .confidence-text {
-      color: rgba(255, 255, 255, 0.9);
+      color: var(--text-muted);
     }
 
     .career-card.primary .confidence-bar-bg {
-      background: rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.1);
     }
 
     .career-card.primary .confidence-bar-fill {
-      background: white;
+      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
     }
 
     .career-title {
       font-size: 1.1rem;
       font-weight: 600;
-      color: #333;
+      color: var(--text-color);
       margin-bottom: 0.75rem;
     }
 
     .confidence-text {
       font-size: 0.9rem;
-      color: #666;
+      color: var(--text-muted);
       margin-bottom: 0.5rem;
     }
 
     .confidence-bar-bg {
       height: 8px;
-      background: #e0e0e0;
+      background: rgba(255, 255, 255, 0.1);
       border-radius: 4px;
       overflow: hidden;
     }
 
     .confidence-bar-fill {
       height: 100%;
-      background: linear-gradient(90deg, #667eea, #764ba2);
+      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
       border-radius: 4px;
       transition: width 0.5s ease;
     }
@@ -177,8 +206,8 @@
       gap: 0.5rem;
       margin-top: 1rem;
       padding: 0.5rem 1rem;
-      background: white;
-      color: #667eea;
+      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+      color: #000;
       border-radius: 20px;
       text-decoration: none;
       font-weight: 500;
@@ -187,33 +216,37 @@
     }
 
     .career-card.primary .roadmap-btn {
-      background: white;
-      color: #667eea;
+      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+      color: #000;
     }
 
     .roadmap-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+      transform: scale(1.05);
+      box-shadow: 0 5px 15px rgba(0, 194, 255, 0.4);
     }
 
     /* Salary Section */
     .salary-display {
       text-align: center;
       padding: 1.5rem;
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.15) 0%, rgba(0, 255, 136, 0.05) 100%);
       border-radius: 12px;
-      color: white;
+      border: 1px solid rgba(0, 255, 136, 0.3);
     }
 
     .salary-amount {
       font-size: 2rem;
       font-weight: 700;
       margin-bottom: 0.25rem;
+      background: linear-gradient(90deg, var(--success), var(--accent-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .salary-note {
       font-size: 0.9rem;
-      opacity: 0.9;
+      color: var(--text-muted);
     }
 
     .salary-details {
@@ -222,7 +255,7 @@
       gap: 2rem;
       margin-top: 1rem;
       padding-top: 1rem;
-      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      border-top: 1px solid var(--border-color);
     }
 
     .salary-detail {
@@ -231,12 +264,13 @@
 
     .salary-detail-label {
       font-size: 0.8rem;
-      opacity: 0.8;
+      color: var(--text-muted);
       margin-bottom: 0.25rem;
     }
 
     .salary-detail-value {
       font-weight: 600;
+      color: var(--success);
     }
 
     /* Skills */
@@ -247,43 +281,51 @@
     }
 
     .skill-badge {
-      padding: 0.375rem 0.75rem;
+      background: rgba(0, 255, 224, 0.15);
+      color: var(--accent-secondary);
+      padding: 6px 14px;
       border-radius: 20px;
       font-size: 0.85rem;
       font-weight: 500;
+      border: 1px solid rgba(0, 255, 224, 0.3);
     }
 
     .skill-badge.tech {
-      background: #e0f2fe;
-      color: #0369a1;
+      background: rgba(0, 194, 255, 0.15);
+      color: var(--accent);
+      border-color: rgba(0, 194, 255, 0.3);
     }
 
     .skill-badge.soft {
-      background: #fef3c7;
-      color: #92400e;
+      background: rgba(255, 170, 0, 0.15);
+      color: var(--warning);
+      border-color: rgba(255, 170, 0, 0.3);
     }
 
     .skill-badge.hr {
-      background: #fce7f3;
-      color: #9d174d;
+      background: rgba(0, 255, 224, 0.15);
+      color: var(--accent-secondary);
+      border-color: rgba(0, 255, 224, 0.3);
     }
 
     .skill-badge.marketing {
-      background: #d1fae5;
-      color: #065f46;
+      background: rgba(0, 255, 136, 0.15);
+      color: var(--success);
+      border-color: rgba(0, 255, 136, 0.3);
     }
 
     .skill-badge.finance {
-      background: #ede9fe;
-      color: #5b21b6;
+      background: rgba(0, 194, 255, 0.15);
+      color: var(--accent);
+      border-color: rgba(0, 194, 255, 0.3);
     }
 
     /* Skill Gaps */
     .skill-gap-badge {
-      padding: 0.375rem 0.75rem;
-      background: #fef2f2;
-      color: #dc2626;
-      border: 1px solid #fecaca;
+      padding: 6px 14px;
+      background: rgba(255, 68, 68, 0.15);
+      color: var(--error);
+      border: 1px solid rgba(255, 68, 68, 0.3);
       border-radius: 20px;
       font-size: 0.85rem;
       font-weight: 500;
@@ -304,29 +346,29 @@
     .quality-score-value {
       font-size: 3rem;
       font-weight: 700;
-      background: linear-gradient(135deg, #667eea, #764ba2);
+      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
 
     .quality-score-label {
-      color: #666;
+      color: var(--text-muted);
       font-size: 0.9rem;
     }
 
     .quality-bar-bg {
       height: 10px;
-      background: #e5e7eb;
-      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
       margin-top: 1rem;
       overflow: hidden;
     }
 
     .quality-bar-fill {
       height: 100%;
-      background: linear-gradient(90deg, #667eea, #764ba2);
-      border-radius: 5px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+      border-radius: 10px;
       transition: width 0.5s ease;
     }
 
@@ -340,18 +382,24 @@
       align-items: flex-start;
       gap: 0.75rem;
       padding: 0.75rem;
-      background: #f8f9ff;
+      background: rgba(255, 255, 255, 0.03);
       border-radius: 8px;
       margin-bottom: 0.5rem;
+      border: 1px solid var(--border-color);
+      transition: all 0.3s ease;
+    }
+
+    .improvement-item:hover {
+      background: rgba(255, 255, 255, 0.06);
     }
 
     .improvement-item i {
-      color: #667eea;
+      color: var(--success);
       margin-top: 0.2rem;
     }
 
     .improvement-item span {
-      color: #333;
+      color: var(--text-color);
       line-height: 1.5;
     }
 
@@ -389,26 +437,40 @@
       align-items: center;
       gap: 0.5rem;
       padding: 0.75rem 1.5rem;
-      border-radius: 50px;
+      border-radius: 30px;
       font-weight: 600;
       text-decoration: none;
       transition: all 0.3s ease;
     }
 
     .action-btn.primary {
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: white;
+      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+      color: #000;
     }
 
     .action-btn.secondary {
-      background: white;
-      color: #667eea;
-      border: 2px solid #667eea;
+      background: transparent;
+      color: var(--accent);
+      border: 2px solid var(--accent);
     }
 
     .action-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+      transform: scale(1.05);
+      box-shadow: 0 5px 20px rgba(0, 194, 255, 0.4);
+    }
+
+    .action-btn.secondary:hover {
+      background: var(--accent);
+      color: #000;
+    }
+
+    /* Error text styling */
+    .error-text {
+      color: var(--error);
+    }
+
+    .muted-text {
+      color: var(--text-muted);
     }
   </style>
 </head>
@@ -523,7 +585,7 @@
             {% endfor %}
           </div>
         {% else %}
-          <p style="color: #dc2626;">No skills detected. Consider adding a skills section to your resume.</p>
+          <p class="error-text">No skills detected. Consider adding a skills section to your resume.</p>
         {% endif %}
       </div>
 
@@ -534,7 +596,7 @@
           <div class="section-icon"><i class="fas fa-exclamation-triangle"></i></div>
           <h2>Skills to Develop</h2>
         </div>
-        <p style="margin-bottom: 1rem; color: #666;">These skills can help you advance in your target career:</p>
+        <p style="margin-bottom: 1rem;" class="muted-text">These skills can help you advance in your target career:</p>
         <div class="skills-container">
           {% for gap in skill_gaps %}
             <span class="skill-gap-badge"><i class="fas fa-plus-circle"></i> {{ gap }}</span>
@@ -552,7 +614,7 @@
         {% if education and education != 'Not detected' %}
           <p>{{ education }}</p>
         {% else %}
-          <p style="color: #dc2626;">Education information not detected</p>
+          <p class="error-text">Education information not detected</p>
         {% endif %}
       </div>
 
@@ -598,7 +660,7 @@
         {% if certificates and certificates != 'Not detected' and certificates.strip() %}
           <p>{{ certificates }}</p>
         {% else %}
-          <p style="color: #666;">No certifications detected. Consider adding relevant certifications like AWS, Azure, PMP, etc.</p>
+          <p class="muted-text">No certifications detected. Consider adding relevant certifications like AWS, Azure, PMP, etc.</p>
         {% endif %}
       </div>
 
@@ -611,7 +673,7 @@
         {% if projects and projects != 'Not detected' %}
           <p>{{ projects }}</p>
         {% else %}
-          <p style="color: #666;">No projects detected. Adding projects can strengthen your resume.</p>
+          <p class="muted-text">No projects detected. Adding projects can strengthen your resume.</p>
         {% endif %}
       </div>
 

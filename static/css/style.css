@@ -1,18 +1,30 @@
 :root {
-  --glass-color: #1a1b22;
+  --bg-color: #0a0b0f;
+  --card-bg: #1a1b22;
   --text-color: #e0e0e0;
-  --bg-color: #1c1e24;
-  --highlight: #00688B;
+  --text-muted: #888;
   --accent: #00c2ff;
-  --shadow: 0 12px 28px rgba(0, 255, 255, 0.15);
+  --accent-secondary: #00ffe0;
+  --success: #00ff88;
+  --warning: #ffaa00;
+  --error: #ff4444;
+  --border-color: rgba(255, 255, 255, 0.1);
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
   font-family: 'Inter', sans-serif;
-  margin: 0;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  min-height: 100vh;
+  line-height: 1.6;
   padding: 20px;
-  background-color: #f9fafb;
-  color: #111827;
 }
 
 .page-content {
@@ -22,20 +34,20 @@ body {
 }
 
 .title {
-  font-size: 3.5rem;
-  color: #06b6d4;
+  font-size: 2.5rem;
   text-align: center;
-  margin-bottom: 0.5rem;
-  background: linear-gradient(90deg, #06b6d4, #3b82f6);
+  margin-bottom: 1rem;
+  background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .subtitle {
   text-align: center;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   margin-bottom: 2rem;
-  color: #4b5563;
+  color: var(--text-muted);
   max-width: 800px;
   margin-left: auto;
   margin-right: auto;
@@ -53,20 +65,19 @@ body {
 }
 
 .glass-card {
-  background-color: white;
-  border-radius: 0.5rem;
+  background: var(--card-bg);
+  border-radius: 16px;
   padding: 1.5rem;
   margin-bottom: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e5e7eb;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border-color);
   max-width: 800px;
   margin-left: auto;
   margin-right: auto;
   animation: glassFadeIn 0.75s ease-out forwards;
   opacity: 0;
-  margin: 0 auto 5rem auto;
   text-align: center;
-  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 @keyframes glassFadeIn {
@@ -76,43 +87,46 @@ body {
 }
 
 .glass-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 10px 50px rgba(0, 255, 255, 0.2);
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 194, 255, 0.2);
 }
 
 button {
-
   margin-top: 2rem;
   padding: 0.9rem 2rem;
   font-size: 1rem;
   font-weight: 600;
-  background-color: var(--accent);
-  color: #111;
+  background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+  color: #000;
   border: none;
-  border-radius: 8px;
+  border-radius: 30px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
-  box-shadow: 0 3px 10px rgba(0, 255, 224, 0.2);
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(0, 194, 255, 0.3);
   display: inline-block;
   text-decoration: none;
 }
 
 button:hover {
-  background-color: #00ddc2;
+  transform: scale(1.05);
+  box-shadow: 0 8px 25px rgba(0, 194, 255, 0.4);
 }
 
 .button {
   display: inline-block;
-  background-color: #2563eb;
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 0.25rem;
+  background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+  color: #000;
+  padding: 0.75rem 1.5rem;
+  border-radius: 30px;
   text-decoration: none;
   margin-top: 1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
 }
 
 .button:hover {
-  background-color: #1d4ed8;
+  transform: scale(1.05);
+  box-shadow: 0 8px 25px rgba(0, 194, 255, 0.4);
 }
 
 #backToTop {
@@ -123,18 +137,19 @@ button:hover {
   z-index: 99;
   border: none;
   outline: none;
-  background-color: #00ffe0;
+  background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
   color: #000;
   cursor: pointer;
   padding: 12px 16px;
-  border-radius: 10px;
+  border-radius: 50%;
   font-size: 18px;
-  box-shadow: -3px 0 12px #00ffe0aa;
-  transition: 0.3s ease;
+  box-shadow: 0 5px 20px rgba(0, 194, 255, 0.4);
+  transition: all 0.3s ease;
 }
 
 #backToTop:hover {
-  background-color: #00cdb3;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0, 194, 255, 0.5);
 }
 
 .glass-nav {
@@ -195,17 +210,15 @@ button:hover {
 }
 
 .glass-card2 {
-  background: var(--glass-color);
+  background: var(--card-bg);
   border-radius: 20px;
   box-shadow: var(--shadow);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
   padding: 2rem;
   margin: 2rem auto;
   width: 95vw;
   max-width: 1400px;
   min-height: 90vh;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid var(--border-color);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -226,21 +239,18 @@ button:hover {
 }
 
 .nested-glass-card {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.03);
   border-radius: 16px;
-  box-shadow: 0 4px 16px rgba(0, 255, 255, 0.1);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
   padding: 1.8rem 1.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  transition: transform 0.3s ease;
+  border: 1px solid var(--border-color);
+  transition: all 0.3s ease;
   text-align: center;
- 
 }
 
 .nested-glass-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 12px 30px rgba(0, 255, 255, 0.2);
+  box-shadow: 0 15px 40px rgba(0, 194, 255, 0.15);
 }
 
 .nested-glass-card .subtitle {
@@ -257,13 +267,13 @@ button:hover {
 }
 
 h1, h2, h3 {
-  color: #1f2937;
+  color: var(--text-color);
   margin-top: 0;
 }
 
 h1 {
   font-size: 2rem;
-  border-bottom: 2px solid #e5e7eb;
+  border-bottom: 1px solid var(--border-color);
   padding-bottom: 0.5rem;
   margin-bottom: 1.5rem;
 }
@@ -296,12 +306,15 @@ p {
 
 .skill-gap {
   display: inline-block;
-  background-color: #f3f4f6;
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.25rem;
+  background: rgba(255, 68, 68, 0.15);
+  color: var(--error);
+  padding: 6px 14px;
+  border-radius: 20px;
   margin-right: 0.5rem;
   margin-bottom: 0.5rem;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border: 1px solid rgba(255, 68, 68, 0.3);
 }
 
 ul {
@@ -317,63 +330,52 @@ li {
   font-size: 2.5rem;
   text-align: center;
   margin-bottom: 1rem;
+  background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .subtitle {
   text-align: center;
   margin-bottom: 2rem;
-  color: #4b5563;
+  color: var(--text-muted);
 }
 
 .salary-section {
   text-align: center;
-  padding: 1rem;
-  background-color: #f3f4f6;
-  border-radius: 0.5rem;
+  padding: 1.5rem;
+  background: rgba(0, 255, 136, 0.1);
+  border-radius: 12px;
   margin-top: 1rem;
   margin-bottom: 1rem;
+  border: 1px solid rgba(0, 255, 136, 0.3);
 }
 
 .salary-amount {
   font-size: 1.5rem;
   font-weight: bold;
-  color: #2563eb;
+  background: linear-gradient(90deg, var(--success), var(--accent-secondary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
 }
 
 .resource-link {
-  color: #2563eb;
+  color: var(--accent);
   text-decoration: none;
+  transition: color 0.3s ease;
 }
 
 .resource-link:hover {
+  color: var(--accent-secondary);
   text-decoration: underline;
 }
 
 .info-label {
   font-weight: 600;
-}
-
-.glass-card {
-  background-color: white;
-  border-radius: 0.5rem;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e5e7eb;
-}
-
-.button {
-  display: inline-block;
-  background-color: #2563eb;
-  color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 0.25rem;
-  text-decoration: none;
-  margin-top: 1rem;
-}
-
-.button:hover {
-  background-color: #1d4ed8;
+  color: var(--accent);
 }
 
 /* Skill categories formatting */
@@ -384,16 +386,20 @@ li {
 .skill-category-title {
   font-weight: bold;
   margin-bottom: 0.25rem;
+  color: var(--accent);
 }
 
 .skill-item {
   display: inline-block;
-  background-color: #f3f4f6;
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.25rem;
+  background: rgba(0, 255, 224, 0.15);
+  color: var(--accent-secondary);
+  padding: 6px 14px;
+  border-radius: 20px;
   margin-right: 0.5rem;
   margin-bottom: 0.5rem;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border: 1px solid rgba(0, 255, 224, 0.3);
 }
 
 @media (max-width: 768px) {
