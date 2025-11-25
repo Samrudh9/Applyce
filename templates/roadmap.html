@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ career | title }} - Learning Roadmap</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0a0b0f;
+            --card-bg: #1a1b22;
+            --text-color: #e0e0e0;
+            --accent: #00c2ff;
+            --accent-secondary: #00ffe0;
+            --success: #00ff88;
+            --warning: #ffaa00;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+        }
+
+        .header p {
+            color: #888;
+            font-size: 1.1rem;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--accent);
+            text-decoration: none;
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: var(--accent-secondary);
+        }
+
+        .roadmap {
+            position: relative;
+        }
+
+        .roadmap::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--accent), var(--accent-secondary));
+            border-radius: 2px;
+        }
+
+        @media (max-width: 768px) {
+            .roadmap::before {
+                left: 20px;
+            }
+        }
+
+        .phase {
+            position: relative;
+            padding: 30px 0;
+        }
+
+        .phase-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 30px;
+            margin: 0 auto;
+            max-width: 500px;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .phase-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 194, 255, 0.2);
+        }
+
+        .phase:nth-child(odd) .phase-card {
+            margin-left: calc(50% + 30px);
+        }
+
+        .phase:nth-child(even) .phase-card {
+            margin-right: calc(50% + 30px);
+        }
+
+        @media (max-width: 768px) {
+            .phase:nth-child(odd) .phase-card,
+            .phase:nth-child(even) .phase-card {
+                margin-left: 60px;
+                margin-right: 20px;
+            }
+        }
+
+        .phase-number {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #000;
+            z-index: 1;
+            box-shadow: 0 4px 15px rgba(0, 194, 255, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .phase-number {
+                left: 20px;
+                transform: translateX(-50%);
+            }
+        }
+
+        .phase-title {
+            font-size: 1.5rem;
+            color: var(--accent);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .duration-badge {
+            font-size: 0.8rem;
+            background: rgba(0, 194, 255, 0.2);
+            color: var(--accent);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .skills-section {
+            margin: 20px 0;
+        }
+
+        .skills-section h4 {
+            color: var(--text-color);
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .skills-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .skill-tag {
+            background: rgba(0, 255, 224, 0.15);
+            color: var(--accent-secondary);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: 1px solid rgba(0, 255, 224, 0.3);
+        }
+
+        .resources-section {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .resources-section h4 {
+            color: var(--text-color);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .resource-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            transition: background 0.3s ease;
+        }
+
+        .resource-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .resource-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .resource-info {
+            flex: 1;
+        }
+
+        .resource-name {
+            font-weight: 500;
+            color: var(--text-color);
+            margin-bottom: 3px;
+        }
+
+        .resource-platform {
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .resource-type {
+            font-size: 0.75rem;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .resource-type.free {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--success);
+        }
+
+        .resource-type.paid {
+            background: rgba(255, 170, 0, 0.2);
+            color: var(--warning);
+        }
+
+        .cta-section {
+            text-align: center;
+            margin-top: 60px;
+            padding: 40px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .cta-section h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+        }
+
+        .cta-section p {
+            color: #888;
+            margin-bottom: 25px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+            color: #000;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 14px 35px;
+            border-radius: 30px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .cta-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(0, 194, 255, 0.4);
+        }
+
+        .timeline-progress {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: var(--card-bg);
+            border-radius: 12px;
+        }
+
+        .timeline-progress h4 {
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
+
+        .timeline-progress p {
+            color: #888;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-link">← Back to Home</a>
+        
+        <div class="header">
+            <h1>🚀 {{ career | title }} Roadmap</h1>
+            <p>Your personalized learning path to becoming a {{ career | title }}</p>
+        </div>
+
+        <div class="timeline-progress">
+            <h4>📅 Estimated Total Duration</h4>
+            <p>{{ roadmap.phases | length * 3 }}-{{ roadmap.phases | length * 5 }} months depending on your pace</p>
+        </div>
+
+        <div class="roadmap">
+            {% for phase in roadmap.phases %}
+            <div class="phase">
+                <div class="phase-number">{{ loop.index }}</div>
+                <div class="phase-card">
+                    <div class="phase-title">
+                        {{ phase.name }}
+                        <span class="duration-badge">{{ phase.duration }}</span>
+                    </div>
+                    
+                    <div class="skills-section">
+                        <h4>🎯 Skills to Master</h4>
+                        <div class="skills-list">
+                            {% for skill in phase.skills %}
+                            <span class="skill-tag">{{ skill }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="resources-section">
+                        <h4>📚 Recommended Resources</h4>
+                        {% for resource in phase.resources %}
+                        <div class="resource-item">
+                            <div class="resource-icon">📖</div>
+                            <div class="resource-info">
+                                <div class="resource-name">{{ resource.name }}</div>
+                                <div class="resource-platform">{{ resource.platform }}</div>
+                            </div>
+                            <span class="resource-type {{ resource.type }}">{{ resource.type }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="cta-section">
+            <h3>Ready to Start Your Journey?</h3>
+            <p>Upload your resume to get a personalized analysis and skill gap assessment</p>
+            <a href="/upload" class="cta-button">Analyze My Resume</a>
+        </div>
+    </div>
+</body>
+</html>
