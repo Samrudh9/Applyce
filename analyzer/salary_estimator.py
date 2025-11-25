@@ -122,6 +122,9 @@ class SalaryEstimator:
     # Skill bonus per relevant skill (percentage)
     SKILL_BONUS_PER_SKILL: float = 0.015  # 1.5% per relevant skill
     MAX_SKILL_BONUS: float = 0.15  # Maximum 15% bonus from skills
+    
+    # Default salary when career is not found (6 LPA in INR)
+    DEFAULT_BASE_SALARY: int = 600000
 
     def __init__(self):
         """Initialize the SalaryEstimator."""
@@ -147,8 +150,8 @@ class SalaryEstimator:
             if key in normalized or normalized in key:
                 return salary
         
-        # Default to software developer salary (6 LPA in INR)
-        return 600000
+        # Default salary when career is not found
+        return self.DEFAULT_BASE_SALARY
 
     def _detect_experience_level(self, experience_years: Optional[int] = None, 
                                   skills_text: str = "") -> Tuple[str, float]:
