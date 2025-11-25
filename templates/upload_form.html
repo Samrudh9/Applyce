@@ -3,25 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Career Guidance - Resume Upload</title>
+  <title>Upload Resume - Career Guidance</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    :root {
-      --glass-color: #1a1b22;
-      --text-color: #e0e0e0;
-      --bg-color: #1c1e24;
-      --accent: #00c2ff;
-      --shadow: 0 12px 28px rgba(0, 255, 255, 0.15);
-    }
-
     * {
+      margin: 0;
+      padding: 0;
       box-sizing: border-box;
     }
 
     body {
-      margin: 0;
-      font-family: 'Orbitron', sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-color);
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       min-height: 100vh;
       display: flex;
       align-items: center;
@@ -30,154 +24,372 @@
     }
 
     .container {
-      background: var(--glass-color);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 20px;
-      box-shadow: var(--shadow);
-      padding: 2.5rem;
+      background: white;
+      border-radius: 24px;
+      padding: 3rem;
       width: 100%;
-      max-width: 600px;
-      animation: fadeIn 1.5s ease-in-out;
-      text-align: center;
+      max-width: 550px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 500;
+      margin-bottom: 1.5rem;
+      transition: color 0.3s ease;
+    }
+
+    .back-link:hover {
+      color: #764ba2;
     }
 
     h1 {
-      font-size: clamp(1.8rem, 4vw, 2.4rem);
+      font-size: 2rem;
       font-weight: 700;
-      margin-bottom: 0.8rem;
-      background: linear-gradient(90deg, var(--accent), #00ffe0);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: #333;
+      margin-bottom: 0.5rem;
     }
 
-    p {
-      font-size: 0.95rem;
+    .subtitle {
+      color: #666;
       margin-bottom: 2rem;
-      color: #c0c0c0;
-      line-height: 1.5;
+      line-height: 1.6;
     }
 
     .drop-zone {
-      border: 2px dashed var(--accent);
-      border-radius: 15px;
-      padding: 30px;
+      border: 2px dashed #667eea;
+      border-radius: 16px;
+      padding: 3rem 2rem;
       text-align: center;
-      color: var(--accent);
-      margin-bottom: 20px;
-      background-color: rgba(0, 255, 255, 0.04);
-      font-size: 1rem;
       cursor: pointer;
-      transition: background-color 0.3s ease, transform 0.3s ease;
-      box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
+      transition: all 0.3s ease;
+      background: #f8f9ff;
+      margin-bottom: 1.5rem;
     }
 
     .drop-zone:hover {
-      background-color: rgba(0, 255, 255, 0.1);
-      transform: scale(1.02);
-      box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+      border-color: #764ba2;
+      background: #f0f2ff;
     }
 
-    .drop-zone::before {
-      content: "📄";
-      font-size: 2rem;
-      display: block;
-      margin-bottom: 10px;
+    .drop-zone.drag-over {
+      border-color: #764ba2;
+      background: #e8ebff;
+      transform: scale(1.02);
+    }
+
+    .drop-zone.uploaded {
+      border-color: #10b981;
+      background: #ecfdf5;
+    }
+
+    .drop-zone-icon {
+      font-size: 3rem;
+      color: #667eea;
+      margin-bottom: 1rem;
+    }
+
+    .drop-zone.uploaded .drop-zone-icon {
+      color: #10b981;
+    }
+
+    .drop-zone h3 {
+      color: #333;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .drop-zone p {
+      color: #666;
+      font-size: 0.9rem;
     }
 
     .drop-zone input[type="file"] {
       display: none;
     }
 
-    #file-name {
-      display: block;
-      margin-top: 10px;
-      color: #00ffaa;
+    .file-info {
+      display: none;
+      margin-top: 1rem;
+      padding: 1rem;
+      background: #f0fdf4;
+      border-radius: 8px;
+      border: 1px solid #86efac;
+    }
+
+    .file-info.show {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .file-info i {
+      color: #10b981;
+      font-size: 1.25rem;
+    }
+
+    .file-info span {
+      color: #166534;
       font-weight: 500;
     }
 
-    #upload-success {
-      display: none;
-      margin-top: 10px;
-      color: #00ffaa;
-      font-size: 1.1rem;
+    .formats {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
     }
 
-    .drop-zone.uploaded {
-      background-color: rgba(0, 255, 0, 0.1);
-      border-color: #00ff88;
-      color: #00ff88;
-      box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+    .format-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: #f3f4f6;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      color: #666;
     }
 
-    input[type="submit"] {
-      background-color: var(--accent);
-      color: #111;
-      padding: 12px 20px;
-      font-size: 1rem;
-      font-weight: bold;
-      border: none;
-      border-radius: 50px;
+    .format-badge i {
+      color: #667eea;
+    }
+
+    .submit-btn {
       width: 100%;
+      padding: 1rem;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 600;
       cursor: pointer;
-      transition: background-color 0.3s ease;
-      box-shadow: 0 4px 15px rgba(0, 198, 255, 0.4);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
     }
 
-    input[type="submit"]:hover {
-      background-color: #00ddc2;
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+    .submit-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .submit-btn.loading {
+      pointer-events: none;
+    }
+
+    .spinner {
+      display: none;
+      width: 20px;
+      height: 20px;
+      border: 2px solid white;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    .submit-btn.loading .spinner {
+      display: inline-block;
+    }
+
+    .submit-btn.loading .btn-text {
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      margin: 2rem 0;
+      color: #999;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: #e5e7eb;
+    }
+
+    .divider span {
+      padding: 0 1rem;
+      font-size: 0.9rem;
+    }
+
+    .alt-link {
+      text-align: center;
+    }
+
+    .alt-link a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+
+    .alt-link a:hover {
+      color: #764ba2;
+      text-decoration: underline;
+    }
+
+    /* Mobile responsive */
+    @media (max-width: 480px) {
+      .container {
+        padding: 2rem;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      .drop-zone {
+        padding: 2rem 1rem;
+      }
+
+      .formats {
+        flex-direction: column;
+        align-items: center;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Upload Your Resume</h1>
-    <p>Your resume helps us understand your qualifications, skills, and interests better.
-    Uploading it allows us to give personalized career guidance and recommend paths best suited to your profile.
-    <strong>Supported formats: PDF and DOCX files.</strong></p>
+    <a href="/" class="back-link">
+      <i class="fas fa-arrow-left"></i> Back to Home
+    </a>
+    
+    <h1>📄 Upload Your Resume</h1>
+    <p class="subtitle">Upload your resume and let our AI analyze your skills, experience, and qualifications to recommend the best career path for you.</p>
 
-    <form action="/resume" method="post" enctype="multipart/form-data">
+    <form action="/resume" method="post" enctype="multipart/form-data" id="uploadForm">
       <div class="drop-zone" id="dropZone">
-        <label for="resume" id="resume-label">Click or drag your resume here to upload (PDF or DOCX)</label>
+        <div class="drop-zone-icon">
+          <i class="fas fa-cloud-upload-alt"></i>
+        </div>
+        <h3>Drag & Drop your resume here</h3>
+        <p>or click to browse files</p>
         <input type="file" id="resume" name="resume" accept=".pdf,.docx" />
-        <span id="file-name"></span>
-        <span id="upload-success">✔ File Uploaded</span>
       </div>
-      <input type="submit" value="Submit" />
+      
+      <div class="file-info" id="fileInfo">
+        <i class="fas fa-check-circle"></i>
+        <span id="fileName"></span>
+      </div>
+
+      <div class="formats">
+        <span class="format-badge">
+          <i class="fas fa-file-pdf"></i> PDF
+        </span>
+        <span class="format-badge">
+          <i class="fas fa-file-word"></i> DOCX
+        </span>
+      </div>
+
+      <button type="submit" class="submit-btn" id="submitBtn">
+        <span class="btn-text"><i class="fas fa-search"></i> Analyze Resume</span>
+        <span class="spinner"></span>
+      </button>
     </form>
+
+    <div class="divider">
+      <span>OR</span>
+    </div>
+
+    <div class="alt-link">
+      <p>Don't have a resume ready? <a href="/form">Enter details manually →</a></p>
+    </div>
   </div>
 
   <script>
-    const resumeInput = document.getElementById("resume");
-    const dropZone = document.getElementById("dropZone");
-    const fileNameSpan = document.getElementById("file-name");
-    const uploadSuccess = document.getElementById("upload-success");
-    const label = document.getElementById("resume-label");
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('resume');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = document.getElementById('fileName');
+    const submitBtn = document.getElementById('submitBtn');
+    const form = document.getElementById('uploadForm');
 
-    dropZone.addEventListener("click", () => {
-      resumeInput.click();
+    // Click to upload
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    // Drag and drop events
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, preventDefaults, false);
     });
 
-    resumeInput.addEventListener("change", () => {
-      const file = resumeInput.files[0];
-      if (file) {
-        fileNameSpan.textContent = `Resume uploaded: ${file.name}`;
-        dropZone.classList.add("uploaded");
-        uploadSuccess.style.display = "inline";
-        label.style.display = "none";
-      } else {
-        fileNameSpan.textContent = "";
-        dropZone.classList.remove("uploaded");
-        uploadSuccess.style.display = "none";
-        label.style.display = "inline";
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropZone.addEventListener(eventName, () => {
+        dropZone.classList.add('drag-over');
+      });
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, () => {
+        dropZone.classList.remove('drag-over');
+      });
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+      const files = e.dataTransfer.files;
+      if (files.length) {
+        fileInput.files = files;
+        handleFileSelect(files[0]);
       }
+    });
+
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files.length) {
+        handleFileSelect(fileInput.files[0]);
+      }
+    });
+
+    function handleFileSelect(file) {
+      const validTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+      const validExtensions = ['.pdf', '.docx'];
+      const parts = file.name.split('.');
+      if (parts.length < 2) {
+        alert('Please upload a file with a valid extension (PDF or DOCX).');
+        fileInput.value = '';
+        return;
+      }
+      const fileExt = '.' + parts.pop().toLowerCase();
+      
+      if (validTypes.includes(file.type) || validExtensions.includes(fileExt)) {
+        dropZone.classList.add('uploaded');
+        fileInfo.classList.add('show');
+        fileName.textContent = file.name;
+        submitBtn.disabled = false;
+      } else {
+        alert('Please upload a PDF or DOCX file.');
+        fileInput.value = '';
+      }
+    }
+
+    form.addEventListener('submit', () => {
+      submitBtn.classList.add('loading');
     });
   </script>
 </body>

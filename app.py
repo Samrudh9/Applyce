@@ -6,6 +6,7 @@ import tempfile
 import uuid
 import re
 import functools
+from typing import List
 from flask import Flask, request, render_template, jsonify, redirect, url_for, flash
 from werkzeug.utils import secure_filename
 import logging
@@ -453,6 +454,9 @@ def handle_resume_upload():
         resume_score = 70
         quality_tips = ["Resume analysis completed"]
 
+    # Generate personalized improvement suggestions
+    improvement_suggestions = generate_improvement_suggestions(analysis_result, extracted_text)
+
     # Career prediction - handle empty skills
     skills_text = ', '.join(skills_found) if skills_found else 'programming, software development'
     predictions = predict_career("", skills_text)
@@ -480,16 +484,17 @@ def handle_resume_upload():
 
     # Salary estimation with error handling
     try:
-        salary_value, _ = salary_est.estimate(
+        salary_range, _ = salary_est.estimate(
             skills=skills_text,
             career=predictions[0][0] if predictions else "Software Developer",
             qualification=education[0] if education != ["Not detected"] else "Unknown"
         )
+        predicted_salary = salary_est.format_salary_display(salary_range)
+        salary_data = salary_range
     except Exception as e:
         print(f"Salary estimation error: {e}")
-        salary_value = 500000  # Default salary
-    
-    predicted_salary = f"₹{salary_value:,}/year"
+        salary_data = {"min": 500000, "max": 700000, "mid": 600000, "currency": "INR"}
+        predicted_salary = "₹5.00L - ₹7.00L/year"
 
     # Resource recommendations
     primary_career = predictions[0][0] if predictions else "software developer"
@@ -508,9 +513,11 @@ def handle_resume_upload():
                           predicted_career=create_career_dict(predictions),
                           quality_score=analysis_result.get("quality_score", resume_score),
                           skill_gaps=skill_gap_data.get("skills_analysis", {}).get("missing_required", []) if skill_gap_data else [],
-                          improvements=quality_tips,
+                          improvements=improvement_suggestions,
                           predicted_salary=predicted_salary,
+                          salary_data=salary_data,
                           roadmap_available=ROADMAP_SUPPORT)
+
 def create_career_dict(predictions):
     """Create a properly formatted career dictionary for the template"""
     if not predictions:
@@ -708,6 +715,77 @@ def extract_certifications_basic(text):
             certifications.append(line.strip())
     
     return certifications if certifications else ["Not detected"]
+
+
+def generate_improvement_suggestions(analysis_result: dict, extracted_text: str) -> List[str]:
+    """
+    Generate personalized resume improvement suggestions based on analysis results.
+    
+    Parameters:
+    - analysis_result: Dictionary with parsed resume data
+    - extracted_text: Raw text from resume
+    
+    Returns:
+    - List of improvement suggestions
+    """
+    suggestions = []
+    text_lower = extracted_text.lower()
+    
+    # Check for missing education
+    education = analysis_result.get("education", [])
+    if not education or education == ["Not detected"]:
+        suggestions.append("📚 Add your education details including degree, institution, and graduation year")
+    
+    # Check for missing projects
+    projects = analysis_result.get("projects", [])
+    if not projects or projects == ["Not detected"]:
+        suggestions.append("💻 Include personal or professional projects to showcase your practical skills")
+    
+    # Check for missing certifications
+    certifications = analysis_result.get("certifications", [])
+    if not certifications or certifications == ["Not detected"]:
+        suggestions.append("🏆 Add relevant certifications (AWS, Azure, PMP, Google Analytics, etc.) to stand out")
+    
+    # Check for low skill count
+    skills = analysis_result.get("skills", [])
+    if isinstance(skills, list) and len(skills) < 5:
+        suggestions.append("🛠️ Add more relevant technical and soft skills to your resume")
+    
+    # Check for missing contact info - Email
+    if '@' not in text_lower:
+        suggestions.append("📧 Include your email address for recruiters to contact you")
+    
+    # Check for missing LinkedIn
+    if 'linkedin' not in text_lower:
+        suggestions.append("🔗 Add your LinkedIn profile URL to increase visibility")
+    
+    # Check for missing GitHub (for tech roles)
+    tech_keywords = ['developer', 'engineer', 'programmer', 'software', 'data', 'machine learning']
+    is_tech_resume = any(keyword in text_lower for keyword in tech_keywords)
+    if is_tech_resume and 'github' not in text_lower:
+        suggestions.append("🐙 Include your GitHub profile to showcase your code and contributions")
+    
+    # Check for missing phone
+    phone_pattern = r'\b\d{10}\b|\b\d{3}[-.\s]\d{3}[-.\s]\d{4}\b|\+\d{1,3}[-.\s]\d+'
+    import re
+    if not re.search(phone_pattern, extracted_text):
+        suggestions.append("📱 Add your phone number for direct communication")
+    
+    # Check for summary/objective
+    summary_keywords = ['summary', 'objective', 'about me', 'profile']
+    if not any(keyword in text_lower for keyword in summary_keywords):
+        suggestions.append("📝 Add a professional summary or career objective at the top of your resume")
+    
+    # Check for experience section
+    experience = analysis_result.get("experience", [])
+    if not experience or experience == ["Not detected"]:
+        suggestions.append("💼 Include your work experience with job titles, companies, and responsibilities")
+    
+    # If everything is good
+    if not suggestions:
+        suggestions.append("✅ Your resume looks comprehensive! Consider tailoring it for specific job applications")
+    
+    return suggestions
 
 
 # ===== Roadmap Feature =====
@@ -920,13 +998,13 @@ def api_analyze_resume():
             
             # Salary estimation
             try:
-                salary_value, _ = salary_est.estimate(
+                salary_range, _ = salary_est.estimate(
                     skills=', '.join(skills_found),
                     career=predictions[0][0] if predictions else "Software Developer",
                     qualification="Unknown"
                 )
             except Exception:
-                salary_value = 500000
+                salary_range = {"min": 500000, "max": 700000, "mid": 600000, "currency": "INR"}
             
             return jsonify({
                 'success': True,
@@ -934,7 +1012,7 @@ def api_analyze_resume():
                 'skills': skills_found,
                 'predictions': [{'career': career, 'confidence': conf} for career, conf in predictions],
                 'skill_gap': skill_gap_data,
-                'estimated_salary': salary_value
+                'estimated_salary': salary_range
             })
         finally:
             # Clean up uploaded file

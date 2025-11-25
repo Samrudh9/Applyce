@@ -618,6 +618,7 @@ def extract_education_details(text: str) -> List[Dict[str, str]]:
     """
     Extract detailed education information from resume text.
     Looks for institutions, degrees, years, and GPA.
+    Supports comprehensive education patterns including Indian and international formats.
     """
     education_details = []
     
@@ -625,41 +626,80 @@ def extract_education_details(text: str) -> List[Dict[str, str]]:
     education_section = extract_section(text, "education") or extract_section(text, "academic") or ""
     if not education_section:
         # Try finding education keywords in full text
-        education_keywords = ["university", "college", "institute", "b.tech", "bachelor", "master", "phd", "diploma"]
+        education_keywords = [
+            "university", "college", "institute", "b.tech", "bachelor", "master", "phd", "diploma",
+            "btech", "mtech", "b.e", "m.e", "b.sc", "m.sc", "mba", "bba", "bca", "mca",
+            "school", "academy", "iit", "nit", "iiit", "bits", "graduation", "undergraduate"
+        ]
         if any(keyword in text.lower() for keyword in education_keywords):
             education_section = text
     
     if not education_section:
         return education_details
     
-    # Extract institution patterns
+    # Extract institution patterns - expanded
     institution_patterns = [
-        r'(\*{0,2}([A-Za-z\s.]+\s(?:Institute|College|University|Polytechnic|School)))',
-        r'([A-Z][A-Za-z\s.]+(?:Institute|College|University|Polytechnic|School))',
-        r'(?:at|from|in)\s+([A-Z][A-Za-z\s.]{3,50})'
+        r'(\*{0,2}([A-Za-z\s.]+\s(?:Institute|College|University|Polytechnic|School|Academy)))',
+        r'([A-Z][A-Za-z\s.]+(?:Institute|College|University|Polytechnic|School|Academy))',
+        r'(?:at|from|in)\s+([A-Z][A-Za-z\s.]{3,50})',
+        # Indian institutions
+        r'(IIT\s+[A-Za-z]+)',  # IIT Delhi, IIT Bombay
+        r'(NIT\s+[A-Za-z]+)',  # NIT Trichy
+        r'(IIIT\s+[A-Za-z]+)',  # IIIT Hyderabad
+        r'(BITS\s+[A-Za-z]+)',  # BITS Pilani
+        r'([A-Z][A-Za-z\s.]+\s(?:Engineering\s+College))',
     ]
     
-    # Extract degree patterns
+    # Extract degree patterns - comprehensive
     degree_patterns = [
-        r'(B\.?Tech|Bachelor|M\.?Tech|Master|Ph\.?D|Diploma)\s+(?:of|in|with)?\s+([\w\s]+)',
-        r'(Bachelor|Master)(?:\'s)?\s+(?:of|in|with)?\s+([\w\s]+)',
-        r'(B\.?E|M\.?E|B\.?Sc|M\.?Sc|MBA|BCA|MCA)\s+(?:in)?\s+([\w\s]+)?'
+        # Bachelor's degrees
+        r'(B\.?Tech|Bachelor(?:\'?s)?)\s*(?:of|in|with)?\s*([\w\s&]+)?',
+        r'(B\.?E\.?|B\.?Eng\.?)\s*(?:in)?\s*([\w\s&]+)?',
+        r'(B\.?Sc\.?|B\.?Science)\s*(?:in)?\s*([\w\s&]+)?',
+        r'(BBA|B\.?B\.?A\.?)\s*(?:in)?\s*([\w\s&]+)?',
+        r'(BCA|B\.?C\.?A\.?)\s*(?:in)?\s*([\w\s&]+)?',
+        r'(B\.?Com\.?|B\.?Commerce)\s*(?:in)?\s*([\w\s&]+)?',
+        r'(BA|B\.?A\.?)\s*(?:in)?\s*([\w\s&]+)?',
+        
+        # Master's degrees
+        r'(M\.?Tech|Master(?:\'?s)?)\s*(?:of|in|with)?\s*([\w\s&]+)?',
+        r'(M\.?E\.?|M\.?Eng\.?)\s*(?:in)?\s*([\w\s&]+)?',
+        r'(M\.?Sc\.?|M\.?Science)\s*(?:in)?\s*([\w\s&]+)?',
+        r'(MBA|M\.?B\.?A\.?)\s*(?:in)?\s*([\w\s&]+)?',
+        r'(MCA|M\.?C\.?A\.?)\s*(?:in)?\s*([\w\s&]+)?',
+        r'(M\.?Com\.?|M\.?Commerce)\s*(?:in)?\s*([\w\s&]+)?',
+        r'(MA|M\.?A\.?)\s*(?:in)?\s*([\w\s&]+)?',
+        r'(MS|M\.?S\.?)\s*(?:in)?\s*([\w\s&]+)?',
+        
+        # Doctoral degrees
+        r'(Ph\.?D\.?|Doctorate)\s*(?:in)?\s*([\w\s&]+)?',
+        
+        # Diploma
+        r'(Diploma)\s*(?:in)?\s*([\w\s&]+)?',
+        r'(PG\s*Diploma|Post\s*Graduate\s*Diploma)\s*(?:in)?\s*([\w\s&]+)?',
+        
+        # Associate degrees
+        r'(Associate(?:\'?s)?)\s*(?:of|in)?\s*([\w\s&]+)?',
     ]
     
-    # Extract year patterns
+    # Extract year patterns - expanded
     year_patterns = [
-        r'(\d{4})\s*-\s*(\d{2,4})',  # 2018-2022 or 2018-22
+        r'(\d{4})\s*[-–—]\s*(\d{2,4})',  # 2018-2022 or 2018-22
         r'(\d{4})\s*to\s*(\d{2,4})',  # 2018 to 2022
-        r'(\d{4})\s*–\s*(?:present|current|ongoing|till date)',  # 2018–present
-        r'(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*[\s,]+(\d{4})'  # Sep 2022
+        r'(\d{4})\s*[-–—]\s*(?:present|current|ongoing|till\s*date|expected)',  # 2018-present
+        r'(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*[\s,]*(\d{4})',  # Sep 2022
+        r'(?:class\s*of|batch\s*of|graduated?)\s*(\d{4})',  # Class of 2022
+        r'(\d{4})\s*(?:batch|graduation|graduate)',  # 2022 batch
     ]
     
-    # Extract GPA/percentage patterns
+    # Extract GPA/percentage patterns - expanded
     gpa_patterns = [
-        r'(?:GPA|CGPA)[:\s]*(\d+\.\d+)',
-        r'(\d{1,3}[.,]?\d{0,2})\s*%?'
+        r'(?:GPA|CGPA|CPI)[:\s]*(\d+\.?\d*)\s*/?\s*(?:\d+\.?\d*)?',
+        r'(\d{1,2}\.?\d*)\s*(?:GPA|CGPA|CPI)',
+        r'(?:Grade|Score)[:\s]*(\d+\.?\d*)',
+        r'(\d{1,3}\.?\d*)\s*%',  # Percentage
+        r'(?:Percentage|Marks)[:\s]*(\d{1,3}\.?\d*)',
     ]
-    
     
     # Find all matches for institutions, degrees, years, and GPA
     institutions = []
@@ -669,22 +709,46 @@ def extract_education_details(text: str) -> List[Dict[str, str]]:
     
     for pattern in institution_patterns:
         matches = re.findall(pattern, education_section, re.IGNORECASE)
-        institutions.extend([match[0] for match in matches])
+        for match in matches:
+            if isinstance(match, tuple):
+                institutions.append(match[0].strip())
+            else:
+                institutions.append(match.strip())
     
     for pattern in degree_patterns:
         matches = re.findall(pattern, education_section, re.IGNORECASE)
-        degrees.extend([match[0] + " in " + match[1] for match in matches if match[1]])
+        for match in matches:
+            if isinstance(match, tuple) and len(match) >= 2:
+                degree_name = match[0].strip()
+                field = match[1].strip() if match[1] else ""
+                if field:
+                    degrees.append(f"{degree_name} in {field}")
+                else:
+                    degrees.append(degree_name)
+            else:
+                degrees.append(str(match).strip())
     
     for pattern in year_patterns:
-        matches = re.findall(pattern, education_section)
-        years.extend([match[0] + "-" + match[1] if len(match) > 1 else match[0] for match in matches])
+        matches = re.findall(pattern, education_section, re.IGNORECASE)
+        for match in matches:
+            if isinstance(match, tuple) and len(match) > 1:
+                years.append(f"{match[0]}-{match[1]}")
+            else:
+                years.append(str(match))
     
     for pattern in gpa_patterns:
-        matches = re.findall(pattern, education_section)
+        matches = re.findall(pattern, education_section, re.IGNORECASE)
         gpas.extend(matches)
     
+    # Remove duplicates while preserving order
+    institutions = list(dict.fromkeys(institutions))
+    degrees = list(dict.fromkeys(degrees))
+    years = list(dict.fromkeys(years))
+    gpas = list(dict.fromkeys(gpas))
+    
     # Combine matches into structured details
-    for i in range(max(len(institutions), len(degrees), len(years), len(gpas))):
+    max_entries = max(len(institutions), len(degrees), len(years), len(gpas), 1)
+    for i in range(max_entries):
         detail = {}
         if i < len(institutions):
             detail["institution"] = institutions[i]
@@ -694,7 +758,8 @@ def extract_education_details(text: str) -> List[Dict[str, str]]:
             detail["year"] = years[i]
         if i < len(gpas):
             detail["gpa"] = gpas[i]
-        education_details.append(detail)
+        if detail:  # Skip empty dictionaries
+            education_details.append(detail)
     
     return education_details
 
@@ -947,6 +1012,150 @@ def clean_text(text: str) -> str:
     
     return '\n'.join(lines).strip()
 
+
+def extract_certifications(text: str) -> List[str]:
+    """
+    Extract certifications from resume text with comprehensive pattern matching.
+    Detects tech, HR, finance, marketing, and other professional certifications.
+    
+    Args:
+        text: Resume text to parse for certifications.
+    
+    Returns:
+        List[str]: List of extracted certification names found in the resume.
+    """
+    certifications = []
+    text_lower = text.lower()
+    
+    # Certification patterns by category
+    certification_patterns = {
+        # Tech certifications
+        "tech": [
+            r'AWS\s*(?:Certified|Solutions?\s*Architect|Developer|SysOps|DevOps)?',
+            r'Azure\s*(?:Certified|Administrator|Developer|Solutions?\s*Architect)?',
+            r'Google\s*Cloud\s*(?:Certified|Professional|Associate)?',
+            r'GCP\s*(?:Certified|Professional)?',
+            r'PMP\s*(?:Certified)?',
+            r'Project\s*Management\s*Professional',
+            r'Scrum\s*Master\s*(?:Certified|CSM|PSM)?',
+            r'Certified\s*Scrum\s*Master',
+            r'CISSP',
+            r'Certified\s*Information\s*Systems?\s*Security\s*Professional',
+            r'CompTIA\s*(?:A\+|Network\+|Security\+|Cloud\+|Linux\+)?',
+            r'Cisco\s*(?:CCNA|CCNP|CCIE)?',
+            r'CCNA|CCNP|CCIE',
+            r'Microsoft\s*(?:Certified|Azure|365|Power\s*Platform)?',
+            r'MCSE|MCSA|MCP',
+            r'Kubernetes\s*(?:Certified|CKA|CKAD)?',
+            r'CKA|CKAD',
+            r'Docker\s*Certified',
+            r'Terraform\s*(?:Associate|Certified)?',
+            r'ITIL\s*(?:Foundation|v3|v4)?',
+            r'Six\s*Sigma\s*(?:Green|Black|Yellow)\s*Belt',
+            r'Lean\s*Six\s*Sigma',
+            r'Oracle\s*(?:Certified|OCA|OCP|OCM)?',
+            r'OCA|OCP|OCM',
+            r'SAP\s*(?:Certified|ABAP|HANA|S/4HANA)?',
+            r'Salesforce\s*(?:Certified|Administrator|Developer|Architect)?',
+            r'Red\s*Hat\s*(?:Certified|RHCSA|RHCE)?',
+            r'RHCSA|RHCE',
+            r'Java\s*(?:Certified|OCAJP|OCPJP)?',
+            r'OCAJP|OCPJP',
+            r'Python\s*(?:Certified|PCEP|PCAP|PCPP)?',
+        ],
+        # HR certifications
+        "hr": [
+            r'SHRM[-\s]*(?:CP|SCP)',
+            r'PHR|SPHR|aPHR',
+            r'Professional\s*in\s*Human\s*Resources',
+            r'Senior\s*Professional\s*in\s*Human\s*Resources',
+            r'HRCI\s*(?:Certified)?',
+            r'Certified\s*HR\s*Professional',
+            r'Talent\s*Acquisition\s*(?:Certified|Specialist)?',
+            r'AIRS\s*(?:Certified)?',
+            r'Workday\s*(?:Certified|Pro)?',
+            r'ADP\s*(?:Certified)?',
+        ],
+        # Finance certifications
+        "finance": [
+            r'CPA',
+            r'Certified\s*Public\s*Accountant',
+            r'CFA',
+            r'Chartered\s*Financial\s*Analyst',
+            r'CMA',
+            r'Certified\s*Management\s*Accountant',
+            r'CFP',
+            r'Certified\s*Financial\s*Planner',
+            r'ACCA',
+            r'Association\s*of\s*Chartered\s*Certified\s*Accountants',
+            r'CA\s*(?:Certified|Chartered\s*Accountant)?',
+            r'FRM',
+            r'Financial\s*Risk\s*Manager',
+            r'CAIA',
+            r'Chartered\s*Alternative\s*Investment\s*Analyst',
+            r'Series\s*(?:7|63|65|66)',
+            r'Bloomberg\s*(?:Certified|Market\s*Concepts)?',
+        ],
+        # Marketing certifications
+        "marketing": [
+            r'Google\s*Analytics\s*(?:Certified|IQ)?',
+            r'Google\s*Ads\s*(?:Certified|Certification)?',
+            r'Google\s*Digital\s*(?:Marketing|Garage)?',
+            r'HubSpot\s*(?:Certified|Inbound|Content|Email)?',
+            r'Facebook\s*(?:Blueprint|Certified)?',
+            r'Meta\s*(?:Blueprint|Certified)?',
+            r'Hootsuite\s*(?:Certified|Platform)?',
+            r'SEMrush\s*(?:Certified)?',
+            r'Moz\s*(?:Certified)?',
+            r'Content\s*Marketing\s*(?:Institute|Certified)?',
+            r'Digital\s*Marketing\s*(?:Institute|Certified)?',
+            r'DMI\s*(?:Certified)?',
+            r'Mailchimp\s*(?:Certified)?',
+        ],
+        # Data and Analytics certifications
+        "data": [
+            r'Tableau\s*(?:Certified|Desktop|Server)?',
+            r'Power\s*BI\s*(?:Certified)?',
+            r'Data\s*Science\s*(?:Certified|Professional)?',
+            r'Machine\s*Learning\s*(?:Certified|Engineer)?',
+            r'TensorFlow\s*(?:Certified|Developer)?',
+            r'Databricks\s*(?:Certified)?',
+            r'Snowflake\s*(?:Certified)?',
+            r'Apache\s*(?:Spark|Kafka|Hadoop)\s*(?:Certified)?',
+            r'SAS\s*(?:Certified)?',
+        ],
+    }
+    
+    # Extract certifications from text
+    for category, patterns in certification_patterns.items():
+        for pattern in patterns:
+            matches = re.findall(pattern, text, re.IGNORECASE)
+            for match in matches:
+                cert = match.strip() if isinstance(match, str) else str(match).strip()
+                if cert and len(cert) > 2:  # Filter out too short matches
+                    certifications.append(cert)
+    
+    # Also extract from certification section if exists
+    cert_section = extract_section(text, "certifications") or extract_section(text, "certificates") or ""
+    if cert_section:
+        # Split by newlines and bullet points
+        for line in re.split(r'\n+|(?:^|\n)\s*[•\-*]\s*', cert_section):
+            line = line.strip()
+            if line and len(line) > 3 and line not in certifications:
+                certifications.append(line)
+    
+    # Remove duplicates while preserving order
+    seen = set()
+    unique_certs = []
+    for cert in certifications:
+        cert_lower = cert.lower()
+        if cert_lower not in seen:
+            seen.add(cert_lower)
+            unique_certs.append(cert)
+    
+    return unique_certs
+
+
 def parse_resume(text: str) -> Dict[str, Any]:
     """
     Main function to parse resume text into structured information.
@@ -976,14 +1185,8 @@ def parse_resume(text: str) -> Dict[str, Any]:
     # Extract projects
     projects = extract_projects(text)
     
-    # Extract certifications
-    certificates_section = extract_section(text, "certifications") or extract_section(text, "certificates") or ""
-    certificates = []
-    if certificates_section:
-        # Split by newlines and bullet points
-        for line in re.split(r'\n+|(?:^|\n)\s*[•\-*]\s*', certificates_section):
-            if line.strip():
-                certificates.append(line.strip())
+    # Extract certifications using comprehensive pattern matching
+    certificates = extract_certifications(text)
     
     # Build final result
     result = {
