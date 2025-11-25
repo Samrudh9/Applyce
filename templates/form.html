@@ -7,6 +7,19 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
+    :root {
+      --bg-color: #0a0b0f;
+      --card-bg: #1a1b22;
+      --text-color: #e0e0e0;
+      --text-muted: #888;
+      --accent: #00c2ff;
+      --accent-secondary: #00ffe0;
+      --success: #00ff88;
+      --warning: #ffaa00;
+      --error: #ff4444;
+      --border-color: rgba(255, 255, 255, 0.1);
+    }
+
     * {
       margin: 0;
       padding: 0;
@@ -15,28 +28,31 @@
 
     body {
       font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background-color: var(--bg-color);
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 2rem;
+      color: var(--text-color);
+      line-height: 1.6;
     }
 
     .container {
-      background: white;
+      background: var(--card-bg);
       border-radius: 24px;
       padding: 3rem;
       width: 100%;
       max-width: 600px;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--border-color);
     }
 
     .back-link {
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      color: #667eea;
+      color: var(--accent);
       text-decoration: none;
       font-weight: 500;
       margin-bottom: 1.5rem;
@@ -44,18 +60,21 @@
     }
 
     .back-link:hover {
-      color: #764ba2;
+      color: var(--accent-secondary);
     }
 
     h1 {
       font-size: 2rem;
       font-weight: 700;
-      color: #333;
       margin-bottom: 0.5rem;
+      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .subtitle {
-      color: #666;
+      color: var(--text-muted);
       margin-bottom: 2rem;
       line-height: 1.6;
     }
@@ -67,35 +86,36 @@
     label {
       display: block;
       font-weight: 600;
-      color: #333;
+      color: var(--text-color);
       margin-bottom: 0.5rem;
       font-size: 0.95rem;
     }
 
     label i {
       margin-right: 0.5rem;
-      color: #667eea;
+      color: var(--accent);
     }
 
     .form-input {
       width: 100%;
       padding: 0.875rem 1rem;
-      border: 2px solid #e5e7eb;
+      border: 1px solid var(--border-color);
       border-radius: 12px;
       font-size: 1rem;
       transition: all 0.3s ease;
-      background: #f9fafb;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-color);
     }
 
     .form-input:focus {
       outline: none;
-      border-color: #667eea;
-      background: white;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      border-color: var(--accent);
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 0 0 3px rgba(0, 194, 255, 0.2);
     }
 
     .form-input::placeholder {
-      color: #9ca3af;
+      color: var(--text-muted);
     }
 
     .suggestions {
@@ -107,28 +127,28 @@
       top: 100%;
       left: 0;
       right: 0;
-      background: white;
-      border: 1px solid #e5e7eb;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
       border-radius: 12px;
       z-index: 999;
       max-height: 180px;
       overflow-y: auto;
       display: none;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
       margin-top: 4px;
     }
 
     .suggestion-list div {
       padding: 0.75rem 1rem;
       cursor: pointer;
-      color: #333;
+      color: var(--text-color);
       transition: background 0.2s ease;
     }
 
     .suggestion-list div:hover,
     .suggestion-list div.active {
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: white;
+      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+      color: #000;
     }
 
     select.form-input {
@@ -138,10 +158,10 @@
     .submit-btn {
       width: 100%;
       padding: 1rem;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: white;
+      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+      color: #000;
       border: none;
-      border-radius: 12px;
+      border-radius: 30px;
       font-size: 1.1rem;
       font-weight: 600;
       cursor: pointer;
@@ -154,15 +174,15 @@
     }
 
     .submit-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+      transform: scale(1.02);
+      box-shadow: 0 10px 25px rgba(0, 194, 255, 0.4);
     }
 
     .divider {
       display: flex;
       align-items: center;
       margin: 2rem 0;
-      color: #999;
+      color: var(--text-muted);
     }
 
     .divider::before,
@@ -170,7 +190,7 @@
       content: "";
       flex: 1;
       height: 1px;
-      background: #e5e7eb;
+      background: var(--border-color);
     }
 
     .divider span {
@@ -186,23 +206,23 @@
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      color: #667eea;
+      color: var(--accent);
       text-decoration: none;
       font-weight: 500;
       padding: 0.75rem 1.5rem;
-      border: 2px solid #667eea;
-      border-radius: 50px;
+      border: 2px solid var(--accent);
+      border-radius: 30px;
       transition: all 0.3s ease;
     }
 
     .alt-link a:hover {
-      background: #667eea;
-      color: white;
+      background: var(--accent);
+      color: #000;
     }
 
     .hint {
       font-size: 0.85rem;
-      color: #9ca3af;
+      color: var(--text-muted);
       margin-top: 0.35rem;
     }
 

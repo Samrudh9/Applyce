@@ -3,52 +3,217 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Your AI Career Path</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/static/css/style.css" />
+  <title>About - AI Career Guidance</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-color: #0a0b0f;
+      --card-bg: #1a1b22;
+      --text-color: #e0e0e0;
+      --text-muted: #888;
+      --accent: #00c2ff;
+      --accent-secondary: #00ffe0;
+      --success: #00ff88;
+      --warning: #ffaa00;
+      --error: #ff4444;
+      --border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      min-height: 100vh;
+      line-height: 1.6;
+      padding: 20px;
+    }
+
+    .page-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+      margin-bottom: 2rem;
+      transition: color 0.3s ease;
+      align-self: flex-start;
+    }
+
+    .back-link:hover {
+      color: var(--accent-secondary);
+    }
+
+    .glass-card2 {
+      background: var(--card-bg);
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      padding: 3rem;
+      margin: 0 auto;
+      width: 100%;
+      max-width: 1000px;
+      border: 1px solid var(--border-color);
+    }
+
+    .title {
+      font-size: 2.5rem;
+      text-align: center;
+      margin-bottom: 2rem;
+      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nested-glass-card {
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 16px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+      padding: 2rem;
+      border: 1px solid var(--border-color);
+      transition: all 0.3s ease;
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .nested-glass-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(0, 194, 255, 0.15);
+    }
+
+    .nested-glass-card h1 {
+      font-size: 1.5rem;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .nested-glass-card .subtitle {
+      font-size: 1rem;
+      line-height: 1.7;
+      color: var(--text-muted);
+      text-align: left;
+    }
+
+    .nested-glass-card .subtitle strong {
+      color: var(--accent-secondary);
+    }
+
+    .fade-in {
+      opacity: 0;
+      animation: fadeInText 1s ease-in forwards;
+    }
+
+    @keyframes fadeInText {
+      to {
+        opacity: 1;
+      }
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      border-radius: 30px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .action-btn.primary {
+      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+      color: #000;
+    }
+
+    .action-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 5px 20px rgba(0, 194, 255, 0.4);
+    }
+
+    @media (max-width: 768px) {
+      .glass-card2 {
+        padding: 1.5rem;
+      }
+      
+      .title {
+        font-size: 1.8rem;
+      }
+      
+      .nested-glass-card {
+        padding: 1.5rem;
+      }
+      
+      .nested-glass-card h1 {
+        font-size: 1.25rem;
+      }
+    }
+  </style>
 </head>
 <body>
 <main class="page-content">
+    <a href="/" class="back-link">← Back to Home</a>
+    
     <section class="glass-card2">
       <h1 class="title">About the Project</h1>
-       <div class="nested-glass-card fade-in">
-      <h1 >Career Recommendation System </h1>
-      <p class="subtitle ">
-        In an era defined by <strong>rapidly evolving industries</strong> and <strong>diverse career landscapes</strong>, navigating one's professional path is more complex—and more <strong>crucial</strong>—than ever. The <strong>Career Recommendation System</strong> project aims to <strong>bridge this gap</strong> using the power of <strong>machine learning</strong> and <strong>intelligent web design</strong> to help individuals <strong>discover career paths</strong> that truly align with their unique skills and personal interests.
+      
+      <div class="nested-glass-card fade-in">
+        <h1>Career Recommendation System</h1>
+        <p class="subtitle">
+          In an era defined by <strong>rapidly evolving industries</strong> and <strong>diverse career landscapes</strong>, navigating one's professional path is more complex—and more <strong>crucial</strong>—than ever. The <strong>Career Recommendation System</strong> project aims to <strong>bridge this gap</strong> using the power of <strong>machine learning</strong> and <strong>intelligent web design</strong> to help individuals <strong>discover career paths</strong> that truly align with their unique skills and personal interests.
+        </p>
+      </div>
 
-      </p>
-   </div>
+      <div class="nested-glass-card fade-in">
+        <h1>Project Overview</h1>
+        <p class="subtitle">
+          This application harnesses <strong>Python</strong>, <strong>Flask</strong>, and a trained <strong>machine learning model</strong> to analyze user inputs—such as personal interests and skill sets—and generate tailored career recommendations. It offers a seamless user experience through a responsive <strong>HTML/CSS</strong> interface, paired with a <strong>Flask</strong>-powered backend and a predictive ML engine built using <strong>Pandas</strong> and <strong>Scikit-learn</strong>.
 
-<br><br>
+          At its core, the system not only delivers recommendations but also aims to simulate real-world software development practices—right from data collection and preprocessing, to model training, frontend design, backend integration, and version control using GitHub.
+        </p>
+      </div>
 
- <div class="nested-glass-card fade-in">
-      <h1 > Project Overview </h1>
-      <p class="subtitle ">
-       This application harnesses <strong>Python</strong>,<strong> Flask</strong>, and a trained<strong> machine learning model</strong> to analyze user inputs—such as personal interests and skill sets—and generate tailored career recommendations. It offers a seamless user experience through a responsive <strong>HTML/CSS </strong>interface, paired with a<strong> Flask</strong>-powered backend and a predictive ML engine built using <strong>Pandas </strong>and <strong>Scikit-learn</strong>.
+      <div class="nested-glass-card fade-in">
+        <h1>Learning Objectives</h1>
+        <p class="subtitle">
+          This project has been meticulously structured to demonstrate the seamless <strong>integration</strong> of <strong>machine learning</strong> algorithms within modern <strong>web applications</strong>. It aims to cultivate <strong>real-world</strong> development workflows by leveraging <strong>industry-relevant tools</strong> such as <strong>Git</strong> for version control and <strong>Flask</strong> for backend development. In doing so, it emphasizes the importance of effective <strong>team collaboration</strong> through clearly defined roles and responsibilities. Ultimately, the project is designed to serve as a <strong>resume-worthy</strong> endeavor, highlighting both <strong>technical expertise</strong> and <strong>creative problem-solving</strong> abilities in a practical and impactful context.
+        </p>      
+      </div>
 
-At its core, the system not only delivers recommendations but also aims to simulate real-world software development practices—right from data collection and preprocessing, to model training, frontend design, backend integration, and version control using GitHub
-      </p>
-   </div>
+      <div class="nested-glass-card fade-in">
+        <h1>Future Scope</h1>
+        <p class="subtitle">
+          With further enhancement, this system holds the potential to evolve into a more <strong>intelligent</strong> and <strong>personalized</strong> career guidance platform. Future iterations could incorporate <strong>real-time market data</strong> to dynamically reflect current <strong>career demand</strong> and trends. <strong>Natural Language Processing (NLP)</strong> can be applied for advanced <strong>resume analysis</strong>, offering deeper insights into <strong>user profiles</strong>. Integration with <strong>job board APIs</strong> would streamline access to live <strong>opportunities</strong>, while a <strong>user-specific dashboard</strong> and <strong>history log</strong> would enable <strong>progress tracking</strong>, personalized recommendations, and improved <strong>user engagement</strong> over time.
+        </p>      
+      </div>
 
-<br><br>
-
-<div class="nested-glass-card fade-in">
-<h1>Learning Objectives</h1>
-<p class="subtitle">This project has been meticulously structured to demonstrate the seamless <strong>integration</strong> of <strong>machine learning</strong> algorithms within modern <strong>web applications</strong>. It aims to cultivate <strong>real-world</strong> development workflows by leveraging <strong>industry-relevant tools</strong> such as <strong>Git</strong> for version control and <strong>Flask</strong> for backend development. In doing so, it emphasizes the importance of effective <strong>team collaboration</strong> through clearly defined roles and responsibilities. Ultimately, the project is designed to serve as a <strong>resume-worthy</strong> endeavor, highlighting both <strong>technical expertise</strong> and <strong>creative problem-solving</strong> abilities in a practical and impactful context.
-
-</p>      
-   </div>
-
-<br><br>
-
-<div class="nested-glass-card fade-in">
-<h1>Future Scope</h1>
-<p class="subtitle">With further enhancement, this system holds the potential to evolve into a more <strong>intelligent</strong> and <strong>personalized</strong> career guidance platform. Future iterations could incorporate <strong>real-time market data</strong> to dynamically reflect current <strong>career demand</strong> and trends. <strong>Natural Language Processing (NLP)</strong> can be applied for advanced <strong>resume analysis</strong>, offering deeper insights into <strong>user profiles</strong>. Integration with <strong>job board APIs</strong> would streamline access to live <strong>opportunities</strong>, while a <strong>user-specific dashboard</strong> and <strong>history log</strong> would enable <strong>progress tracking</strong>, personalized recommendations, and improved <strong>user engagement</strong> over time.
-
-
-</p>      
-   </div>
-
-
+      <div class="action-buttons">
+        <a href="/" class="action-btn primary">🏠 Back to Home</a>
+      </div>
+    </section>
+</main>
 </body>
 </html>
