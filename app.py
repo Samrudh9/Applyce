@@ -101,6 +101,7 @@ class SkillGapAnalyzer:
     """Analyzes skill gaps for career recommendations"""
     def __init__(self):
         self.career_skills = {
+            # Tech careers
             "data scientist": ["python", "machine learning", "statistics", "sql", "tensorflow", "pandas", "numpy", "scikit-learn", "deep learning", "data visualization"],
             "frontend developer": ["html", "css", "javascript", "react", "vue", "typescript", "angular", "webpack", "sass", "responsive design"],
             "backend developer": ["python", "java", "nodejs", "sql", "api", "docker", "mongodb", "postgresql", "rest", "microservices"],
@@ -109,8 +110,51 @@ class SkillGapAnalyzer:
             "full stack developer": ["javascript", "react", "nodejs", "python", "sql", "html", "css", "git", "docker", "rest api"],
             "machine learning engineer": ["python", "tensorflow", "pytorch", "machine learning", "deep learning", "neural networks", "nlp", "computer vision", "mlops"],
             "software developer": ["python", "java", "javascript", "sql", "git", "algorithms", "data structures", "oop", "testing"],
+            "software engineer": ["python", "java", "javascript", "sql", "git", "algorithms", "data structures", "oop", "testing"],
             "web developer": ["html", "css", "javascript", "php", "mysql", "responsive design", "wordpress", "bootstrap"],
-            "project manager": ["agile", "scrum", "jira", "communication", "leadership", "risk management", "budgeting", "planning"]
+            "project manager": ["agile", "scrum", "jira", "communication", "leadership", "risk management", "budgeting", "planning"],
+            "data analyst": ["python", "sql", "excel", "tableau", "data visualization", "statistics", "pandas", "power bi"],
+            
+            # HR careers
+            "hr manager": ["recruitment", "employee relations", "payroll", "hris", "training", "labor law", "performance management", "benefits administration"],
+            "recruiter": ["talent acquisition", "interviewing", "ats", "sourcing", "onboarding", "screening", "linkedin recruiter"],
+            "human resources": ["recruitment", "payroll", "benefits", "employee relations", "hr policies", "onboarding", "training"],
+            "hr specialist": ["hris", "workday", "benefits administration", "compensation", "hr policies", "employee support"],
+            "training manager": ["training", "development", "learning management", "performance management", "instructional design"],
+            "payroll specialist": ["payroll", "hris", "benefits", "compliance", "taxation", "labor law"],
+            
+            # Marketing careers
+            "marketing manager": ["seo", "social media", "google analytics", "content marketing", "branding", "campaign management", "market research"],
+            "digital marketer": ["seo", "ppc", "social media", "email marketing", "google ads", "facebook ads", "content marketing"],
+            "digital marketing specialist": ["seo", "sem", "ppc", "google ads", "social media marketing", "email marketing", "analytics"],
+            "brand manager": ["brand strategy", "market research", "campaign management", "advertising", "consumer behavior", "positioning"],
+            "content marketing manager": ["content strategy", "copywriting", "social media", "email marketing", "seo", "content creation"],
+            "market research analyst": ["market research", "consumer insights", "data analysis", "competitive analysis", "surveys", "reporting"],
+            
+            # Finance careers
+            "financial analyst": ["financial modeling", "excel", "budgeting", "forecasting", "analysis", "valuation", "financial reporting"],
+            "accountant": ["accounting", "taxation", "bookkeeping", "auditing", "gaap", "financial statements", "quickbooks"],
+            "investment banker": ["financial modeling", "valuation", "due diligence", "m&a", "excel", "pitchbook", "deal structuring"],
+            "risk manager": ["risk management", "compliance", "regulatory", "internal controls", "risk assessment"],
+            "treasury analyst": ["treasury", "cash flow", "banking", "investments", "liquidity management"],
+            
+            # Sales careers
+            "sales manager": ["sales", "crm", "negotiation", "lead generation", "team management", "pipeline management", "forecasting"],
+            "account executive": ["b2b sales", "account management", "salesforce", "pipeline management", "client relations", "closing deals"],
+            "sales executive": ["sales", "negotiation", "customer relations", "prospecting", "closing deals", "crm"],
+            "business development": ["sales", "lead generation", "partnerships", "negotiation", "market expansion", "networking"],
+            
+            # Healthcare careers
+            "healthcare administrator": ["healthcare administration", "hipaa", "patient care", "medical records", "ehr", "healthcare compliance"],
+            "medical billing specialist": ["medical billing", "ehr", "epic", "healthcare compliance", "revenue cycle", "medical coding"],
+            
+            # Legal careers
+            "legal advisor": ["legal research", "contract review", "compliance", "corporate law", "regulatory"],
+            "corporate lawyer": ["contract drafting", "litigation", "corporate law", "m&a", "compliance", "due diligence"],
+            
+            # Operations careers
+            "operations manager": ["supply chain", "logistics", "inventory", "process improvement", "operations management", "vendor management"],
+            "supply chain manager": ["procurement", "vendor management", "supply chain analytics", "logistics", "sourcing", "inventory management"]
         }
     
     def analyze_skill_gap(self, user_skills, target_career):
@@ -519,9 +563,11 @@ def extract_contact_info(text):
     return ' | '.join(contact_parts) if contact_parts else "Contact information not detected"
 
 def basic_skill_detection(text):
-    """Fallback skill detection using common programming keywords"""
+    """Fallback skill detection using common programming keywords and non-tech skills"""
     text_lower = text.lower()
-    common_skills = [
+    
+    # Tech skills
+    tech_skills = [
         'python', 'java', 'javascript', 'react', 'angular', 'vue', 'nodejs', 'html', 'css',
         'sql', 'mongodb', 'postgresql', 'git', 'docker', 'kubernetes', 'aws', 'azure',
         'machine learning', 'data science', 'android', 'ios', 'flutter', 'swift', 'kotlin',
@@ -529,8 +575,75 @@ def basic_skill_detection(text):
         'express', 'django', 'flask', 'spring', 'laravel', 'rails', 'tensorflow', 'pytorch'
     ]
     
+    # HR skills
+    hr_skills = [
+        'recruitment', 'hiring', 'talent acquisition', 'onboarding', 'payroll',
+        'hris', 'workday', 'bamboohr', 'employee relations', 'performance management',
+        'benefits administration', 'compensation', 'training', 'hr policies', 'labor law',
+        'shrm', 'ats', 'applicant tracking', 'employee engagement', 'talent management',
+        'succession planning', 'workforce planning', 'hr analytics'
+    ]
+    
+    # Marketing skills
+    marketing_skills = [
+        'seo', 'sem', 'google analytics', 'social media', 'content marketing',
+        'email marketing', 'brand management', 'market research', 'advertising',
+        'ppc', 'facebook ads', 'google ads', 'hubspot', 'mailchimp', 'copywriting',
+        'brand strategy', 'campaign management', 'digital marketing', 'branding',
+        'lead generation', 'marketing automation', 'a/b testing', 'content strategy'
+    ]
+    
+    # Finance skills
+    finance_skills = [
+        'financial analysis', 'budgeting', 'forecasting', 'accounting',
+        'bookkeeping', 'taxation', 'auditing', 'financial modeling', 'excel',
+        'quickbooks', 'sap', 'gaap', 'ifrs', 'cpa', 'cfa', 'valuation',
+        'due diligence', 'm&a', 'investment analysis', 'risk management',
+        'treasury', 'cash flow', 'financial reporting', 'variance analysis'
+    ]
+    
+    # Sales skills
+    sales_skills = [
+        'sales', 'crm', 'salesforce', 'negotiation', 'lead generation',
+        'cold calling', 'account management', 'b2b', 'b2c', 'pipeline management',
+        'sales forecasting', 'territory management', 'client relations',
+        'business development', 'closing deals', 'prospecting'
+    ]
+    
+    # Healthcare skills
+    healthcare_skills = [
+        'patient care', 'medical records', 'hipaa', 'ehr', 'epic',
+        'medical billing', 'healthcare administration', 'clinical research',
+        'healthcare compliance', 'revenue cycle', 'medical coding'
+    ]
+    
+    # Legal skills
+    legal_skills = [
+        'legal research', 'contract review', 'compliance', 'litigation',
+        'corporate law', 'intellectual property', 'regulatory',
+        'contract drafting', 'due diligence', 'corporate governance'
+    ]
+    
+    # Operations skills
+    operations_skills = [
+        'supply chain', 'logistics', 'inventory management', 'procurement',
+        'vendor management', 'process improvement', 'lean', 'six sigma',
+        'quality control', 'operations management', 'warehouse management'
+    ]
+    
+    # Soft skills
+    soft_skills = [
+        'communication', 'leadership', 'teamwork', 'problem solving',
+        'critical thinking', 'time management', 'project management',
+        'presentation', 'public speaking', 'conflict resolution'
+    ]
+    
+    # Combine all skills
+    all_skills = (tech_skills + hr_skills + marketing_skills + finance_skills + 
+                  sales_skills + healthcare_skills + legal_skills + operations_skills + soft_skills)
+    
     detected_skills = []
-    for skill in common_skills:
+    for skill in all_skills:
         if skill in text_lower:
             detected_skills.append(skill)
     
