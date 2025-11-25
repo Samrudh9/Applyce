@@ -125,6 +125,9 @@ class SalaryEstimator:
     
     # Default salary when career is not found (6 LPA in INR)
     DEFAULT_BASE_SALARY: int = 600000
+    
+    # Threshold in LPA for switching decimal precision in salary display
+    SALARY_DISPLAY_THRESHOLD: int = 10  # Use 1 decimal place for salaries >= 10 LPA
 
     def __init__(self):
         """Initialize the SalaryEstimator."""
@@ -306,8 +309,8 @@ class SalaryEstimator:
             min_lpa = min_sal / 100000
             max_lpa = max_sal / 100000
             
-            # Format based on value
-            if min_lpa >= 10:
+            # Format based on value - use fewer decimals for larger salaries
+            if min_lpa >= self.SALARY_DISPLAY_THRESHOLD:
                 return f"₹{min_lpa:.1f}L - ₹{max_lpa:.1f}L/year"
             else:
                 return f"₹{min_lpa:.2f}L - ₹{max_lpa:.2f}L/year"
