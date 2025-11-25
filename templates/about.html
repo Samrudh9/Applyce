@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>About - AI Career Guidance</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <style>
     :root {
       --bg-color: #0a0b0f;
@@ -171,6 +172,113 @@
         font-size: 1.25rem;
       }
     }
+
+    /* Team Section Styles */
+    .team-section {
+        margin-top: 60px;
+        text-align: center;
+    }
+
+    .section-title {
+        font-size: 2rem;
+        margin-bottom: 10px;
+    }
+
+    .gradient-text {
+        background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .section-subtitle {
+        color: #888;
+        margin-bottom: 40px;
+    }
+
+    .team-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 30px;
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .team-card {
+        background: var(--card-bg);
+        border-radius: 16px;
+        padding: 30px 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        text-align: center;
+    }
+
+    .team-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 40px rgba(0, 194, 255, 0.2);
+    }
+
+    .member-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        margin: 0 auto 20px;
+        overflow: hidden;
+        border: 3px solid var(--accent);
+        box-shadow: 0 4px 15px rgba(0, 194, 255, 0.3);
+    }
+
+    .member-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .member-name {
+        color: var(--text-color);
+        font-size: 1.2rem;
+        margin-bottom: 5px;
+    }
+
+    .member-role {
+        color: var(--accent);
+        font-size: 0.9rem;
+        margin-bottom: 15px;
+    }
+
+    .linkedin-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: linear-gradient(90deg, #0077b5, #00a0dc);
+        color: white;
+        text-decoration: none;
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .linkedin-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 5px 15px rgba(0, 119, 181, 0.4);
+    }
+
+    /* Mobile responsive for team section */
+    @media (max-width: 768px) {
+        .team-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .team-grid {
+            grid-template-columns: 1fr;
+        }
+    }
   </style>
 </head>
 <body>
@@ -213,6 +321,74 @@
       <div class="action-buttons">
         <a href="/upload" class="action-btn primary">🚀 Get Started</a>
       </div>
+
+      <!-- Team Section -->
+      <section class="team-section">
+          <h2 class="section-title gradient-text">👥 Meet Our Team</h2>
+          <p class="section-subtitle">The talented people behind this project</p>
+          
+          <div class="team-grid">
+              <!-- Team Member 1 -->
+              <div class="team-card">
+                  <div class="member-avatar">
+                      <img src="https://ui-avatars.com/api/?name=Member+1&background=00c2ff&color=000&size=150" alt="Team Member 1">
+                  </div>
+                  <h3 class="member-name">Team Member 1</h3>
+                  <p class="member-role">Project Lead</p>
+                  <a href="https://linkedin.com/in/username1" target="_blank" class="linkedin-btn">
+                      <i class="fab fa-linkedin"></i> LinkedIn
+                  </a>
+              </div>
+              
+              <!-- Team Member 2 -->
+              <div class="team-card">
+                  <div class="member-avatar">
+                      <img src="https://ui-avatars.com/api/?name=Member+2&background=00ffe0&color=000&size=150" alt="Team Member 2">
+                  </div>
+                  <h3 class="member-name">Team Member 2</h3>
+                  <p class="member-role">Full Stack Developer</p>
+                  <a href="https://linkedin.com/in/username2" target="_blank" class="linkedin-btn">
+                      <i class="fab fa-linkedin"></i> LinkedIn
+                  </a>
+              </div>
+              
+              <!-- Team Member 3 -->
+              <div class="team-card">
+                  <div class="member-avatar">
+                      <img src="https://ui-avatars.com/api/?name=Member+3&background=00ff88&color=000&size=150" alt="Team Member 3">
+                  </div>
+                  <h3 class="member-name">Team Member 3</h3>
+                  <p class="member-role">Backend Developer</p>
+                  <a href="https://linkedin.com/in/username3" target="_blank" class="linkedin-btn">
+                      <i class="fab fa-linkedin"></i> LinkedIn
+                  </a>
+              </div>
+              
+              <!-- Team Member 4 -->
+              <div class="team-card">
+                  <div class="member-avatar">
+                      <img src="https://ui-avatars.com/api/?name=Member+4&background=ffaa00&color=000&size=150" alt="Team Member 4">
+                  </div>
+                  <h3 class="member-name">Team Member 4</h3>
+                  <p class="member-role">UI/UX Designer</p>
+                  <a href="https://linkedin.com/in/username4" target="_blank" class="linkedin-btn">
+                      <i class="fab fa-linkedin"></i> LinkedIn
+                  </a>
+              </div>
+              
+              <!-- Team Member 5 -->
+              <div class="team-card">
+                  <div class="member-avatar">
+                      <img src="https://ui-avatars.com/api/?name=Member+5&background=00c2ff&color=000&size=150" alt="Team Member 5">
+                  </div>
+                  <h3 class="member-name">Team Member 5</h3>
+                  <p class="member-role">ML Engineer</p>
+                  <a href="https://linkedin.com/in/username5" target="_blank" class="linkedin-btn">
+                      <i class="fab fa-linkedin"></i> LinkedIn
+                  </a>
+              </div>
+          </div>
+      </section>
     </section>
 </main>
 </body>
