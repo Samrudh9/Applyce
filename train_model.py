@@ -106,4 +106,4 @@ def train_career_model():
 if __name__ == "__main__":
     train_career_model()
     print("🚀 Training complete!")
-    print("=",*60)
+    print("=" * 60)
