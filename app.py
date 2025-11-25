@@ -5,6 +5,7 @@ import random
 import tempfile
 import uuid
 import re
+import functools
 from flask import Flask, request, render_template, jsonify, redirect, url_for, flash
 from werkzeug.utils import secure_filename
 import logging
@@ -13,6 +14,7 @@ import logging
 from analyzer.resume_parser import extract_text_from_pdf
 from analyzer.quality_checker import check_resume_quality
 from analyzer.salary_estimator import salary_est
+from config import config
 
 # Document support
 try:
@@ -22,15 +24,27 @@ except ImportError:
     DOCX_SUPPORT = False
     print("Warning: python-docx not installed")
 
-# Disable problematic features
-ENHANCED_ANALYZER_SUPPORT = False
-RESUME_ANALYZER_SUPPORT = False  
-ROADMAP_SUPPORT = False
-resume_analyzer = None
+# Try to import enhanced analyzers
+try:
+    from analyzer.resume_analyzer import ResumeSkillGapAnalyzer, analyze_resume_for_app
+    ENHANCED_ANALYZER_SUPPORT = True
+except ImportError:
+    ENHANCED_ANALYZER_SUPPORT = False
+    print("Warning: Enhanced resume analyzer not available")
+
+try:
+    from roadmap import RoadmapGenerator
+    ROADMAP_SUPPORT = True
+except ImportError:
+    ROADMAP_SUPPORT = False
+    print("Warning: Roadmap generator not available")
 
 print("✅ All imports loaded successfully")
 
 app = Flask(__name__)
+
+# Set secret key for session and flash messages
+app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
 
 # ===== Configuration =====
 UPLOAD_FOLDER = 'uploads'
@@ -38,22 +52,89 @@ UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'pdf', 'docx'} if DOCX_SUPPORT else {'pdf'}
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max
 
-# Add configuration flags
-ROADMAP_SUPPORT = config.get('ROADMAP_SUPPORT', True)  # Default to True
+# Feature flags from config
 ML_CLASSIFIER_ENABLED = config.get('ML_CLASSIFIER_ENABLED', False)
 GITHUB_INTEGRATION_ENABLED = config.get('GITHUB_INTEGRATION_ENABLED', False)
 
-# Initialize the enhanced resume analyzer if available
-if RESUME_ANALYZER_SUPPORT:
-    try:
-        resume_analyzer = ResumeAnalyzer()
-    except Exception as e:
-        print(f"Warning: Failed to initialize ResumeAnalyzer: {e}")
-        resume_analyzer = None
-        RESUME_ANALYZER_SUPPORT = False
-else:
-    resume_analyzer = None
+# Resume analyzer support
+RESUME_ANALYZER_SUPPORT = ENHANCED_ANALYZER_SUPPORT
+resume_analyzer = None
+
+
+# ===== Utility Functions =====
+def format_list_for_display(items):
+    """Format a list for HTML display"""
+    if not items or items == ["Not detected"]:
+        return "Not detected"
+    return ", ".join(items) if isinstance(items, list) else str(items)
+
+
+def handle_parsing_errors(handler_name):
+    """Decorator for handling parsing errors gracefully"""
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            try:
+                return func(*args, **kwargs)
+            except Exception as e:
+                print(f"Error in {handler_name}: {e}")
+                flash(f"An error occurred: {str(e)}")
+                return redirect(url_for('upload'))
+        return wrapper
+    return decorator
+
+
+class FileValidator:
+    """Validates file uploads"""
+    @staticmethod
+    def validate_file_upload(file):
+        if not file or file.filename == '':
+            return False, "No file selected"
+        if not allowed_file(file.filename):
+            return False, f"Invalid file type. Allowed: {', '.join(ALLOWED_EXTENSIONS)}"
+        return True, None
+
+
+class SkillGapAnalyzer:
+    """Analyzes skill gaps for career recommendations"""
+    def __init__(self):
+        self.career_skills = {
+            "data scientist": ["python", "machine learning", "statistics", "sql", "tensorflow", "pandas", "numpy", "scikit-learn", "deep learning", "data visualization"],
+            "frontend developer": ["html", "css", "javascript", "react", "vue", "typescript", "angular", "webpack", "sass", "responsive design"],
+            "backend developer": ["python", "java", "nodejs", "sql", "api", "docker", "mongodb", "postgresql", "rest", "microservices"],
+            "mobile app developer": ["flutter", "react native", "swift", "kotlin", "android", "ios", "dart", "mobile ui", "firebase"],
+            "devops engineer": ["docker", "kubernetes", "aws", "azure", "ci/cd", "jenkins", "terraform", "linux", "ansible", "monitoring"],
+            "full stack developer": ["javascript", "react", "nodejs", "python", "sql", "html", "css", "git", "docker", "rest api"],
+            "machine learning engineer": ["python", "tensorflow", "pytorch", "machine learning", "deep learning", "neural networks", "nlp", "computer vision", "mlops"],
+            "software developer": ["python", "java", "javascript", "sql", "git", "algorithms", "data structures", "oop", "testing"],
+            "web developer": ["html", "css", "javascript", "php", "mysql", "responsive design", "wordpress", "bootstrap"],
+            "project manager": ["agile", "scrum", "jira", "communication", "leadership", "risk management", "budgeting", "planning"]
+        }
+    
+    def analyze_skill_gap(self, user_skills, target_career):
+        """Analyze the gap between user skills and career requirements"""
+        required = set(self.career_skills.get(target_career.lower(), []))
+        user_set = set(s.lower() for s in user_skills if s)
+        missing = required - user_set
+        matching = required & user_set
+        match_percentage = len(matching) / len(required) * 100 if required else 0
+        
+        return {
+            "matching_skills": list(matching),
+            "missing_skills": list(missing),
+            "match_percentage": round(match_percentage, 1),
+            "skills_analysis": {
+                "missing_required": list(missing)[:10],  # Top 10 missing skills
+                "total_required": len(required),
+                "total_matching": len(matching)
+            }
+        }
+
+
+# Initialize skill gap analyzer
+skill_gap_analyzer = SkillGapAnalyzer()
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -235,23 +316,20 @@ def upload():
     return render_template('upload_form.html')
 
 @app.route('/resume', methods=['POST'])
-@handle_parsing_errors('upload_handler')
 def handle_resume_upload():
-    try:
-        # Validate file upload
-        if 'resume' not in request.files:
-            flash('No file selected')
-            return redirect(url_for('upload_form'))
-        
-        file = request.files['resume']
-        
-        # Use the FileValidator for comprehensive validation
-        is_valid, error_message = FileValidator.validate_file_upload(file)
-        if not is_valid:
-            flash(f'File validation failed: {error_message}')
-            return redirect(url_for('upload_form'))
-        
-        resume = file
+    """Handle resume file upload and analysis"""
+    # Validate file upload
+    if 'resume' not in request.files:
+        flash('No file selected')
+        return redirect(url_for('upload'))
+    
+    resume = request.files['resume']
+    
+    # Use the FileValidator for comprehensive validation
+    is_valid, error_message = FileValidator.validate_file_upload(resume)
+    if not is_valid:
+        flash(f'File validation failed: {error_message}')
+        return redirect(url_for('upload'))
 
     if not resume or resume.filename == '':
         return "❌ No resume uploaded", 400
@@ -347,9 +425,9 @@ def handle_resume_upload():
             'description': description
         })
 
-    # Generate skill gap analysis if roadmap support is available
+    # Generate skill gap analysis
     skill_gap_data = None
-    if ROADMAP_SUPPORT and predictions:
+    if predictions:
         primary_career = predictions[0][0]
         try:
             skill_gap_data = skill_gap_analyzer.analyze_skill_gap(skills_found, primary_career)
@@ -517,6 +595,282 @@ def extract_certifications_basic(text):
             certifications.append(line.strip())
     
     return certifications if certifications else ["Not detected"]
+
+
+# ===== Roadmap Feature =====
+def get_career_roadmap(career):
+    """Generate a learning roadmap for a specific career"""
+    roadmaps = {
+        "data scientist": {
+            "phases": [
+                {
+                    "name": "Beginner",
+                    "duration": "3-4 months",
+                    "skills": ["Python basics", "Statistics fundamentals", "SQL basics", "Data manipulation with Pandas"],
+                    "resources": [
+                        {"name": "Python for Data Science", "platform": "Coursera", "type": "free"},
+                        {"name": "Statistics with Python", "platform": "edX", "type": "free"},
+                        {"name": "SQL for Data Science", "platform": "Coursera", "type": "free"}
+                    ]
+                },
+                {
+                    "name": "Intermediate",
+                    "duration": "4-6 months",
+                    "skills": ["Machine Learning", "Data Visualization", "Feature Engineering", "Model Evaluation"],
+                    "resources": [
+                        {"name": "Machine Learning by Andrew Ng", "platform": "Coursera", "type": "free"},
+                        {"name": "Data Visualization with Python", "platform": "Kaggle Learn", "type": "free"},
+                        {"name": "Hands-On Machine Learning Book", "platform": "O'Reilly", "type": "paid"}
+                    ]
+                },
+                {
+                    "name": "Advanced",
+                    "duration": "6+ months",
+                    "skills": ["Deep Learning", "NLP", "Computer Vision", "MLOps", "Big Data"],
+                    "resources": [
+                        {"name": "Deep Learning Specialization", "platform": "Coursera", "type": "paid"},
+                        {"name": "NLP with Transformers", "platform": "Hugging Face", "type": "free"},
+                        {"name": "MLOps Engineering", "platform": "Google Cloud", "type": "free"}
+                    ]
+                }
+            ]
+        },
+        "frontend developer": {
+            "phases": [
+                {
+                    "name": "Beginner",
+                    "duration": "2-3 months",
+                    "skills": ["HTML", "CSS", "JavaScript basics", "Responsive Design"],
+                    "resources": [
+                        {"name": "freeCodeCamp Responsive Web Design", "platform": "freeCodeCamp", "type": "free"},
+                        {"name": "JavaScript.info", "platform": "Web", "type": "free"},
+                        {"name": "CSS Grid & Flexbox", "platform": "Wes Bos", "type": "free"}
+                    ]
+                },
+                {
+                    "name": "Intermediate",
+                    "duration": "3-4 months",
+                    "skills": ["React/Vue/Angular", "State Management", "REST APIs", "Testing"],
+                    "resources": [
+                        {"name": "React - The Complete Guide", "platform": "Udemy", "type": "paid"},
+                        {"name": "Vue Mastery", "platform": "Vue Mastery", "type": "free"},
+                        {"name": "Testing JavaScript", "platform": "Testing Library", "type": "free"}
+                    ]
+                },
+                {
+                    "name": "Advanced",
+                    "duration": "4+ months",
+                    "skills": ["TypeScript", "Performance Optimization", "SSR/SSG", "CI/CD"],
+                    "resources": [
+                        {"name": "TypeScript Deep Dive", "platform": "GitHub", "type": "free"},
+                        {"name": "Next.js Documentation", "platform": "Vercel", "type": "free"},
+                        {"name": "Web Performance", "platform": "Google", "type": "free"}
+                    ]
+                }
+            ]
+        },
+        "backend developer": {
+            "phases": [
+                {
+                    "name": "Beginner",
+                    "duration": "3-4 months",
+                    "skills": ["Programming fundamentals", "SQL", "REST APIs", "Git"],
+                    "resources": [
+                        {"name": "Python/Node.js basics", "platform": "Codecademy", "type": "free"},
+                        {"name": "Database Design", "platform": "Khan Academy", "type": "free"},
+                        {"name": "Git & GitHub", "platform": "GitHub Learning", "type": "free"}
+                    ]
+                },
+                {
+                    "name": "Intermediate",
+                    "duration": "4-5 months",
+                    "skills": ["Framework mastery", "Authentication", "Database optimization", "Caching"],
+                    "resources": [
+                        {"name": "Django/Express.js", "platform": "Official Docs", "type": "free"},
+                        {"name": "JWT Authentication", "platform": "Auth0", "type": "free"},
+                        {"name": "Redis Caching", "platform": "Redis University", "type": "free"}
+                    ]
+                },
+                {
+                    "name": "Advanced",
+                    "duration": "5+ months",
+                    "skills": ["Docker", "Kubernetes", "Microservices", "System Design"],
+                    "resources": [
+                        {"name": "Docker & Kubernetes", "platform": "Docker Docs", "type": "free"},
+                        {"name": "System Design Primer", "platform": "GitHub", "type": "free"},
+                        {"name": "Microservices Architecture", "platform": "Martin Fowler", "type": "free"}
+                    ]
+                }
+            ]
+        }
+    }
+    
+    # Default roadmap for unknown careers
+    default_roadmap = {
+        "phases": [
+            {
+                "name": "Beginner",
+                "duration": "2-3 months",
+                "skills": ["Industry fundamentals", "Core tools", "Basic concepts"],
+                "resources": [
+                    {"name": "LinkedIn Learning", "platform": "LinkedIn", "type": "paid"},
+                    {"name": "Coursera Specializations", "platform": "Coursera", "type": "free"},
+                    {"name": "YouTube tutorials", "platform": "YouTube", "type": "free"}
+                ]
+            },
+            {
+                "name": "Intermediate",
+                "duration": "3-4 months",
+                "skills": ["Advanced techniques", "Project building", "Industry practices"],
+                "resources": [
+                    {"name": "Udemy courses", "platform": "Udemy", "type": "paid"},
+                    {"name": "Industry documentation", "platform": "Official Docs", "type": "free"}
+                ]
+            },
+            {
+                "name": "Advanced",
+                "duration": "4+ months",
+                "skills": ["Specialization", "Leadership", "Innovation"],
+                "resources": [
+                    {"name": "Professional certifications", "platform": "Various", "type": "paid"},
+                    {"name": "Conference talks", "platform": "YouTube", "type": "free"}
+                ]
+            }
+        ]
+    }
+    
+    return roadmaps.get(career.lower(), default_roadmap)
+
+
+@app.route('/roadmap/<career>')
+def show_roadmap(career):
+    """Show learning roadmap for a specific career"""
+    roadmap_data = get_career_roadmap(career)
+    return render_template('roadmap.html', career=career, roadmap=roadmap_data)
+
+
+# ===== API Endpoints =====
+@app.route('/api/predict', methods=['POST'])
+def api_predict():
+    """API endpoint for career prediction"""
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'error': 'No data provided'}), 400
+        
+        skills = data.get('skills', '')
+        interests = data.get('interests', '')
+        
+        predictions = predict_career(interests, skills)
+        
+        return jsonify({
+            'success': True,
+            'predictions': [
+                {'career': career, 'confidence': conf} 
+                for career, conf in predictions
+            ]
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/analyze-resume', methods=['POST'])
+def api_analyze_resume():
+    """API endpoint for resume analysis"""
+    try:
+        if 'resume' not in request.files:
+            return jsonify({'success': False, 'error': 'No file uploaded'}), 400
+        
+        resume = request.files['resume']
+        is_valid, error_message = FileValidator.validate_file_upload(resume)
+        if not is_valid:
+            return jsonify({'success': False, 'error': error_message}), 400
+        
+        # Save file temporarily
+        file_ext = resume.filename.rsplit('.', 1)[1].lower()
+        unique_filename = f"{uuid.uuid4()}.{file_ext}"
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+        resume.save(filepath)
+        
+        try:
+            # Extract text from resume
+            extracted_text = extract_text_from_file(filepath, resume.filename)
+            
+            # Perform analysis
+            skills_found = basic_skill_detection(extracted_text)
+            predictions = predict_career("", ', '.join(skills_found))
+            
+            # Skill gap analysis
+            skill_gap_data = None
+            if predictions:
+                skill_gap_data = skill_gap_analyzer.analyze_skill_gap(skills_found, predictions[0][0])
+            
+            # Salary estimation
+            try:
+                salary_value, _ = salary_est.estimate(
+                    skills=', '.join(skills_found),
+                    career=predictions[0][0] if predictions else "Software Developer",
+                    qualification="Unknown"
+                )
+            except Exception:
+                salary_value = 500000
+            
+            return jsonify({
+                'success': True,
+                'name': extract_name_from_text(extracted_text),
+                'skills': skills_found,
+                'predictions': [{'career': career, 'confidence': conf} for career, conf in predictions],
+                'skill_gap': skill_gap_data,
+                'estimated_salary': salary_value
+            })
+        finally:
+            # Clean up uploaded file
+            try:
+                os.remove(filepath)
+            except Exception:
+                pass
+            
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/roadmap/<career>')
+def api_get_roadmap(career):
+    """API endpoint for career roadmap"""
+    try:
+        roadmap_data = get_career_roadmap(career)
+        return jsonify({
+            'success': True,
+            'career': career,
+            'roadmap': roadmap_data
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/skill-gap', methods=['POST'])
+def api_skill_gap():
+    """API endpoint for skill gap analysis"""
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'error': 'No data provided'}), 400
+        
+        skills = data.get('skills', [])
+        target_career = data.get('career', '')
+        
+        if not target_career:
+            return jsonify({'success': False, 'error': 'Career not specified'}), 400
+        
+        skill_gap_data = skill_gap_analyzer.analyze_skill_gap(skills, target_career)
+        
+        return jsonify({
+            'success': True,
+            'analysis': skill_gap_data
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 
 # ===== Run =====
 if __name__ == '__main__':

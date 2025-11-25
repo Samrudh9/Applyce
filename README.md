@@ -1,91 +1,211 @@
-# Career Recommendation System Using Machine Learning
+# 🚀 Career Recommendation System
 
-## 🎯 Objective
-To build a machine learning-based web application that provides personalized career suggestions to users based on their interests, skills, and preferences. The system uses a trained classification model to match user input with suitable career paths.
+An intelligent, ML-powered web application that provides personalized career recommendations based on your skills, interests, and resume analysis.
 
-## 💡 Motivation
-Many students and early professionals struggle to choose the right career. Our project aims to provide data-driven recommendations, acting as a virtual career counselor. This tool can reduce uncertainty and support informed decision-making.
+![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
+![Flask](https://img.shields.io/badge/Flask-2.0+-green.svg)
+![ML](https://img.shields.io/badge/Machine%20Learning-Scikit--learn-orange.svg)
 
-## 🔍 Scope
-- Collect and preprocess user input data (skills, interests, academic scores).
-- Train an ML model to classify user profiles into career categories.
-- Build a Flask-based web application for user interaction.
-- Display the top 3–5 career suggestions with brief descriptions.
-- Deploy the system using Replit or PythonAnywhere.
-- Parse resume documents (DOCX format only) for automated skill extraction.
+## ✨ Features
 
-## 🧪 Methodology
+### 🎯 Core Features
+- **Resume Analysis**: Upload your resume (PDF/DOCX) for automatic skill extraction and career matching
+- **Career Prediction**: ML-based career recommendations with confidence scores
+- **Skill Gap Analysis**: Identify missing skills for your target career
+- **Salary Estimation**: Get estimated salary ranges based on your skills and experience
+- **Learning Roadmap**: Personalized learning paths with curated resources
 
-### 1. Data Collection
-- Use open datasets or manually created CSV with features like subject interest, technical/non-technical skills, preferred domains, etc.
-- Perform cleaning and encoding (e.g., label encoding, one-hot encoding).
+### 🔧 Technical Features
+- **REST API**: Programmatic access to all features
+- **Multiple Input Methods**: Form-based input or resume upload
+- **Quality Scoring**: Resume quality assessment with improvement suggestions
+- **Resource Recommendations**: Curated learning resources for skill development
 
-### 2. Model Development
-- Train using classification algorithms: Decision Tree, Random Forest, or Logistic Regression.
-- Evaluate with metrics like accuracy and F1-score.
-- Save the model as `model.pkl` using `joblib`.
+## 🛠️ Installation
 
-### 3. Web Application
-- Use Flask to create routes and serve HTML pages.
-- Create a simple frontend using HTML/CSS for user input and output.
-- Integrate ML model to predict careers based on submitted data.
+### Prerequisites
+- Python 3.8 or higher
+- pip package manager
 
-### 4. Testing
-- Validate predictions with different inputs.
-- Handle incorrect inputs and provide feedback.
-- Ensure UI responsiveness and usability.
+### Quick Start
 
-## 🛠️ Tools and Technologies
-- **Languages:** Python, HTML, CSS
-- **Libraries:** Scikit-learn, Pandas, Numpy, Joblib, python-docx
-- **Framework:** Flask
-- **Visualization:** Matplotlib, Seaborn
-- **Collaboration:** GitHub, Google Drive, Replit Teams
-- **Deployment:** Replit / PythonAnywhere
-- **Document Processing:** python-docx (for DOCX file parsing)
+1. **Clone the repository**
+```bash
+git clone https://github.com/Samrudh9/Career-Recommendation-demo.git
+cd Career-Recommendation-demo
+```
 
-## ⚠️ Challenges and Solutions
-| Challenge | Solution |
-|----------|----------|
-| Small or imbalanced dataset | Use synthetic data or expand dataset manually |
-| Model underperformance | Try different algorithms and tune hyperparameters |
-| New team to tech stack | Use beginner-friendly tools and tutorials |
-| Limited document support | Currently only DOCX files are supported for resume parsing |
-| Remote collaboration | Use shared drives, Trello, and Replit for version control |
+2. **Create a virtual environment (recommended)**
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
 
-## 🎯 Expected Outcome
-- A responsive web app that collects user input and provides top career suggestions.
-- A trained ML model with decent prediction accuracy.
-- A structured codebase and clean UI.
-- A complete report documenting the process, learnings, and future scope.
+3. **Install dependencies**
+```bash
+pip install -r REQUIREMENTS.txt
+```
 
-## 👥 Team Member Roles
+4. **Run the application**
+```bash
+python app.py
+```
 
-| Member | Role | Responsibility |
-|--------|------|----------------|
-| A | ML Engineer & Team Lead | Dataset, model training, guidance |
-| B | Backend Developer | Flask routes, model integration |
-| C | Frontend Developer | HTML form, result display, CSS |
-| D | Tester & Debugger | Input validation, UI testing |
-| E | Documentation & UI Design | Report writing, slides, UI tweaks |
+5. **Open your browser**
+Navigate to `http://localhost:5000`
 
-## 🗓️ 4-Week Timeline
+## 📚 Usage
 
-| Week | Tasks |
-|------|--------|
-| **Week 1** | Finalize project, assign roles, setup tools, collect dataset, preprocessing |
-| **Week 2** | Train model, evaluate, begin Flask backend and HTML form |
-| **Week 3** | Model integration, form connection, result display, testing |
-| **Week 4** | Final fixes, deployment, prepare report, slide deck, and submit |
+### Web Interface
 
-## ✅ How to Run
-1. Clone or fork this repository.
-2. Install dependencies: `pip install -r REQUIREMENTS.txt`
-3. Run the Flask app: `python app.py`
-4. Open browser at `http://localhost:5000/` to interact with the app.
+#### Manual Input
+1. Go to `/form`
+2. Enter your name, interests, skills, and qualification
+3. Submit to get career recommendations
 
-## 📚 References
-- [Scikit-learn Documentation](https://scikit-learn.org/)
-- [Flask Documentation](https://flask.palletsprojects.com/)
-- [Career Dataset - Kaggle](https://www.kaggle.com/)
-- Online ML Tutorials (YouTube, ChatGPT)
+#### Resume Upload
+1. Go to `/upload`
+2. Upload your resume (DOCX or PDF format)
+3. Get comprehensive analysis including:
+   - Extracted skills
+   - Career recommendations
+   - Skill gap analysis
+   - Estimated salary
+   - Improvement suggestions
+
+#### Learning Roadmap
+1. Go to `/roadmap/<career-name>`
+2. View a structured learning path for your target career
+3. Access curated resources for each learning phase
+
+### REST API
+
+#### Career Prediction
+```bash
+POST /api/predict
+Content-Type: application/json
+
+{
+    "skills": "python, machine learning, sql",
+    "interests": "data analysis, statistics"
+}
+```
+
+**Response:**
+```json
+{
+    "success": true,
+    "predictions": [
+        {"career": "Data Scientist", "confidence": 85.5},
+        {"career": "Machine Learning Engineer", "confidence": 78.2}
+    ]
+}
+```
+
+#### Resume Analysis
+```bash
+POST /api/analyze-resume
+Content-Type: multipart/form-data
+
+resume: [file]
+```
+
+#### Skill Gap Analysis
+```bash
+POST /api/skill-gap
+Content-Type: application/json
+
+{
+    "skills": ["python", "sql", "pandas"],
+    "career": "data scientist"
+}
+```
+
+#### Get Career Roadmap
+```bash
+GET /api/roadmap/<career-name>
+```
+
+## 📁 Project Structure
+
+```
+Career-Recommendation-demo/
+├── app.py                 # Main Flask application
+├── config.py              # Configuration settings
+├── roadmap.py             # Roadmap generation
+├── analyzer/
+│   ├── resume_parser.py   # Resume text extraction
+│   ├── quality_checker.py # Resume quality assessment
+│   ├── salary_estimator.py# Salary estimation
+│   └── resume_analyzer.py # Enhanced analysis
+├── model/
+│   ├── career_model.pkl   # Career prediction model
+│   └── salary_model.pkl   # Salary estimation model
+├── dataset/
+│   ├── career_data.csv    # Career dataset
+│   └── skills_career_map.csv
+├── templates/
+│   ├── intro.html         # Landing page
+│   ├── form.html          # Manual input form
+│   ├── upload_form.html   # Resume upload
+│   ├── result.html        # Analysis results
+│   └── roadmap.html       # Learning roadmap
+├── static/
+│   └── css/               # Stylesheets
+└── REQUIREMENTS.txt       # Dependencies
+```
+
+## 🧪 Technology Stack
+
+- **Backend**: Flask (Python)
+- **ML/Data Science**: Scikit-learn, Pandas, NumPy
+- **Document Processing**: pdfplumber, python-docx
+- **Frontend**: HTML5, CSS3, JavaScript
+
+## 🔮 API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/` | GET | Landing page |
+| `/form` | GET | Manual input form |
+| `/submit` | POST | Process form input |
+| `/upload` | GET | Resume upload page |
+| `/resume` | POST | Process resume upload |
+| `/roadmap/<career>` | GET | Learning roadmap |
+| `/api/predict` | POST | Career prediction API |
+| `/api/analyze-resume` | POST | Resume analysis API |
+| `/api/skill-gap` | POST | Skill gap analysis API |
+| `/api/roadmap/<career>` | GET | Roadmap API |
+
+## 🚀 Deployment
+
+### Local Development
+```bash
+python app.py
+```
+
+### Production (Gunicorn)
+```bash
+gunicorn -w 4 -b 0.0.0.0:8000 app:app
+```
+
+### Environment Variables
+- `SECRET_KEY`: Flask secret key (required in production)
+- `FLASK_ENV`: Environment (development/production)
+- `UPLOAD_FOLDER`: Custom upload directory
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+## 👥 Team
+
+Built with ❤️ by the Career Guidance Team
+
+---
+
+⭐ Star this repository if you found it helpful!
