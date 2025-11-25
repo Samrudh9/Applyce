@@ -369,7 +369,13 @@
     function handleFileSelect(file) {
       const validTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
       const validExtensions = ['.pdf', '.docx'];
-      const fileExt = '.' + file.name.split('.').pop().toLowerCase();
+      const parts = file.name.split('.');
+      if (parts.length < 2) {
+        alert('Please upload a file with a valid extension (PDF or DOCX).');
+        fileInput.value = '';
+        return;
+      }
+      const fileExt = '.' + parts.pop().toLowerCase();
       
       if (validTypes.includes(file.type) || validExtensions.includes(fileExt)) {
         dropZone.classList.add('uploaded');

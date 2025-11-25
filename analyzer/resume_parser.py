@@ -758,7 +758,7 @@ def extract_education_details(text: str) -> List[Dict[str, str]]:
             detail["year"] = years[i]
         if i < len(gpas):
             detail["gpa"] = gpas[i]
-        if detail:  # Only add non-empty details
+        if detail:  # Skip empty dictionaries
             education_details.append(detail)
     
     return education_details
@@ -1017,6 +1017,12 @@ def extract_certifications(text: str) -> List[str]:
     """
     Extract certifications from resume text with comprehensive pattern matching.
     Detects tech, HR, finance, marketing, and other professional certifications.
+    
+    Args:
+        text: Resume text to parse for certifications.
+    
+    Returns:
+        List[str]: List of extracted certification names found in the resume.
     """
     certifications = []
     text_lower = text.lower()
