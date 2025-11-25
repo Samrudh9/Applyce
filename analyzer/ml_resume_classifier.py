@@ -110,7 +110,7 @@ class ResumeCareerClassifier:
         """Create a sample dataset if none exists"""
         print("⚠️ Creating sample dataset for initial training...")
         
-        # Career categories
+        # Career categories - including non-tech careers
         careers = [
             'Backend Developer',
             'Frontend Developer',
@@ -121,7 +121,18 @@ class ResumeCareerClassifier:
             'UI/UX Designer',
             'Software Engineer',
             'Database Administrator',
-            'Network Engineer'
+            'Network Engineer',
+            # Non-tech careers
+            'HR Manager',
+            'Recruiter',
+            'Marketing Manager',
+            'Digital Marketer',
+            'Financial Analyst',
+            'Accountant',
+            'Sales Manager',
+            'Operations Manager',
+            'Healthcare Administrator',
+            'Legal Advisor'
         ]
         
         # Skills associated with each career
@@ -195,10 +206,87 @@ class ResumeCareerClassifier:
                 'network design implementation troubleshooting cisco juniper routing switching',
                 'sdwan network virtualization routing protocols monitoring troubleshooting',
                 'network infrastructure design implementation maintenance security'
+            ],
+            # HR Careers
+            'HR Manager': [
+                'recruitment hiring talent acquisition onboarding payroll hris employee relations performance management training',
+                'human resources hr policies labor law benefits administration compensation workforce planning shrm',
+                'employee engagement talent management succession planning organizational development hr analytics workday',
+                'recruitment screening interviewing onboarding employee relations performance reviews training development',
+                'hris payroll benefits administration compensation employee engagement workforce planning hr policies'
+            ],
+            'Recruiter': [
+                'talent acquisition sourcing interviewing ats applicant tracking onboarding candidate experience linkedin recruiter',
+                'recruitment staffing hiring headhunting job posting screening background checks reference checks',
+                'sourcing recruiting interviewing candidate assessment onboarding employer branding talent pipeline',
+                'ats applicant tracking recruitment sourcing screening interviewing hiring offer negotiation',
+                'linkedin recruiter boolean search sourcing talent acquisition interviewing candidate experience'
+            ],
+            # Marketing Careers
+            'Marketing Manager': [
+                'marketing strategy brand management digital marketing seo sem social media content marketing campaign management',
+                'market research consumer behavior advertising google analytics hubspot email marketing lead generation',
+                'brand strategy marketing campaigns product marketing content strategy social media marketing analytics',
+                'digital marketing branding campaign management market analysis competitive analysis marketing automation',
+                'marketing planning budget management team leadership brand positioning market segmentation growth marketing'
+            ],
+            'Digital Marketer': [
+                'seo sem ppc google ads facebook ads social media marketing content strategy email campaigns analytics',
+                'digital advertising conversion optimization a/b testing marketing automation hubspot mailchimp',
+                'social media management content marketing email marketing google analytics paid advertising',
+                'ppc campaigns google ads facebook advertising instagram marketing linkedin ads remarketing',
+                'seo optimization keyword research content marketing link building organic traffic growth hacking'
+            ],
+            # Finance Careers
+            'Financial Analyst': [
+                'financial analysis budgeting forecasting financial modeling excel valuation investment analysis reporting',
+                'financial planning variance analysis p&l balance sheet cash flow dcf models excel powerpoint',
+                'corporate finance financial reporting budget analysis forecasting financial statements ratio analysis',
+                'investment analysis portfolio management financial modeling valuation equity research market analysis',
+                'budgeting forecasting financial planning variance analysis management reporting excel financial systems'
+            ],
+            'Accountant': [
+                'accounting bookkeeping taxation audit financial statements gaap ifrs accounts payable receivable quickbooks',
+                'tax preparation financial reporting compliance internal controls sap oracle financials reconciliation',
+                'general ledger accounts payable accounts receivable month end close financial statements gaap',
+                'audit compliance sox internal controls financial reporting tax preparation cpa',
+                'bookkeeping payroll taxation accounts management financial records quickbooks sage accounting software'
+            ],
+            # Sales Careers
+            'Sales Manager': [
+                'sales management team leadership crm salesforce pipeline management territory management quota achievement',
+                'business development client relationships negotiation account management sales strategy forecasting',
+                'sales team management coaching training quota setting territory planning revenue growth',
+                'b2b sales enterprise sales account management client success sales operations forecasting',
+                'sales leadership pipeline management deal closing negotiation customer relationships revenue targets'
+            ],
+            # Operations Careers
+            'Operations Manager': [
+                'operations management supply chain logistics inventory management process improvement lean six sigma',
+                'warehouse management distribution logistics vendor management quality control operations planning',
+                'supply chain optimization procurement vendor relationships inventory control cost reduction',
+                'process improvement operational efficiency lean manufacturing quality management team leadership',
+                'logistics coordination supply chain management inventory optimization vendor management cost control'
+            ],
+            # Healthcare Careers
+            'Healthcare Administrator': [
+                'healthcare administration hospital management patient care medical records hipaa compliance ehr epic',
+                'healthcare operations patient services medical billing revenue cycle management healthcare compliance',
+                'hospital administration healthcare management regulatory compliance patient experience quality improvement',
+                'medical practice management healthcare finance patient care coordination hipaa ehr systems',
+                'healthcare leadership facility management patient safety quality assurance regulatory compliance'
+            ],
+            # Legal Careers
+            'Legal Advisor': [
+                'legal research contract review compliance corporate law regulatory affairs legal writing',
+                'contract drafting negotiation legal compliance corporate governance risk management',
+                'legal analysis regulatory compliance contract management corporate law business law',
+                'intellectual property contract law compliance legal documentation corporate governance',
+                'legal research legal writing contract review regulatory compliance corporate legal matters'
             ]
         }
         
-        # Education levels
+        # Education levels - expanded to include non-tech degrees
         education_levels = [
             'bachelors in computer science',
             'masters in computer science',
@@ -207,10 +295,22 @@ class ResumeCareerClassifier:
             'bachelors in engineering',
             'diploma in computer science',
             'phd in computer science',
-            'self-taught programmer'
+            'self-taught programmer',
+            'bachelors in business administration',
+            'mba master of business administration',
+            'bachelors in human resources',
+            'masters in human resources management',
+            'bachelors in marketing',
+            'bachelors in finance',
+            'masters in finance',
+            'bachelors in accounting',
+            'cpa certified public accountant',
+            'bachelors in healthcare administration',
+            'law degree llb jd',
+            'bachelors in supply chain management'
         ]
         
-        # Experience levels
+        # Experience levels - expanded
         experience_levels = [
             'internship at tech company developing software',
             '2 years experience in development',
@@ -219,7 +319,15 @@ class ResumeCareerClassifier:
             '3 years experience building applications',
             'worked on multiple projects for enterprise clients',
             'freelance developer for 4 years',
-            'recent graduate with internship experience'
+            'recent graduate with internship experience',
+            '3 years experience in human resources',
+            '5 years experience in recruitment and talent acquisition',
+            '4 years experience in marketing and brand management',
+            '6 years experience in financial analysis and planning',
+            '3 years experience in sales and business development',
+            '5 years experience in operations and supply chain',
+            '4 years experience in healthcare administration',
+            '3 years experience in corporate legal department'
         ]
         
         # Generate sample data
@@ -387,7 +495,50 @@ class ResumeCareerClassifier:
             
             "Machine Learning Engineer": "Machine Learning Engineers design and implement AI systems. They develop models, optimize algorithms, and deploy solutions at scale. They combine strong software engineering skills with deep knowledge of machine learning techniques.",
             
-            "Full Stack Developer": "Full Stack Developers work across both frontend and backend technologies. They can develop complete web applications from database to user interface. They have broad technical knowledge and can coordinate various parts of application development."
+            "Full Stack Developer": "Full Stack Developers work across both frontend and backend technologies. They can develop complete web applications from database to user interface. They have broad technical knowledge and can coordinate various parts of application development.",
+            
+            # HR Careers
+            "HR Manager": "HR Managers lead human resources functions including recruitment, employee relations, payroll management, and organizational development. They develop HR policies, manage employee benefits, and ensure compliance with labor laws.",
+            
+            "Recruiter": "Recruiters source, screen, and hire candidates for organizations. They use applicant tracking systems, conduct interviews, and manage the full recruitment lifecycle from job posting to onboarding.",
+            
+            "HR Specialist": "HR Specialists manage specific HR functions such as benefits administration, compensation, or employee relations. They support employees and ensure smooth HR operations.",
+            
+            # Marketing Careers
+            "Marketing Manager": "Marketing Managers develop and execute marketing strategies across digital and traditional channels. They drive brand awareness, customer acquisition, and market research to achieve business goals.",
+            
+            "Digital Marketer": "Digital Marketers execute online marketing campaigns including SEO, paid advertising, social media, and email marketing. They analyze data to optimize campaigns and drive engagement.",
+            
+            "Digital Marketing Specialist": "Digital Marketing Specialists focus on specific aspects of digital marketing such as SEO, SEM, or social media. They implement tactics to improve online visibility and lead generation.",
+            
+            "Brand Manager": "Brand Managers oversee brand identity, positioning, and marketing campaigns. They work to build brand equity and market share through strategic brand initiatives.",
+            
+            # Finance Careers
+            "Financial Analyst": "Financial Analysts evaluate financial data, create forecasts, and provide recommendations for investment and budgeting decisions. They use financial modeling and analysis to support business planning.",
+            
+            "Accountant": "Accountants maintain financial records, prepare tax returns, and ensure compliance with accounting standards. They handle bookkeeping, auditing, and financial reporting for organizations.",
+            
+            "Investment Banker": "Investment Bankers advise clients on mergers, acquisitions, and capital raising. They perform financial modeling, valuation analysis, and due diligence for corporate transactions.",
+            
+            # Sales Careers
+            "Sales Manager": "Sales Managers lead sales teams, develop strategies, and manage client relationships to achieve revenue targets. They oversee pipeline management, forecasting, and team performance.",
+            
+            "Account Executive": "Account Executives manage enterprise client accounts and close deals. They build long-term business relationships and drive revenue through B2B sales activities.",
+            
+            # Operations Careers
+            "Operations Manager": "Operations Managers oversee daily operations, supply chain logistics, and process optimization. They improve efficiency and manage resources to meet organizational goals.",
+            
+            "Supply Chain Manager": "Supply Chain Managers handle procurement, vendor relationships, and logistics. They optimize supply chain operations to reduce costs and improve delivery performance.",
+            
+            # Healthcare Careers
+            "Healthcare Administrator": "Healthcare Administrators manage healthcare facility operations, ensure regulatory compliance, and oversee patient care delivery systems. They work to improve healthcare quality and efficiency.",
+            
+            "Medical Billing Specialist": "Medical Billing Specialists process medical claims, manage billing systems, and ensure accurate healthcare revenue cycle management. They handle insurance claims and patient billing.",
+            
+            # Legal Careers
+            "Legal Advisor": "Legal Advisors provide guidance on contracts, compliance, and corporate governance matters. They conduct legal research and help organizations navigate legal requirements.",
+            
+            "Corporate Lawyer": "Corporate Lawyers handle corporate legal matters including contracts, mergers, and regulatory compliance. They advise businesses on legal risks and represent them in legal matters."
         }
     
     def get_career_description(self, career: str) -> str:

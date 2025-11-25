@@ -34,9 +34,60 @@ SKILL_CATEGORIES = {
         "git", "github", "gitlab", "bitbucket", "jira", "confluence", "docker", "kubernetes",
         "jenkins", "aws", "azure", "gcp", "heroku", "terraform", "linux", "windows"
     ],
+    "hr_skills": [
+        "recruitment", "hiring", "talent acquisition", "onboarding", "payroll",
+        "hris", "workday", "sap hr", "bamboohr", "employee relations", 
+        "performance management", "benefits administration", "compensation",
+        "training", "development", "hr policies", "labor law", "shrm",
+        "succession planning", "workforce planning", "hr analytics", "ats",
+        "applicant tracking", "employee engagement", "talent management"
+    ],
+    "marketing_skills": [
+        "seo", "sem", "google analytics", "social media", "content marketing",
+        "email marketing", "brand management", "market research", "advertising",
+        "ppc", "facebook ads", "google ads", "hubspot", "mailchimp", "copywriting",
+        "brand strategy", "campaign management", "digital marketing", "branding",
+        "lead generation", "marketing automation", "crm marketing", "a/b testing",
+        "conversion optimization", "content strategy", "influencer marketing"
+    ],
+    "finance_skills": [
+        "financial analysis", "budgeting", "forecasting", "accounting",
+        "bookkeeping", "taxation", "auditing", "financial modeling", "excel",
+        "quickbooks", "sap", "oracle financials", "gaap", "ifrs", "cpa", "cfa",
+        "valuation", "due diligence", "m&a", "investment analysis", "risk management",
+        "treasury", "cash flow", "financial reporting", "variance analysis",
+        "p&l", "balance sheet", "revenue cycle", "cost accounting"
+    ],
+    "sales_skills": [
+        "sales", "crm", "salesforce", "negotiation", "lead generation",
+        "cold calling", "account management", "b2b", "b2c", "pipeline management",
+        "sales forecasting", "territory management", "client relations",
+        "business development", "quota achievement", "closing deals",
+        "prospecting", "customer acquisition", "sales strategy"
+    ],
+    "healthcare_skills": [
+        "patient care", "medical records", "hipaa", "ehr", "epic",
+        "medical billing", "healthcare administration", "clinical research",
+        "healthcare compliance", "revenue cycle management", "medical coding",
+        "patient support", "healthcare operations", "medical terminology"
+    ],
+    "legal_skills": [
+        "legal research", "contract review", "compliance", "litigation",
+        "corporate law", "intellectual property", "regulatory",
+        "contract drafting", "due diligence", "corporate governance",
+        "dispute resolution", "legal writing", "mergers", "acquisitions"
+    ],
+    "operations_skills": [
+        "supply chain", "logistics", "inventory management", "procurement",
+        "vendor management", "process improvement", "lean", "six sigma",
+        "quality control", "operations management", "warehouse management",
+        "distribution", "supply chain analytics", "sourcing", "cost optimization"
+    ],
     "soft_skills": [
         "communication", "leadership", "teamwork", "problem-solving", "critical thinking",
-        "time management", "creativity", "adaptability", "collaboration", "analytical"
+        "time management", "creativity", "adaptability", "collaboration", "analytical",
+        "project management", "presentation", "public speaking", "conflict resolution",
+        "decision making", "strategic thinking", "negotiation", "stakeholder management"
     ]
 }
 
