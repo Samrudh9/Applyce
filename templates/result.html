@@ -982,13 +982,72 @@
       </div>
       {% endif %}
 
+      <!-- Checklist Link -->
+      <div class="section" style="margin-bottom: 1.5rem; text-align: center; background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(0, 194, 255, 0.1));">
+        <a href="/checklist" style="text-decoration: none; display: block;">
+          <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; padding: 1rem;">
+            <span style="font-size: 2rem;">📋</span>
+            <div style="text-align: left;">
+              <div style="font-size: 1.25rem; font-weight: 700; color: #fff;">View Full Checklist</div>
+              <div style="color: var(--text-muted); font-size: 0.9rem;">Get detailed evaluation with essential items, red flags & suggestions</div>
+            </div>
+            <i class="fas fa-chevron-right" style="color: var(--accent); font-size: 1.25rem;"></i>
+          </div>
+        </a>
+      </div>
+
+      <!-- Feedback Widget -->
+      <div class="section" style="margin-bottom: 1.5rem;">
+        <div class="section-header">
+          <div class="section-icon"><i class="fas fa-comment"></i></div>
+          <h2>Was this helpful?</h2>
+        </div>
+        <div style="display: flex; gap: 1rem; justify-content: center;" id="feedback-buttons">
+          <button onclick="submitFeedback('positive')" class="feedback-btn" id="btn-positive" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 1rem 2rem; background: rgba(0, 255, 136, 0.1); border: 2px solid rgba(0, 255, 136, 0.3); border-radius: 30px; color: var(--success); font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+            <i class="fas fa-thumbs-up"></i> Yes, helpful!
+          </button>
+          <button onclick="submitFeedback('negative')" class="feedback-btn" id="btn-negative" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 1rem 2rem; background: rgba(255, 170, 0, 0.1); border: 2px solid rgba(255, 170, 0, 0.3); border-radius: 30px; color: var(--warning); font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+            <i class="fas fa-thumbs-down"></i> Could be better
+          </button>
+        </div>
+        <div id="feedback-thanks" style="display: none; text-align: center; padding: 1rem; color: var(--success);">
+          <i class="fas fa-check-circle"></i> Thank you for your feedback!
+        </div>
+      </div>
+
+      <script>
+        function submitFeedback(type) {
+          fetch('/feedback', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ feedback_type: type })
+          })
+          .then(response => response.json())
+          .then(data => {
+            document.getElementById('feedback-buttons').style.display = 'none';
+            document.getElementById('feedback-thanks').style.display = 'block';
+          })
+          .catch(error => {
+            console.error('Error:', error);
+          });
+        }
+      </script>
+
       <!-- Action Buttons -->
       <div class="action-buttons">
-        <a href="/upload" class="action-btn primary">
-          <i class="fas fa-redo"></i> Analyze Another Resume
+        <a href="/checklist" class="action-btn primary">
+          <i class="fas fa-clipboard-list"></i> View Full Checklist
+        </a>
+        <a href="/guide" class="action-btn secondary">
+          <i class="fas fa-book"></i> Resume Guide
+        </a>
+        <a href="/upload" class="action-btn secondary">
+          <i class="fas fa-redo"></i> Analyze Another
         </a>
         <a href="/" class="action-btn secondary">
-          <i class="fas fa-home"></i> Back to Home
+          <i class="fas fa-home"></i> Home
         </a>
       </div>
     </div>
