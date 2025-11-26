@@ -818,26 +818,29 @@
                   </div>
                   <div class="quality-label">out of 100</div>
                 </div>
+                {# Quick stats provide approximate sub-score breakdown based on overall quality score #}
+                {% set base_score = quality_score if quality_score else 70 %}
                 <div class="quick-stats">
                   <div class="quick-stat">
                     <i class="fas fa-key"></i>
                     <span class="quick-stat-label">Keywords</span>
-                    <span class="quick-stat-value">{% set kw_score = ((quality_score if quality_score else 70) * 1.1)|int %}{{ [kw_score, 100]|min }}%</span>
+                    <span class="quick-stat-value">{{ [((base_score * 1.1)|int), 100]|min }}%</span>
                   </div>
                   <div class="quick-stat">
                     <i class="fas fa-file-alt"></i>
                     <span class="quick-stat-label">Format</span>
-                    <span class="quick-stat-value">{{ ((quality_score if quality_score else 70) * 0.9)|int }}%</span>
+                    <span class="quick-stat-value">{{ (base_score * 0.9)|int }}%</span>
                   </div>
                   <div class="quick-stat">
                     <i class="fas fa-list"></i>
                     <span class="quick-stat-label">Sections</span>
-                    <span class="quick-stat-value">{{ quality_score if quality_score else 70 }}%</span>
+                    <span class="quick-stat-value">{{ base_score }}%</span>
                   </div>
                 </div>
               </div>
               
-              {% if predicted_career is mapping %}
+              {# Show top career match preview if career predictions are available #}
+              {% if predicted_career is mapping and predicted_career.predicted_career %}
               <div class="top-career-preview">
                 <div class="top-career-preview-header">
                   <i class="fas fa-trophy"></i>
