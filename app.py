@@ -143,6 +143,10 @@ resume_analyzer = None
 DEGREE_KEYWORDS = ['bachelor', 'master', 'phd', 'degree', 'b.tech', 'm.tech', 'b.e', 'm.e', 'bsc', 'msc']
 PHONE_PATTERN = r'\b\d{10}\b|\b\d{3}[-.\s]\d{3}[-.\s]\d{4}\b|\+\d{1,3}[-.\s]\d+'
 
+# Score calculation multipliers for sub-scores
+KEYWORD_SCORE_MULTIPLIER = 1.1  # Keywords are weighted 10% higher
+FORMAT_SCORE_MULTIPLIER = 0.9   # Format is weighted 10% lower
+
 
 # ===== Utility Functions =====
 def format_list_for_display(items):
@@ -422,6 +426,119 @@ def logout():
     flash('You have been logged out.', 'info')
     return redirect(url_for('home'))
 
+
+@app.route('/dashboard')
+@login_required
+def dashboard():
+    """User dashboard with resume history and progress tracking"""
+    from models.resume_history import ResumeHistory
+    import json
+    
+    # Get user's resume history
+    history = ResumeHistory.query.filter_by(user_id=current_user.id)\
+        .order_by(ResumeHistory.upload_date.desc()).all()
+    
+    # Calculate stats
+    total_resumes = len(history)
+    
+    if history:
+        latest = history[0]
+        latest_score = latest.overall_score
+        best_score = max(h.overall_score for h in history)
+        
+        # Calculate improvement (compare with previous upload, not oldest)
+        if len(history) >= 2:
+            improvement = latest.overall_score - history[1].overall_score
+        else:
+            improvement = 0
+        
+        # Get score history for chart
+        score_history = [
+            {
+                'date': h.upload_date.strftime('%b %d'),
+                'score': h.overall_score
+            }
+            for h in reversed(history[-10:])  # Last 10 entries
+        ]
+        
+        # Get all detected skills across all resumes
+        all_skills = set()
+        for h in history:
+            if h.skills_detected:
+                try:
+                    skills = json.loads(h.skills_detected)
+                    all_skills.update(skills)
+                except json.JSONDecodeError as e:
+                    logging.warning(f"Failed to parse skills JSON for history id {h.id}: {e}")
+        
+        top_career = latest.predicted_career
+        career_confidence = latest.career_confidence
+    else:
+        latest_score = 0
+        best_score = 0
+        improvement = 0
+        score_history = []
+        all_skills = set()
+        top_career = None
+        career_confidence = 0
+    
+    return render_template('dashboard.html',
+        user=current_user,
+        history=history,
+        total_resumes=total_resumes,
+        latest_score=latest_score,
+        best_score=best_score,
+        improvement=improvement,
+        score_history=score_history,
+        all_skills=list(all_skills),
+        top_career=top_career,
+        career_confidence=career_confidence
+    )
+
+
+@app.route('/dashboard/delete/<int:history_id>', methods=['POST'])
+@login_required
+def delete_resume_history(history_id):
+    """Delete a resume history entry"""
+    from models.resume_history import ResumeHistory
+    
+    entry = ResumeHistory.query.get_or_404(history_id)
+    
+    # Ensure user owns this entry
+    if entry.user_id != current_user.id:
+        flash('Unauthorized action.', 'error')
+        return redirect(url_for('dashboard'))
+    
+    db.session.delete(entry)
+    db.session.commit()
+    flash('Resume history entry deleted.', 'success')
+    return redirect(url_for('dashboard'))
+
+
+@app.route('/api/dashboard/stats')
+@login_required
+def api_dashboard_stats():
+    """API endpoint for dashboard statistics"""
+    from models.resume_history import ResumeHistory
+    import json
+    
+    history = ResumeHistory.query.filter_by(user_id=current_user.id)\
+        .order_by(ResumeHistory.upload_date.asc()).all()
+    
+    return jsonify({
+        'success': True,
+        'score_history': [
+            {'date': h.upload_date.strftime('%Y-%m-%d'), 'score': h.overall_score}
+            for h in history
+        ],
+        'total_resumes': len(history),
+        'skills_over_time': [
+            {'date': h.upload_date.strftime('%Y-%m-%d'), 'count': h.skill_count}
+            for h in history
+        ]
+    })
+
+
 @app.route('/submit', methods=['POST'])
 def submit():
     name = request.form['name']
@@ -631,6 +748,39 @@ def handle_resume_upload():
     except Exception as e:
         print(f"Resume evaluation error: {e}")
         session['evaluation_data'] = {}
+
+    # Save resume history for logged-in users
+    if current_user.is_authenticated:
+        try:
+            from models.resume_history import ResumeHistory
+            import json as json_lib
+            
+            # Calculate sub-scores using defined multipliers
+            base_score = resume_score if resume_score else 0
+            keyword_score = min(int(base_score * KEYWORD_SCORE_MULTIPLIER), 100)
+            format_score = int(base_score * FORMAT_SCORE_MULTIPLIER)
+            
+            history_entry = ResumeHistory(
+                user_id=current_user.id,
+                filename=secure_filename(resume.filename),
+                overall_score=base_score,
+                keyword_score=keyword_score,
+                format_score=format_score,
+                section_score=base_score,
+                predicted_career=predictions[0][0] if predictions else None,
+                career_confidence=predictions[0][1] if predictions else 0,
+                top_careers=json_lib.dumps([(c, conf) for c, conf in predictions[:3]]) if predictions else '[]',
+                skills_detected=json_lib.dumps(skills_found) if skills_found else '[]',
+                skills_missing=json_lib.dumps(skill_gap_data.get("skills_analysis", {}).get("missing_required", [])) if skill_gap_data else '[]',
+                skill_count=len(skills_found) if skills_found else 0,
+                predicted_salary_min=salary_data.get('min', 0) if salary_data else 0,
+                predicted_salary_max=salary_data.get('max', 0) if salary_data else 0
+            )
+            db.session.add(history_entry)
+            db.session.commit()
+        except Exception as e:
+            logging.error(f"Resume history save error: {e}")
+            db.session.rollback()
 
     return render_template('result.html',
                           mode="resume",
@@ -1220,5 +1370,5 @@ init_db()
 
 if __name__ == '__main__':
     import os
-    port = int(os. environ.get('PORT', 5000))
-    app.run(host='0. 0.0.0', port=port, debug=False)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
