@@ -4,6 +4,9 @@ Contains 50+ careers with skills, salaries, and requirements.
 """
 
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 CAREERS_DATA = [
     # Technology Careers
@@ -770,7 +773,7 @@ def seed_careers(db_session, Career):
         return True
     except Exception as e:
         db_session.rollback()
-        print(f"Error seeding careers: {e}")
+        logger.error(f"Error seeding careers: {e}")
         return False
 
 

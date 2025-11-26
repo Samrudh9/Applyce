@@ -358,14 +358,25 @@
   </div>
 
   <script>
-    // Simple password match validation
+    // Password match validation with inline error display
     document.querySelector('form').addEventListener('submit', function(e) {
       const password = document.getElementById('password').value;
       const confirmPassword = document.getElementById('confirm_password').value;
+      const confirmField = document.getElementById('confirm_password');
+      
+      // Remove any existing error message
+      const existingError = document.querySelector('.password-error');
+      if (existingError) existingError.remove();
       
       if (password !== confirmPassword) {
         e.preventDefault();
-        alert('Passwords do not match!');
+        // Create inline error message
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'password-error';
+        errorDiv.style.cssText = 'color: var(--error); font-size: 0.85rem; margin-top: 0.5rem;';
+        errorDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> Passwords do not match';
+        confirmField.parentNode.appendChild(errorDiv);
+        confirmField.focus();
       }
     });
   </script>
