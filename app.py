@@ -48,6 +48,15 @@ except ImportError:
 from services.ats_analyzer import ATSAnalyzer
 ats_analyzer = ATSAnalyzer()
 
+# Resume Evaluator
+from services.resume_evaluator import (
+    get_evaluator,
+    get_sample_bullet_points,
+    get_career_tips,
+    get_action_verbs_list
+)
+resume_evaluator = get_evaluator()
+
 print("✅ All imports loaded successfully")
 
 app = Flask(__name__)
@@ -462,6 +471,16 @@ def handle_resume_upload():
         print(f"ATS analysis error: {e}")
         session['ats_data'] = {}
 
+    # Resume Evaluation for checklist
+    try:
+        evaluation_data = resume_evaluator.evaluate(extracted_text, primary_career)
+        session['evaluation_data'] = evaluation_data
+        session['resume_text'] = extracted_text
+        session['target_career'] = primary_career
+    except Exception as e:
+        print(f"Resume evaluation error: {e}")
+        session['evaluation_data'] = {}
+
     return render_template('result.html',
                           mode="resume",
                           name=name,
@@ -765,6 +784,51 @@ def ats_report():
         flash('Please upload a resume first to view the ATS report.')
         return redirect(url_for('upload'))
     return render_template('ats_report.html', ats_data=ats_data)
+
+
+@app.route('/checklist')
+def checklist():
+    """Show resume checklist with evaluation results"""
+    evaluation_data = session.get('evaluation_data', {})
+    if not evaluation_data:
+        flash('Please upload a resume first to view the checklist.')
+        return redirect(url_for('upload'))
+    return render_template('checklist.html', evaluation_data=evaluation_data)
+
+
+@app.route('/guide')
+def guide():
+    """Show resume writing guide"""
+    target_career = session.get('target_career', 'default')
+    return render_template('guide.html',
+                           target_career=target_career,
+                           career_tips=get_career_tips(target_career),
+                           good_examples=get_sample_bullet_points()['good'],
+                           bad_examples=get_sample_bullet_points()['bad'],
+                           action_verbs=get_action_verbs_list())
+
+
+@app.route('/feedback', methods=['POST'])
+def feedback():
+    """Collect user feedback"""
+    try:
+        data = request.get_json(force=True, silent=True)
+        if not data:
+            return jsonify({'success': False, 'error': 'No data provided'}), 400
+        
+        feedback_type = data.get('feedback_type', '')
+        if not feedback_type:
+            return jsonify({'success': False, 'error': 'Missing feedback_type'}), 400
+        
+        # Log feedback (in production, save to database)
+        print(f"User feedback received: {feedback_type}")
+        
+        return jsonify({
+            'success': True,
+            'message': 'Thank you for your feedback!'
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 
 # ===== API Endpoints =====
