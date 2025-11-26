@@ -1100,9 +1100,10 @@ def api_skill_gap():
 # ===== Database Initialization =====
 def init_db():
     """Initialize database and seed data on first run"""
+   # Create tables on startup (needed for Render)
     with app.app_context():
-        # Create all tables
-        db.create_all()
+        db. create_all()
+        print("✅ Database tables created!")
         
         # Seed careers data if empty
         from models.career import Career
