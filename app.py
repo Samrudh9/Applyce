@@ -10,6 +10,7 @@ from typing import List
 from flask import Flask, request, render_template, jsonify, redirect, url_for, flash, session
 from werkzeug.utils import secure_filename
 import logging
+from flask_login import LoginManager, login_required, current_user
 
 # Clean imports - no more try/catch chaos
 from analyzer.resume_parser import extract_text_from_pdf
@@ -63,6 +64,31 @@ app = Flask(__name__)
 
 # Set secret key for session and flash messages
 app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
+
+# ===== Database Configuration =====
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///skillfit.db')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Initialize database
+from models import db
+db.init_app(app)
+
+# Initialize Flask-Login
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+login_manager.login_message = 'Please log in to access this page.'
+login_manager.login_message_category = 'info'
+
+@login_manager.user_loader
+def load_user(user_id):
+    from models.user import User
+    return User.query.get(int(user_id))
+
+# Import services after app and db initialization
+from services.auth_service import AuthService
+from services.feedback_service import FeedbackService
+from services.learning_engine import LearningEngine
 
 # ===== Configuration =====
 UPLOAD_FOLDER = 'uploads'
@@ -283,6 +309,72 @@ def form():
 @app.route('/about')
 def about():
     return render_template('about.html')
+
+# ===== Authentication Routes =====
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    """Handle user login"""
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    
+    if request.method == 'POST':
+        username_or_email = request.form.get('username', '').strip()
+        password = request.form.get('password', '')
+        remember = request.form.get('remember', False)
+        
+        if not username_or_email or not password:
+            flash('Please enter both username/email and password.', 'error')
+            return render_template('login.html')
+        
+        success, result = AuthService.authenticate_user(username_or_email, password)
+        
+        if success:
+            AuthService.login(result, remember=bool(remember))
+            flash(f'Welcome back, {result.username}!', 'success')
+            next_page = request.args.get('next')
+            return redirect(next_page or url_for('home'))
+        else:
+            flash(result, 'error')
+    
+    return render_template('login.html')
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    """Handle user registration"""
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    
+    if request.method == 'POST':
+        username = request.form.get('username', '').strip()
+        email = request.form.get('email', '').strip()
+        password = request.form.get('password', '')
+        confirm_password = request.form.get('confirm_password', '')
+        
+        if not all([username, email, password, confirm_password]):
+            flash('Please fill in all fields.', 'error')
+            return render_template('register.html')
+        
+        if password != confirm_password:
+            flash('Passwords do not match.', 'error')
+            return render_template('register.html')
+        
+        success, result = AuthService.register_user(username, email, password)
+        
+        if success:
+            flash('Registration successful! Please log in.', 'success')
+            return redirect(url_for('login'))
+        else:
+            flash(result, 'error')
+    
+    return render_template('register.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    """Handle user logout"""
+    AuthService.logout()
+    flash('You have been logged out.', 'info')
+    return redirect(url_for('home'))
 
 @app.route('/submit', methods=['POST'])
 def submit():
@@ -810,7 +902,7 @@ def guide():
 
 @app.route('/feedback', methods=['POST'])
 def feedback():
-    """Collect user feedback"""
+    """Collect user feedback and store in database"""
     try:
         # Parse JSON with explicit error handling
         try:
@@ -825,14 +917,39 @@ def feedback():
         if not feedback_type:
             return jsonify({'success': False, 'error': 'Missing feedback_type'}), 400
         
-        # Log feedback (in production, save to database)
-        print(f"User feedback received: {feedback_type}")
+        # Get optional data
+        predicted_career = data.get('predicted_career')
+        correct_career = data.get('correct_career')
+        skills = data.get('skills', [])
+        comments = data.get('comments')
         
-        return jsonify({
-            'success': True,
-            'message': 'Thank you for your feedback!'
-        })
+        # Get user_id if logged in
+        user_id = current_user.id if current_user.is_authenticated else None
+        
+        # Store feedback in database
+        success, message = FeedbackService.record_feedback(
+            feedback_type=feedback_type,
+            predicted_career=predicted_career,
+            skills=skills,
+            correct_career=correct_career,
+            user_id=user_id,
+            comments=comments
+        )
+        
+        if success:
+            return jsonify({
+                'success': True,
+                'message': 'Thank you for your feedback!'
+            })
+        else:
+            # Log the error using logging module
+            logging.warning(f"Feedback storage warning: {message}")
+            return jsonify({
+                'success': True,
+                'message': 'Thank you for your feedback!'
+            })
     except Exception as e:
+        logging.error(f"Feedback error: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
@@ -959,6 +1076,28 @@ def api_skill_gap():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+# ===== Database Initialization =====
+def init_db():
+    """Initialize database and seed data on first run"""
+    with app.app_context():
+        # Create all tables
+        db.create_all()
+        
+        # Seed careers data if empty
+        from models.career import Career
+        if Career.query.count() == 0:
+            print("🌱 Seeding careers database...")
+            from dataset.careers_seed import seed_careers
+            success = seed_careers(db.session, Career)
+            if success:
+                print("✅ Careers database seeded successfully")
+            else:
+                print("⚠️ Some careers may not have been seeded")
+        
+        print("✅ Database initialized")
+
+
 # ===== Run =====
 if __name__ == '__main__':
+    init_db()
     app.run(debug=True)
