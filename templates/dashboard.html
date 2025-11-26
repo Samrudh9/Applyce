@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard - SkillFit</title>
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg-color: #0a0b0f;
+      --bg-secondary: #12131a;
+      --card-bg: #1a1b22;
+      --card-bg-hover: #22232d;
+      --text-color: #e0e0e0;
+      --text-muted: #888;
+      --accent: #00c2ff;
+      --accent-secondary: #00ffe0;
+      --accent-purple: #a855f7;
+      --success: #00ff88;
+      --warning: #ffaa00;
+      --error: #ff4444;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --glow: 0 0 40px rgba(0, 194, 255, 0.15);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      min-height: 100vh;
+      line-height: 1.6;
+      overflow-x: hidden;
+      padding-top: 70px;
+    }
+
+    /* Animated Background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(ellipse at 20% 20%, rgba(0, 194, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(0, 255, 224, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(168, 85, 247, 0.05) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* Dashboard Header */
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .welcome-section h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .welcome-section p {
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    .upload-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+      color: #000;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .upload-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(0, 194, 255, 0.4);
+    }
+
+    /* Stats Cards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 1024px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 1.5rem;
+      border: 1px solid var(--border-color);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .stat-card:hover {
+      border-color: rgba(0, 194, 255, 0.3);
+      box-shadow: var(--glow);
+      transform: translateY(-3px);
+    }
+
+    .stat-card:hover::before {
+      opacity: 1;
+    }
+
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+    }
+
+    .stat-icon.blue {
+      background: rgba(0, 194, 255, 0.15);
+      color: var(--accent);
+    }
+
+    .stat-icon.green {
+      background: rgba(0, 255, 136, 0.15);
+      color: var(--success);
+    }
+
+    .stat-icon.purple {
+      background: rgba(168, 85, 247, 0.15);
+      color: var(--accent-purple);
+    }
+
+    .stat-icon.yellow {
+      background: rgba(255, 170, 0, 0.15);
+      color: var(--warning);
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .stat-value.positive {
+      color: var(--success);
+    }
+
+    .stat-value.negative {
+      color: var(--error);
+    }
+
+    /* Section Cards */
+    .section {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 1.5rem;
+      border: 1px solid var(--border-color);
+      margin-bottom: 1.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .section:hover {
+      border-color: rgba(0, 194, 255, 0.2);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .section-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, rgba(0, 194, 255, 0.2), rgba(0, 255, 224, 0.2));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+      font-size: 1.1rem;
+    }
+
+    .section-header h2 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    /* Chart Container */
+    .chart-container {
+      position: relative;
+      height: 300px;
+      width: 100%;
+    }
+
+    /* History Table */
+    .history-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .history-table th,
+    .history-table td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .history-table th {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
+
+    .history-table tr:hover {
+      background: rgba(0, 194, 255, 0.05);
+    }
+
+    .history-table td {
+      color: var(--text-color);
+    }
+
+    .history-score {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.35rem 0.75rem;
+      background: rgba(0, 255, 136, 0.15);
+      color: var(--success);
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+
+    .history-career {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .history-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .action-btn {
+      padding: 0.4rem 0.75rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .action-btn.delete {
+      background: rgba(255, 68, 68, 0.15);
+      color: var(--error);
+      border: none;
+      cursor: pointer;
+    }
+
+    .action-btn.delete:hover {
+      background: rgba(255, 68, 68, 0.3);
+    }
+
+    /* Skills Grid */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .skills-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .skills-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .skill-badge {
+      padding: 0.4rem 0.85rem;
+      border-radius: 25px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      background: rgba(0, 194, 255, 0.15);
+      color: var(--accent);
+      border: 1px solid rgba(0, 194, 255, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .skill-badge:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 3px 10px rgba(0, 194, 255, 0.2);
+    }
+
+    /* Recommendations */
+    .recommendation-list {
+      list-style: none;
+    }
+
+    .recommendation-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.75rem;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 10px;
+      margin-bottom: 0.5rem;
+      border: 1px solid var(--border-color);
+      transition: all 0.3s ease;
+    }
+
+    .recommendation-item:hover {
+      background: rgba(0, 194, 255, 0.05);
+      border-color: rgba(0, 194, 255, 0.2);
+    }
+
+    .recommendation-icon {
+      width: 28px;
+      height: 28px;
+      background: rgba(0, 255, 136, 0.15);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--success);
+      font-size: 0.8rem;
+      flex-shrink: 0;
+    }
+
+    .recommendation-text {
+      color: var(--text-color);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 3rem 2rem;
+    }
+
+    .empty-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    .empty-state h3 {
+      font-size: 1.25rem;
+      color: var(--text-color);
+      margin-bottom: 0.5rem;
+    }
+
+    .empty-state p {
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+
+    /* Responsive Table */
+    @media (max-width: 768px) {
+      .history-table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+    }
+
+    /* Flash Messages */
+    .flash-messages {
+      margin-bottom: 1.5rem;
+    }
+
+    .flash-message {
+      padding: 1rem 1.25rem;
+      border-radius: 10px;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .flash-message.success {
+      background: rgba(0, 255, 136, 0.15);
+      border: 1px solid rgba(0, 255, 136, 0.3);
+      color: var(--success);
+    }
+
+    .flash-message.error {
+      background: rgba(255, 68, 68, 0.15);
+      border: 1px solid rgba(255, 68, 68, 0.3);
+      color: var(--error);
+    }
+
+    .flash-message.info {
+      background: rgba(0, 194, 255, 0.15);
+      border: 1px solid rgba(0, 194, 255, 0.3);
+      color: var(--accent);
+    }
+
+    /* User Card */
+    .user-card {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      background: rgba(0, 194, 255, 0.05);
+      border-radius: 12px;
+      margin-bottom: 1rem;
+    }
+
+    .user-avatar {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #000;
+    }
+
+    .user-info h3 {
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .user-info p {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  {% include 'components/navbar.html' %}
+
+  <div class="container">
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-messages">
+          {% for category, message in messages %}
+            <div class="flash-message {{ category }}">
+              {% if category == 'success' %}
+                <i class="fas fa-check-circle"></i>
+              {% elif category == 'error' %}
+                <i class="fas fa-exclamation-circle"></i>
+              {% else %}
+                <i class="fas fa-info-circle"></i>
+              {% endif %}
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+      <div class="welcome-section">
+        <h1>Welcome back, {{ user.username }}!</h1>
+        <p>Track your resume improvement progress</p>
+      </div>
+      <a href="{{ url_for('upload') }}" class="upload-btn">
+        <i class="fas fa-upload"></i> Upload New Resume
+      </a>
+    </div>
+
+    {% if total_resumes > 0 %}
+      <!-- Stats Cards -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon blue">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <div class="stat-label">Latest Score</div>
+          <div class="stat-value">{{ latest_score }}/100</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon purple">
+            <i class="fas fa-file-alt"></i>
+          </div>
+          <div class="stat-label">Total Uploads</div>
+          <div class="stat-value">{{ total_resumes }}</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon green">
+            <i class="fas fa-trophy"></i>
+          </div>
+          <div class="stat-label">Best Score</div>
+          <div class="stat-value">{{ best_score }}/100</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon yellow">
+            <i class="fas fa-arrow-up"></i>
+          </div>
+          <div class="stat-label">Improvement</div>
+          <div class="stat-value {% if improvement > 0 %}positive{% elif improvement < 0 %}negative{% endif %}">
+            {% if improvement > 0 %}+{% endif %}{{ improvement }} pts
+          </div>
+        </div>
+      </div>
+
+      <!-- Score Progress Chart -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-icon"><i class="fas fa-chart-area"></i></div>
+          <h2>📈 Score Progress</h2>
+        </div>
+        <div class="chart-container">
+          <canvas id="scoreChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Resume History -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-icon"><i class="fas fa-history"></i></div>
+          <h2>📄 Resume History</h2>
+        </div>
+        <table class="history-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Filename</th>
+              <th>Score</th>
+              <th>Career Match</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in history %}
+              <tr>
+                <td>{{ item.upload_date.strftime('%b %d, %Y') }}</td>
+                <td>{{ item.filename }}</td>
+                <td>
+                  <span class="history-score">
+                    <i class="fas fa-star"></i> {{ item.overall_score }}/100
+                  </span>
+                </td>
+                <td class="history-career">{{ item.predicted_career or 'N/A' }}</td>
+                <td class="history-actions">
+                  <form action="{{ url_for('delete_resume_history', history_id=item.id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this entry?');">
+                    <button type="submit" class="action-btn delete">
+                      <i class="fas fa-trash"></i> Delete
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Skills & Recommendations -->
+      <div class="skills-grid">
+        <div class="section">
+          <div class="section-header">
+            <div class="section-icon"><i class="fas fa-code"></i></div>
+            <h2>🛠️ Your Skills</h2>
+          </div>
+          {% if all_skills %}
+            <div class="skills-container">
+              {% for skill in all_skills %}
+                <span class="skill-badge">{{ skill }}</span>
+              {% endfor %}
+            </div>
+          {% else %}
+            <p style="color: var(--text-muted);">No skills detected yet. Upload a resume to get started!</p>
+          {% endif %}
+        </div>
+
+        <div class="section">
+          <div class="section-header">
+            <div class="section-icon"><i class="fas fa-lightbulb"></i></div>
+            <h2>💡 Recommended Actions</h2>
+          </div>
+          <ul class="recommendation-list">
+            {% if top_career %}
+              <li class="recommendation-item">
+                <div class="recommendation-icon"><i class="fas fa-road"></i></div>
+                <span class="recommendation-text">View the learning roadmap for {{ top_career }}</span>
+              </li>
+            {% endif %}
+            {% if latest_score < 70 %}
+              <li class="recommendation-item">
+                <div class="recommendation-icon"><i class="fas fa-edit"></i></div>
+                <span class="recommendation-text">Improve your resume score by adding more relevant skills</span>
+              </li>
+            {% endif %}
+            <li class="recommendation-item">
+              <div class="recommendation-icon"><i class="fas fa-certificate"></i></div>
+              <span class="recommendation-text">Add relevant certifications to stand out</span>
+            </li>
+            <li class="recommendation-item">
+              <div class="recommendation-icon"><i class="fas fa-project-diagram"></i></div>
+              <span class="recommendation-text">Include more projects showcasing your expertise</span>
+            </li>
+            <li class="recommendation-item">
+              <div class="recommendation-icon"><i class="fas fa-link"></i></div>
+              <span class="recommendation-text">Update your LinkedIn profile with new skills</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+    {% else %}
+      <!-- Empty State -->
+      <div class="section">
+        <div class="empty-state">
+          <div class="empty-icon">📊</div>
+          <h3>No Resume History Yet</h3>
+          <p>Upload your first resume to start tracking your career progress!</p>
+          <a href="{{ url_for('upload') }}" class="upload-btn">
+            <i class="fas fa-upload"></i> Upload Your First Resume
+          </a>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Footer -->
+  {% include 'components/footer.html' %}
+
+  {% if total_resumes > 0 %}
+  <script>
+    // Score Progress Chart
+    const scoreHistory = {{ score_history | safe }};
+    
+    if (scoreHistory && scoreHistory.length > 0) {
+      const ctx = document.getElementById('scoreChart').getContext('2d');
+      
+      const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+      gradient.addColorStop(0, 'rgba(0, 194, 255, 0.3)');
+      gradient.addColorStop(1, 'rgba(0, 194, 255, 0.0)');
+      
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: scoreHistory.map(item => item.date),
+          datasets: [{
+            label: 'Resume Score',
+            data: scoreHistory.map(item => item.score),
+            borderColor: '#00c2ff',
+            backgroundColor: gradient,
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: '#00c2ff',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointRadius: 5,
+            pointHoverRadius: 7
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              backgroundColor: '#1a1b22',
+              titleColor: '#fff',
+              bodyColor: '#e0e0e0',
+              borderColor: 'rgba(0, 194, 255, 0.3)',
+              borderWidth: 1,
+              padding: 12,
+              displayColors: false,
+              callbacks: {
+                label: function(context) {
+                  return 'Score: ' + context.raw + '/100';
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 100,
+              grid: {
+                color: 'rgba(255, 255, 255, 0.05)'
+              },
+              ticks: {
+                color: '#888',
+                callback: function(value) {
+                  return value + '/100';
+                }
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              },
+              ticks: {
+                color: '#888'
+              }
+            }
+          },
+          interaction: {
+            intersect: false,
+            mode: 'index'
+          }
+        }
+      });
+    }
+  </script>
+  {% endif %}
+</body>
+</html>
