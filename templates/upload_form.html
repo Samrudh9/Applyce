@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Upload Resume - Career Guidance</title>
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -179,6 +180,118 @@
       color: var(--accent);
     }
 
+    /* Format tip box */
+    .format-tip {
+      background: linear-gradient(135deg, rgba(0, 194, 255, 0.1) 0%, rgba(0, 255, 224, 0.05) 100%);
+      border: 1px solid rgba(0, 194, 255, 0.3);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+
+    .tip-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    .tip-header i {
+      font-size: 1.25rem;
+      color: var(--warning);
+    }
+
+    .tip-content {
+      color: var(--text-color);
+    }
+
+    .tip-content p {
+      margin-bottom: 0.75rem;
+    }
+
+    .tip-content ul {
+      list-style: none;
+      padding: 0;
+      margin: 1rem 0;
+    }
+
+    .tip-content ul li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+      color: var(--text-color);
+    }
+
+    .tip-content ul li i {
+      color: var(--success);
+    }
+
+    .tip-content ul li strong {
+      color: var(--accent-secondary);
+    }
+
+    .tip-note {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-top: 1rem;
+    }
+
+    .tip-note i {
+      color: var(--accent);
+      margin-right: 5px;
+    }
+
+    .tip-note strong {
+      color: var(--text-color);
+    }
+
+    /* Supported formats badges */
+    .supported-formats {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin: 1rem 0 1.5rem 0;
+    }
+
+    .format-badge-new {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 25px;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .format-badge-new.pdf {
+      background: rgba(239, 68, 68, 0.15);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .format-badge-new.docx {
+      background: rgba(59, 130, 246, 0.15);
+      color: #3b82f6;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    .format-badge-new .recommended {
+      background: var(--success);
+      color: #000;
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
     .submit-btn {
       width: 100%;
       padding: 1rem;
@@ -293,6 +406,15 @@
         flex-direction: column;
         align-items: center;
       }
+
+      .supported-formats {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .format-tip {
+        padding: 1rem;
+      }
     }
   </style>
 </head>
@@ -304,6 +426,25 @@
     
     <h1>📄 Upload Your Resume</h1>
     <p class="subtitle">Upload your resume and let our AI analyze your skills, experience, and qualifications to recommend the best career path for you.</p>
+
+    <div class="format-tip">
+      <div class="tip-header">
+        <i class="fas fa-lightbulb"></i>
+        <span>Pro Tip: Best Resume Format</span>
+      </div>
+      <div class="tip-content">
+        <p><strong>📄 PDF is recommended</strong> for the most accurate results!</p>
+        <ul>
+          <li><i class="fas fa-check-circle"></i> <strong>PDF</strong> - Preserves formatting, most accurate text extraction</li>
+          <li><i class="fas fa-check-circle"></i> <strong>DOCX</strong> - Good results, may have minor formatting differences</li>
+        </ul>
+        <p class="tip-note">
+          <i class="fas fa-info-circle"></i> 
+          For best results, ensure your resume has clear sections for: 
+          <strong>Skills, Education, Experience, and Contact Information</strong>
+        </p>
+      </div>
+    </div>
 
     <form action="/resume" method="post" enctype="multipart/form-data" id="uploadForm">
       <div class="drop-zone" id="dropZone">
@@ -320,11 +461,12 @@
         <span id="fileName"></span>
       </div>
 
-      <div class="formats">
-        <span class="format-badge">
+      <div class="supported-formats">
+        <span class="format-badge-new pdf">
           <i class="fas fa-file-pdf"></i> PDF
+          <span class="recommended">Recommended</span>
         </span>
-        <span class="format-badge">
+        <span class="format-badge-new docx">
           <i class="fas fa-file-word"></i> DOCX
         </span>
       </div>
