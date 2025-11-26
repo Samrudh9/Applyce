@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ career | title }} - Learning Roadmap</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
     <style>
         :root {
             --bg-color: #0a0b0f;
@@ -216,15 +217,31 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 12px;
+            padding: 15px;
             background: rgba(255, 255, 255, 0.03);
-            border-radius: 10px;
-            margin-bottom: 10px;
-            transition: background 0.3s ease;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            border: 1px solid transparent;
+            cursor: pointer;
         }
 
         .resource-item:hover {
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(0, 194, 255, 0.1);
+            border-color: var(--accent);
+            transform: translateX(5px);
+        }
+
+        .link-icon {
+            color: var(--accent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .resource-item:hover .link-icon {
+            opacity: 1;
         }
 
         .resource-icon {
@@ -362,14 +379,28 @@
                     <div class="resources-section">
                         <h4>📚 Recommended Resources</h4>
                         {% for resource in phase.resources %}
-                        <div class="resource-item">
-                            <div class="resource-icon">📖</div>
+                        <a href="{{ resource.url | default('#') }}" target="_blank" rel="noopener noreferrer" class="resource-item">
+                            <div class="resource-icon">
+                                {% if 'coursera' in resource.platform|lower %}🎓
+                                {% elif 'udemy' in resource.platform|lower %}📺
+                                {% elif 'youtube' in resource.platform|lower %}▶️
+                                {% elif 'github' in resource.platform|lower %}🐙
+                                {% elif 'kaggle' in resource.platform|lower %}📊
+                                {% elif 'google' in resource.platform|lower %}🔍
+                                {% elif 'microsoft' in resource.platform|lower %}💻
+                                {% elif 'aws' in resource.platform|lower or 'amazon' in resource.platform|lower %}☁️
+                                {% elif 'linkedin' in resource.platform|lower %}🔗
+                                {% elif 'freecodecamp' in resource.platform|lower %}🔥
+                                {% else %}📖
+                                {% endif %}
+                            </div>
                             <div class="resource-info">
                                 <div class="resource-name">{{ resource.name }}</div>
                                 <div class="resource-platform">{{ resource.platform }}</div>
                             </div>
                             <span class="resource-type {{ resource.type }}">{{ resource.type }}</span>
-                        </div>
+                            <div class="link-icon"><i class="fas fa-external-link-alt"></i></div>
+                        </a>
                         {% endfor %}
                     </div>
                 </div>
