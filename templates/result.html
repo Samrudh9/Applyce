@@ -486,6 +486,36 @@
       font-size: 0.9rem;
     }
 
+    /* ATS Score Link */
+    .ats-score-link {
+      text-decoration: none;
+      display: block;
+    }
+
+    .ats-score-link .section {
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .ats-score-link:hover .section {
+      border-color: var(--accent);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 40px rgba(0, 194, 255, 0.2);
+    }
+
+    .click-hint {
+      text-align: center;
+      color: var(--accent);
+      font-size: 0.85rem;
+      margin-top: 1rem;
+      opacity: 0.8;
+      transition: opacity 0.3s ease;
+    }
+
+    .ats-score-link:hover .click-hint {
+      opacity: 1;
+    }
+
     /* Improvements */
     .improvement-list {
       list-style: none;
@@ -654,18 +684,21 @@
           </div>
         </div>
 
-        <div class="section">
-          <div class="section-header">
-            <div class="section-icon"><i class="fas fa-chart-line"></i></div>
-            <h2>Resume Score</h2>
-          </div>
-          <div class="quality-display">
-            <div class="quality-circle" style="--score: {{ quality_score if quality_score else 70 }}">
-              <span class="quality-value">{{ quality_score if quality_score else 70 }}</span>
+        <a href="/ats-report" class="ats-score-link">
+          <div class="section">
+            <div class="section-header">
+              <div class="section-icon"><i class="fas fa-chart-line"></i></div>
+              <h2>Resume Score</h2>
             </div>
-            <div class="quality-label">out of 100</div>
+            <div class="quality-display">
+              <div class="quality-circle" style="--score: {{ quality_score if quality_score else 70 }}">
+                <span class="quality-value">{{ quality_score if quality_score else 70 }}</span>
+              </div>
+              <div class="quality-label">out of 100</div>
+            </div>
+            <p class="click-hint">👆 Click for detailed ATS report</p>
           </div>
-        </div>
+        </a>
       </div>
 
       <!-- Career Recommendations -->
