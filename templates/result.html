@@ -688,5 +688,78 @@
       </div>
     </div>
   {% endif %}
+  {% elif mode == "manual" %}
+  <!-- Header -->
+  <div class="header">
+    <h1>🎯 Career Recommendations</h1>
+    <p>Based on your interests and skills</p>
+  </div>
+
+  <div class="container">
+    <a href="/" class="back-link">
+      <i class="fas fa-arrow-left"></i> Back to Home
+    </a>
+
+    <!-- Basic Info Section -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon"><i class="fas fa-user"></i></div>
+        <h2>Your Profile</h2>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Name:</span>
+        <span class="info-value">{{ name }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Interests:</span>
+        <span class="info-value">{{ interests }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Skills:</span>
+        <span class="info-value">{{ skills }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Qualification:</span>
+        <span class="info-value">{{ qualification }}</span>
+      </div>
+    </div>
+
+    <!-- Career Recommendations -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon"><i class="fas fa-briefcase"></i></div>
+        <h2>Top Career Matches</h2>
+      </div>
+      <div class="career-grid">
+        {% for career in top_3_careers %}
+          <div class="career-card {% if loop.first %}primary{% endif %}">
+            <div class="career-title">{% if loop.first %}🏆 {% endif %}{{ career. career }}</div>
+            <div class="confidence-text">Match Score: {{ "%.1f"|format(career.confidence) }}%</div>
+            <div class="confidence-bar-bg">
+              <div class="confidence-bar-fill" style="width: {{ career.confidence }}%"></div>
+            </div>
+            <p style="margin-top: 0.75rem; color: var(--text-muted); font-size: 0.9rem;">{{ career. description }}</p>
+            {% if loop.first %}
+            <a href="/roadmap/{{ career.career | urlencode }}" class="roadmap-btn">
+              <i class="fas fa-road"></i> View Learning Roadmap
+            </a>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <a href="/form" class="action-btn primary">
+        <i class="fas fa-redo"></i> Try Again
+      </a>
+      <a href="/upload" class="action-btn secondary">
+        <i class="fas fa-upload"></i> Upload Resume Instead
+      </a>
+    </div>
+  </div>
+{% endif %}
 </body>
 </html>
+
