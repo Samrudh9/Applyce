@@ -1111,26 +1111,18 @@ def api_skill_gap():
 
 # ===== Database Initialization =====
 def init_db():
-    """Initialize database and seed data on first run"""
-    with app.app_context():
-        # Create all tables
-        db.create_all()
-        
-        # Seed careers data if empty
-        from models.career import Career
-        if Career.query.count() == 0:
-            print("🌱 Seeding careers database...")
-            from dataset.careers_seed import seed_careers
-            success = seed_careers(db.session, Career)
-            if success:
-                print("✅ Careers database seeded successfully")
-            else:
-                print("⚠️ Some careers may not have been seeded")
-        
-        print("✅ Database initialized")
+    """Initialize database and create tables"""
+    try:
+        with app.app_context():
+            db.create_all()
+            print("✅ Database tables created!")
+    except Exception as e:
+        print(f"⚠️ Database setup error: {e}")
 
+# Call init_db
+init_db()
 
-# ===== Run =====
 if __name__ == '__main__':
-    init_db()  # <-- This MUST be here
-    app.run(debug=True)
+    import os
+    port = int(os. environ.get('PORT', 5000))
+    app.run(host='0. 0.0.0', port=port, debug=False)
