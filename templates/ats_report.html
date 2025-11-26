@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ATS Report - Career Recommendation</title>
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-color: #0a0b0f;
+      --bg-secondary: #12131a;
+      --card-bg: #1a1b22;
+      --card-bg-hover: #22232d;
+      --text-color: #e0e0e0;
+      --text-muted: #888;
+      --accent: #00c2ff;
+      --accent-secondary: #00ffe0;
+      --accent-purple: #a855f7;
+      --success: #00ff88;
+      --warning: #ffaa00;
+      --error: #ff4444;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --glow: 0 0 40px rgba(0, 194, 255, 0.15);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      min-height: 100vh;
+      line-height: 1.6;
+      overflow-x: hidden;
+      padding-top: 70px;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(ellipse at 20% 20%, rgba(0, 194, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(0, 255, 224, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(168, 85, 247, 0.05) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .header {
+      background: linear-gradient(180deg, var(--bg-secondary) 0%, transparent 100%);
+      padding: 3rem 2rem;
+      text-align: center;
+      position: relative;
+    }
+
+    .header::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), var(--accent-secondary), transparent);
+    }
+
+    .header-icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+      font-size: 2rem;
+      box-shadow: var(--glow);
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, #fff 0%, var(--accent) 50%, var(--accent-secondary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header p {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 500;
+      margin-bottom: 2rem;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .back-link:hover {
+      color: var(--accent);
+      background: rgba(0, 194, 255, 0.1);
+    }
+
+    /* Main Score Circle */
+    .score-section {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .score-circle-large {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: conic-gradient(
+        var(--accent) calc(var(--score) * 3.6deg),
+        rgba(255, 255, 255, 0.1) calc(var(--score) * 3.6deg)
+      );
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+      position: relative;
+      box-shadow: 0 0 60px rgba(0, 194, 255, 0.3);
+    }
+
+    .score-circle-large::before {
+      content: '';
+      position: absolute;
+      width: 160px;
+      height: 160px;
+      background: var(--bg-color);
+      border-radius: 50%;
+    }
+
+    .score-inner {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+    }
+
+    .score-value-large {
+      font-size: 3.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+    }
+
+    .score-max {
+      font-size: 1.2rem;
+      color: var(--text-muted);
+    }
+
+    .score-status {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-top: 0.5rem;
+    }
+
+    .score-status.excellent { color: var(--success); }
+    .score-status.good { color: var(--accent); }
+    .score-status.needs-work { color: var(--warning); }
+    .score-status.poor { color: var(--error); }
+
+    /* Section Card */
+    .section {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 1.75rem;
+      border: 1px solid var(--border-color);
+      margin-bottom: 1.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .section:hover {
+      border-color: rgba(0, 194, 255, 0.3);
+      box-shadow: var(--glow);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .section-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, rgba(0, 194, 255, 0.2), rgba(0, 255, 224, 0.2));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+      font-size: 1.25rem;
+    }
+
+    .section-header h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .section-header .score-badge {
+      margin-left: auto;
+      background: rgba(0, 194, 255, 0.15);
+      color: var(--accent);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    /* Score Breakdown Bars */
+    .breakdown-item {
+      margin-bottom: 1.25rem;
+    }
+
+    .breakdown-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+
+    .breakdown-label span:first-child {
+      font-weight: 500;
+      color: var(--text-color);
+    }
+
+    .breakdown-label span:last-child {
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .breakdown-bar {
+      height: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 5px;
+      overflow: hidden;
+    }
+
+    .breakdown-fill {
+      height: 100%;
+      border-radius: 5px;
+      transition: width 1s ease;
+    }
+
+    .breakdown-fill.keyword { background: linear-gradient(90deg, var(--accent), var(--accent-secondary)); }
+    .breakdown-fill.section { background: linear-gradient(90deg, var(--accent-purple), #f472b6); }
+    .breakdown-fill.format { background: linear-gradient(90deg, var(--success), #34d399); }
+
+    /* Keywords Tags */
+    .keywords-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .keyword-tag {
+      padding: 0.5rem 1rem;
+      border-radius: 25px;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .keyword-tag.found {
+      background: rgba(0, 255, 136, 0.15);
+      color: var(--success);
+      border: 1px solid rgba(0, 255, 136, 0.3);
+    }
+
+    .keyword-tag.missing {
+      background: rgba(255, 170, 0, 0.15);
+      color: var(--warning);
+      border: 1px solid rgba(255, 170, 0, 0.3);
+    }
+
+    .keyword-tag i {
+      margin-right: 0.25rem;
+    }
+
+    /* Section Checklist */
+    .checklist {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .checklist-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+    }
+
+    .checklist-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+    }
+
+    .checklist-icon.pass {
+      background: rgba(0, 255, 136, 0.2);
+      color: var(--success);
+    }
+
+    .checklist-icon.fail {
+      background: rgba(255, 68, 68, 0.2);
+      color: var(--error);
+    }
+
+    .checklist-text {
+      font-weight: 500;
+    }
+
+    /* Format Checks */
+    .format-checks {
+      display: flex;
+      gap: 1.5rem;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .format-check {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 1.5rem;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .format-check-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+
+    .format-check-icon.pass {
+      background: rgba(0, 255, 136, 0.15);
+      color: var(--success);
+    }
+
+    .format-check-icon.fail {
+      background: rgba(255, 68, 68, 0.15);
+      color: var(--error);
+    }
+
+    .format-check-text {
+      font-weight: 500;
+    }
+
+    .format-check-status {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* Action Button */
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1rem 2rem;
+      border-radius: 30px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      font-size: 1rem;
+    }
+
+    .action-btn.primary {
+      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+      color: #000;
+      box-shadow: 0 4px 20px rgba(0, 194, 255, 0.4);
+    }
+
+    .action-btn.secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-color);
+      border: 2px solid var(--accent);
+    }
+
+    .action-btn:hover {
+      transform: translateY(-3px);
+    }
+
+    .action-btn.primary:hover {
+      box-shadow: 0 8px 30px rgba(0, 194, 255, 0.5);
+    }
+
+    .career-target {
+      text-align: center;
+      padding: 1rem;
+      background: rgba(168, 85, 247, 0.1);
+      border-radius: 12px;
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      margin-bottom: 1.5rem;
+    }
+
+    .career-target-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+
+    .career-target-value {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--accent-purple);
+    }
+
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 1.75rem;
+      }
+
+      .container {
+        padding: 1rem;
+      }
+
+      .score-circle-large {
+        width: 160px;
+        height: 160px;
+      }
+
+      .score-circle-large::before {
+        width: 130px;
+        height: 130px;
+      }
+
+      .score-value-large {
+        font-size: 2.5rem;
+      }
+
+      .format-checks {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  {% include 'components/navbar.html' %}
+
+  <div class="header">
+    <div class="header-icon">📋</div>
+    <h1>ATS Compatibility Report</h1>
+    <p>Detailed analysis of your resume's ATS score</p>
+  </div>
+
+  <div class="container">
+    <a href="javascript:history.back()" class="back-link">
+      <i class="fas fa-arrow-left"></i> Back to Results
+    </a>
+
+    {% if ats_data %}
+    <!-- Career Target -->
+    <div class="career-target">
+      <div class="career-target-label">Analyzing for career:</div>
+      <div class="career-target-value">{{ ats_data.predicted_career }}</div>
+    </div>
+
+    <!-- Main Score -->
+    <div class="score-section">
+      <div class="score-circle-large" style="--score: {{ ats_data.overall_score }}">
+        <div class="score-inner">
+          <div class="score-value-large">{{ ats_data.overall_score }}</div>
+          <div class="score-max">/100</div>
+        </div>
+      </div>
+      <div class="score-status {% if ats_data.overall_score >= 80 %}excellent{% elif ats_data.overall_score >= 60 %}good{% elif ats_data.overall_score >= 40 %}needs-work{% else %}poor{% endif %}">
+        {{ ats_data.status.emoji }} {{ ats_data.status.label }}
+      </div>
+    </div>
+
+    <!-- Score Breakdown -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon"><i class="fas fa-chart-bar"></i></div>
+        <h2>Score Breakdown</h2>
+      </div>
+      
+      <div class="breakdown-item">
+        <div class="breakdown-label">
+          <span><i class="fas fa-key"></i> Keyword Match</span>
+          <span>{{ ats_data.keyword_analysis.score }}%</span>
+        </div>
+        <div class="breakdown-bar">
+          <div class="breakdown-fill keyword" style="width: {{ ats_data.keyword_analysis.score }}%"></div>
+        </div>
+      </div>
+
+      <div class="breakdown-item">
+        <div class="breakdown-label">
+          <span><i class="fas fa-list-check"></i> Section Coverage</span>
+          <span>{{ ats_data.section_analysis.score }}%</span>
+        </div>
+        <div class="breakdown-bar">
+          <div class="breakdown-fill section" style="width: {{ ats_data.section_analysis.score }}%"></div>
+        </div>
+      </div>
+
+      <div class="breakdown-item">
+        <div class="breakdown-label">
+          <span><i class="fas fa-file-alt"></i> Format Quality</span>
+          <span>{{ ats_data.format_analysis.score }}%</span>
+        </div>
+        <div class="breakdown-bar">
+          <div class="breakdown-fill format" style="width: {{ ats_data.format_analysis.score }}%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Keyword Analysis -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon"><i class="fas fa-search"></i></div>
+        <h2>Keyword Analysis</h2>
+        <span class="score-badge">{{ ats_data.keyword_analysis.score }}%</span>
+      </div>
+
+      {% if ats_data.keyword_analysis.found %}
+      <h4 style="color: var(--success); margin-bottom: 0.5rem;"><i class="fas fa-check-circle"></i> Found Keywords</h4>
+      <div class="keywords-container">
+        {% for keyword in ats_data.keyword_analysis.found %}
+          <span class="keyword-tag found"><i class="fas fa-check"></i> {{ keyword }}</span>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      {% if ats_data.keyword_analysis.missing %}
+      <h4 style="color: var(--warning); margin-top: 1.5rem; margin-bottom: 0.5rem;"><i class="fas fa-exclamation-circle"></i> Missing Keywords</h4>
+      <div class="keywords-container">
+        {% for keyword in ats_data.keyword_analysis.missing %}
+          <span class="keyword-tag missing"><i class="fas fa-plus"></i> {{ keyword }}</span>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      {% if not ats_data.keyword_analysis.found and not ats_data.keyword_analysis.missing %}
+      <p style="color: var(--text-muted);">No specific keywords analyzed for this career path.</p>
+      {% endif %}
+    </div>
+
+    <!-- Section Analysis -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon"><i class="fas fa-list-check"></i></div>
+        <h2>Section Checklist</h2>
+        <span class="score-badge">{{ ats_data.section_analysis.score }}%</span>
+      </div>
+
+      <div class="checklist">
+        {% for section_name, is_present in ats_data.section_analysis.sections.items() %}
+        <div class="checklist-item">
+          <div class="checklist-icon {% if is_present %}pass{% else %}fail{% endif %}">
+            <i class="fas fa-{% if is_present %}check{% else %}times{% endif %}"></i>
+          </div>
+          <span class="checklist-text">{{ section_name }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Format Analysis -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon"><i class="fas fa-file-alt"></i></div>
+        <h2>Format Analysis</h2>
+        <span class="score-badge">{{ ats_data.format_analysis.score }}%</span>
+      </div>
+
+      <div class="format-checks">
+        <div class="format-check">
+          <div class="format-check-icon {% if ats_data.format_analysis.has_email %}pass{% else %}fail{% endif %}">
+            <i class="fas fa-envelope"></i>
+          </div>
+          <div>
+            <div class="format-check-text">Email Address</div>
+            <div class="format-check-status">{% if ats_data.format_analysis.has_email %}Detected{% else %}Not Found{% endif %}</div>
+          </div>
+        </div>
+
+        <div class="format-check">
+          <div class="format-check-icon {% if ats_data.format_analysis.has_phone %}pass{% else %}fail{% endif %}">
+            <i class="fas fa-phone"></i>
+          </div>
+          <div>
+            <div class="format-check-text">Phone Number</div>
+            <div class="format-check-status">{% if ats_data.format_analysis.has_phone %}Detected{% else %}Not Found{% endif %}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% else %}
+    <!-- No Data State -->
+    <div class="section" style="text-align: center; padding: 3rem;">
+      <i class="fas fa-exclamation-circle" style="font-size: 3rem; color: var(--warning); margin-bottom: 1rem;"></i>
+      <h3 style="margin-bottom: 0.5rem;">No ATS Data Available</h3>
+      <p style="color: var(--text-muted);">Please upload a resume first to get your ATS compatibility report.</p>
+    </div>
+    {% endif %}
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <a href="/upload" class="action-btn primary">
+        <i class="fas fa-upload"></i> Upload New Resume
+      </a>
+      <a href="/" class="action-btn secondary">
+        <i class="fas fa-home"></i> Back to Home
+      </a>
+    </div>
+  </div>
+
+</body>
+</html>

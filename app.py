@@ -7,7 +7,7 @@ import uuid
 import re
 import functools
 from typing import List
-from flask import Flask, request, render_template, jsonify, redirect, url_for, flash
+from flask import Flask, request, render_template, jsonify, redirect, url_for, flash, session
 from werkzeug.utils import secure_filename
 import logging
 
@@ -43,6 +43,10 @@ try:
 except ImportError:
     ROADMAP_SUPPORT = False
     print("Warning: Roadmap generator not available")
+
+# ATS Analyzer
+from services.ats_analyzer import ATSAnalyzer
+ats_analyzer = ATSAnalyzer()
 
 print("✅ All imports loaded successfully")
 
@@ -450,6 +454,14 @@ def handle_resume_upload():
     primary_career = predictions[0][0] if predictions else "software developer"
     resources = recommend_resources(primary_career)
 
+    # ATS Analysis
+    try:
+        ats_data = ats_analyzer.analyze(extracted_text, skills_found, primary_career)
+        session['ats_data'] = ats_data
+    except Exception as e:
+        print(f"ATS analysis error: {e}")
+        session['ats_data'] = {}
+
     return render_template('result.html',
                           mode="resume",
                           name=name,
@@ -743,6 +755,15 @@ def show_roadmap(career):
     """Show learning roadmap for a specific career"""
     roadmap_data = get_career_roadmap(career)
     return render_template('roadmap.html', career=career, roadmap=roadmap_data)
+
+
+@app.route('/ats-report')
+def ats_report():
+    """Show detailed ATS analysis report"""
+    ats_data = session.get('ats_data', {})
+    if not ats_data:
+        return redirect(url_for('upload'))
+    return render_template('ats_report.html', ats_data=ats_data)
 
 
 # ===== API Endpoints =====
