@@ -4,20 +4,24 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Career Analysis Results</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare. com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root {
       --bg-color: #0a0b0f;
+      --bg-secondary: #12131a;
       --card-bg: #1a1b22;
+      --card-bg-hover: #22232d;
       --text-color: #e0e0e0;
       --text-muted: #888;
       --accent: #00c2ff;
       --accent-secondary: #00ffe0;
+      --accent-purple: #a855f7;
       --success: #00ff88;
       --warning: #ffaa00;
       --error: #ff4444;
-      --border-color: rgba(255, 255, 255, 0.1);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --glow: 0 0 40px rgba(0, 194, 255, 0.15);
     }
 
     * {
@@ -31,23 +35,69 @@
       background-color: var(--bg-color);
       color: var(--text-color);
       min-height: 100vh;
-      padding-bottom: 3rem;
       line-height: 1.6;
+      overflow-x: hidden;
     }
 
+    /* Animated Background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(ellipse at 20% 20%, rgba(0, 194, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(0, 255, 224, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(168, 85, 247, 0.05) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    /* Header */
     .header {
-      background: var(--card-bg);
-      color: var(--text-color);
-      padding: 2rem;
+      background: linear-gradient(180deg, var(--bg-secondary) 0%, transparent 100%);
+      padding: 3rem 2rem;
       text-align: center;
-      border-bottom: 1px solid var(--border-color);
+      position: relative;
     }
 
-    .header h1 {
+    .header::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), var(--accent-secondary), transparent);
+    }
+
+    .header-icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1. 5rem;
       font-size: 2rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+      box-shadow: var(--glow);
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    . header h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 0. 5rem;
+      background: linear-gradient(135deg, #fff 0%, var(--accent) 50%, var(--accent-secondary) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -55,222 +105,297 @@
 
     .header p {
       color: var(--text-muted);
+      font-size: 1.1rem;
     }
 
+    /* Container */
     .container {
-      max-width: 1000px;
+      max-width: 1100px;
       margin: 0 auto;
       padding: 2rem;
     }
 
+    /* Back Link */
     .back-link {
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      color: var(--accent);
+      color: var(--text-muted);
       text-decoration: none;
       font-weight: 500;
-      margin-bottom: 1.5rem;
-      transition: color 0.3s ease;
+      margin-bottom: 2rem;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      transition: all 0. 3s ease;
     }
 
     .back-link:hover {
-      color: var(--accent-secondary);
+      color: var(--accent);
+      background: rgba(0, 194, 255, 0. 1);
     }
 
+    /* Grid Layout */
+    .grid {
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 768px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+
+    /* Section Cards */
     .section {
       background: var(--card-bg);
-      border-radius: 16px;
-      padding: 1.5rem;
-      margin-bottom: 1.5rem;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      border-radius: 20px;
+      padding: 1.75rem;
       border: 1px solid var(--border-color);
+      transition: all 0. 3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    . section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .section:hover {
+      border-color: rgba(0, 194, 255, 0. 3);
+      box-shadow: var(--glow);
+    }
+
+    .section:hover::before {
+      opacity: 1;
     }
 
     .section-header {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-      margin-bottom: 1rem;
-      padding-bottom: 0.75rem;
-      border-bottom: 1px solid var(--border-color);
+      gap: 1rem;
+      margin-bottom: 1. 25rem;
     }
 
     .section-icon {
-      width: 40px;
-      height: 40px;
-      background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
-      border-radius: 10px;
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, rgba(0, 194, 255, 0.2), rgba(0, 255, 224, 0.2));
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #000;
-      font-size: 1.1rem;
+      color: var(--accent);
+      font-size: 1. 25rem;
     }
 
     .section-header h2 {
       font-size: 1.25rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    /* Profile Info */
+    .profile-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    @media (max-width: 500px) {
+      .profile-grid { grid-template-columns: 1fr; }
+    }
+
+    .profile-item {
+      background: rgba(255, 255, 255, 0.03);
+      padding: 1rem;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+    }
+
+    .profile-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.25rem;
+    }
+
+    .profile-value {
+      font-size: 1rem;
       font-weight: 600;
-      color: var(--text-color);
-    }
-
-    .info-row {
-      display: flex;
-      gap: 0.5rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .info-label {
-      font-weight: 600;
-      color: var(--accent);
-      min-width: 100px;
-    }
-
-    .info-value {
-      color: var(--text-color);
+      color: #fff;
     }
 
     /* Career Cards */
-    .career-grid {
-      display: grid;
+    . career-list {
+      display: flex;
+      flex-direction: column;
       gap: 1rem;
     }
 
     .career-card {
-      background: rgba(255, 255, 255, 0.03);
+      background: rgba(255, 255, 255, 0.02);
       border: 1px solid var(--border-color);
-      border-radius: 12px;
-      padding: 1.25rem;
-      transition: all 0.3s ease;
+      border-radius: 16px;
+      padding: 1.5rem;
+      transition: all 0. 3s ease;
+      position: relative;
     }
 
     .career-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 25px rgba(0, 194, 255, 0.15);
+      transform: translateX(5px);
+      border-color: rgba(0, 194, 255, 0.3);
     }
 
-    .career-card.primary {
-      background: linear-gradient(135deg, rgba(0, 194, 255, 0.15) 0%, rgba(0, 255, 224, 0.15) 100%);
-      border: 1px solid var(--accent);
+    . career-card. primary {
+      background: linear-gradient(135deg, rgba(0, 194, 255, 0.1) 0%, rgba(0, 255, 224, 0.05) 100%);
+      border: 2px solid var(--accent);
     }
 
-    .career-card.primary .career-title {
+    .career-card.primary::before {
+      content: '🏆 TOP MATCH';
+      position: absolute;
+      top: -10px;
+      left: 20px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+      color: #000;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+
+    .career-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+    }
+
+    .career-title {
+      font-size: 1. 35rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .career-card.primary . career-title {
       background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
 
-    .career-card.primary .confidence-text {
+    .career-score {
+      background: rgba(0, 255, 136, 0.15);
+      color: var(--success);
+      padding: 0.35rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .career-description {
       color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
+      line-height: 1.6;
     }
 
-    .career-card.primary .confidence-bar-bg {
-      background: rgba(255, 255, 255, 0.1);
-    }
-
-    .career-card.primary .confidence-bar-fill {
-      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
-    }
-
-    .career-title {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: var(--text-color);
-      margin-bottom: 0.75rem;
-    }
-
-    .confidence-text {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      margin-bottom: 0.5rem;
-    }
-
-    .confidence-bar-bg {
-      height: 8px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 4px;
+    . career-progress {
+      height: 6px;
+      background: rgba(255, 255, 255, 0. 1);
+      border-radius: 3px;
       overflow: hidden;
+      margin-bottom: 1rem;
     }
 
-    .confidence-bar-fill {
+    .career-progress-fill {
       height: 100%;
       background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
-      border-radius: 4px;
-      transition: width 0.5s ease;
+      border-radius: 3px;
+      transition: width 1s ease;
     }
 
     .roadmap-btn {
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      margin-top: 1rem;
-      padding: 0.5rem 1rem;
+      padding: 0.65rem 1. 25rem;
       background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
       color: #000;
-      border-radius: 20px;
+      border-radius: 25px;
       text-decoration: none;
-      font-weight: 500;
+      font-weight: 600;
       font-size: 0.9rem;
       transition: all 0.3s ease;
     }
 
-    .career-card.primary .roadmap-btn {
-      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
-      color: #000;
-    }
-
     .roadmap-btn:hover {
       transform: scale(1.05);
-      box-shadow: 0 5px 15px rgba(0, 194, 255, 0.4);
+      box-shadow: 0 5px 20px rgba(0, 194, 255, 0.4);
     }
 
     /* Salary Section */
-    .salary-display {
+    .salary-card {
       text-align: center;
-      padding: 1.5rem;
-      background: linear-gradient(135deg, rgba(0, 255, 136, 0.15) 0%, rgba(0, 255, 136, 0.05) 100%);
-      border-radius: 12px;
-      border: 1px solid rgba(0, 255, 136, 0.3);
+      padding: 2rem;
     }
 
-    .salary-amount {
-      font-size: 2rem;
-      font-weight: 700;
-      margin-bottom: 0.25rem;
-      background: linear-gradient(90deg, var(--success), var(--accent-secondary));
+    .salary-main {
+      margin-bottom: 1.5rem;
+    }
+
+    . salary-amount {
+      font-size: 2. 75rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--success), var(--accent-secondary));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+      line-height: 1.2;
     }
 
-    .salary-note {
-      font-size: 0.9rem;
+    .salary-label {
+      font-size: 0. 9rem;
       color: var(--text-muted);
+      margin-top: 0.25rem;
     }
 
-    .salary-details {
+    .salary-breakdown {
       display: flex;
       justify-content: center;
       gap: 2rem;
-      margin-top: 1rem;
-      padding-top: 1rem;
+      padding-top: 1. 5rem;
       border-top: 1px solid var(--border-color);
     }
 
-    .salary-detail {
+    .salary-item {
       text-align: center;
     }
 
-    .salary-detail-label {
-      font-size: 0.8rem;
+    .salary-item-label {
+      font-size: 0. 75rem;
       color: var(--text-muted);
-      margin-bottom: 0.25rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
-    .salary-detail-value {
-      font-weight: 600;
+    .salary-item-value {
+      font-size: 1.1rem;
+      font-weight: 700;
       color: var(--success);
+      margin-top: 0.25rem;
     }
 
     /* Skills */
@@ -280,99 +405,86 @@
       gap: 0.5rem;
     }
 
-    .skill-badge {
-      background: rgba(0, 255, 224, 0.15);
-      color: var(--accent-secondary);
-      padding: 6px 14px;
-      border-radius: 20px;
+    . skill-badge {
+      padding: 0.5rem 1rem;
+      border-radius: 25px;
       font-size: 0.85rem;
       font-weight: 500;
-      border: 1px solid rgba(0, 255, 224, 0.3);
+      transition: all 0. 3s ease;
+    }
+
+    . skill-badge:hover {
+      transform: translateY(-2px);
     }
 
     .skill-badge.tech {
       background: rgba(0, 194, 255, 0.15);
       color: var(--accent);
-      border-color: rgba(0, 194, 255, 0.3);
+      border: 1px solid rgba(0, 194, 255, 0.3);
     }
 
-    .skill-badge.soft {
-      background: rgba(255, 170, 0, 0.15);
-      color: var(--warning);
-      border-color: rgba(255, 170, 0, 0.3);
+    . skill-badge.interest {
+      background: rgba(168, 85, 247, 0. 15);
+      color: var(--accent-purple);
+      border: 1px solid rgba(168, 85, 247, 0.3);
     }
 
-    .skill-badge.hr {
-      background: rgba(0, 255, 224, 0.15);
-      color: var(--accent-secondary);
-      border-color: rgba(0, 255, 224, 0.3);
-    }
-
-    .skill-badge.marketing {
-      background: rgba(0, 255, 136, 0.15);
-      color: var(--success);
-      border-color: rgba(0, 255, 136, 0.3);
-    }
-
-    .skill-badge.finance {
-      background: rgba(0, 194, 255, 0.15);
-      color: var(--accent);
-      border-color: rgba(0, 194, 255, 0.3);
-    }
-
-    /* Skill Gaps */
-    .skill-gap-badge {
-      padding: 6px 14px;
+    . skill-badge.gap {
       background: rgba(255, 68, 68, 0.15);
       color: var(--error);
       border: 1px solid rgba(255, 68, 68, 0.3);
-      border-radius: 20px;
-      font-size: 0.85rem;
-      font-weight: 500;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
     }
 
-    .skill-gap-badge i {
-      font-size: 0.75rem;
+    .skill-badge.gap i {
+      margin-right: 0.25rem;
     }
 
-    /* Progress Bar for Quality Score */
-    .quality-score {
+    /* Quality Score */
+    .quality-display {
       text-align: center;
     }
 
-    .quality-score-value {
-      font-size: 3rem;
-      font-weight: 700;
-      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+    .quality-circle {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: conic-gradient(
+        var(--accent) calc(var(--score) * 1%),
+        rgba(255, 255, 255, 0. 1) calc(var(--score) * 1%)
+      );
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+      position: relative;
+    }
+
+    .quality-circle::before {
+      content: '';
+      position: absolute;
+      width: 110px;
+      height: 110px;
+      background: var(--card-bg);
+      border-radius: 50%;
+    }
+
+    .quality-value {
+      position: relative;
+      z-index: 1;
+      font-size: 2. 5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
 
-    .quality-score-label {
+    .quality-label {
       color: var(--text-muted);
       font-size: 0.9rem;
     }
 
-    .quality-bar-bg {
-      height: 10px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 10px;
-      margin-top: 1rem;
-      overflow: hidden;
-    }
-
-    .quality-bar-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
-      border-radius: 10px;
-      transition: width 0.5s ease;
-    }
-
-    /* Improvement Tips */
+    /* Improvements */
     .improvement-list {
       list-style: none;
     }
@@ -380,54 +492,42 @@
     .improvement-item {
       display: flex;
       align-items: flex-start;
-      gap: 0.75rem;
-      padding: 0.75rem;
-      background: rgba(255, 255, 255, 0.03);
-      border-radius: 8px;
-      margin-bottom: 0.5rem;
+      gap: 1rem;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 12px;
+      margin-bottom: 0.75rem;
       border: 1px solid var(--border-color);
       transition: all 0.3s ease;
     }
 
     .improvement-item:hover {
-      background: rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(0, 255, 136, 0.3);
     }
 
-    .improvement-item i {
+    .improvement-icon {
+      width: 32px;
+      height: 32px;
+      background: rgba(0, 255, 136, 0.15);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       color: var(--success);
-      margin-top: 0.2rem;
+      flex-shrink: 0;
     }
 
-    .improvement-item span {
+    .improvement-text {
       color: var(--text-color);
       line-height: 1.5;
     }
 
-    /* Responsive */
-    @media (max-width: 768px) {
-      .container {
-        padding: 1rem;
-      }
-
-      .header h1 {
-        font-size: 1.5rem;
-      }
-
-      .salary-details {
-        flex-direction: column;
-        gap: 1rem;
-      }
-
-      .salary-amount {
-        font-size: 1.5rem;
-      }
-    }
-
-    /* Action buttons */
+    /* Action Buttons */
     .action-buttons {
       display: flex;
       gap: 1rem;
-      margin-top: 2rem;
+      margin-top: 2. 5rem;
       justify-content: center;
       flex-wrap: wrap;
     }
@@ -436,50 +536,82 @@
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      padding: 0.75rem 1.5rem;
+      padding: 0.9rem 1.75rem;
       border-radius: 30px;
       font-weight: 600;
       text-decoration: none;
       transition: all 0.3s ease;
+      font-size: 0.95rem;
     }
 
-    .action-btn.primary {
+    .action-btn. primary {
       background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
       color: #000;
+      box-shadow: 0 4px 15px rgba(0, 194, 255, 0.3);
     }
 
-    .action-btn.secondary {
-      background: transparent;
-      color: var(--accent);
-      border: 2px solid var(--accent);
+    . action-btn.secondary {
+      background: rgba(255, 255, 255, 0. 05);
+      color: var(--text-color);
+      border: 1px solid var(--border-color);
     }
 
     .action-btn:hover {
-      transform: scale(1.05);
-      box-shadow: 0 5px 20px rgba(0, 194, 255, 0.4);
+      transform: translateY(-3px);
     }
 
-    .action-btn.secondary:hover {
-      background: var(--accent);
-      color: #000;
+    . action-btn. primary:hover {
+      box-shadow: 0 8px 25px rgba(0, 194, 255, 0.4);
     }
 
-    /* Error text styling */
-    .error-text {
-      color: var(--error);
+    . action-btn.secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: var(--accent);
     }
 
-    .muted-text {
+    /* Empty State */
+    . empty-state {
+      text-align: center;
+      padding: 2rem;
       color: var(--text-muted);
+    }
+
+    . empty-state i {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      opacity: 0.5;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 1.75rem;
+      }
+
+      .container {
+        padding: 1rem;
+      }
+
+      . salary-breakdown {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .career-header {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
     }
   </style>
 </head>
 <body>
+
   {% if mode == "resume" %}
-    <!-- Header -->
+    <!-- ==================== RESUME MODE ==================== -->
     <div class="header">
-      <h1>🎯 Resume Analysis Complete!</h1>
-      <p>Here's what we found and our career recommendations for you</p>
+      <div class="header-icon">📊</div>
+      <h1>Resume Analysis Complete! </h1>
+      <p>Here's your personalized career roadmap</p>
     </div>
 
     <div class="container">
@@ -487,195 +619,168 @@
         <i class="fas fa-arrow-left"></i> Back to Home
       </a>
 
-      <!-- Basic Info Section -->
-      <div class="section">
-        <div class="section-header">
-          <div class="section-icon"><i class="fas fa-user"></i></div>
-          <h2>Basic Information</h2>
+      <!-- Profile & Quality Score -->
+      <div class="grid grid-2" style="margin-bottom: 1.5rem;">
+        <div class="section">
+          <div class="section-header">
+            <div class="section-icon"><i class="fas fa-user"></i></div>
+            <h2>Profile</h2>
+          </div>
+          <div class="profile-grid">
+            <div class="profile-item">
+              <div class="profile-label">Name</div>
+              <div class="profile-value">{{ name }}</div>
+            </div>
+            <div class="profile-item">
+              <div class="profile-label">Contact</div>
+              <div class="profile-value">{{ contact if contact else 'Not detected' }}</div>
+            </div>
+            <div class="profile-item">
+              <div class="profile-label">Education</div>
+              <div class="profile-value">{{ education if education and education != 'Not detected' else 'Not detected' }}</div>
+            </div>
+            <div class="profile-item">
+              <div class="profile-label">Experience</div>
+              <div class="profile-value">{{ experience if experience and experience != 'Not detected' else 'Not detected' }}</div>
+            </div>
+          </div>
         </div>
-        <div class="info-row">
-          <span class="info-label">Name:</span>
-          <span class="info-value">{{ name }}</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label">Contact:</span>
-          <span class="info-value">{{ contact }}</span>
+
+        <div class="section">
+          <div class="section-header">
+            <div class="section-icon"><i class="fas fa-chart-line"></i></div>
+            <h2>Resume Score</h2>
+          </div>
+          <div class="quality-display">
+            <div class="quality-circle" style="--score: {{ quality_score if quality_score else 70 }}">
+              <span class="quality-value">{{ quality_score if quality_score else 70 }}</span>
+            </div>
+            <div class="quality-label">out of 100</div>
+          </div>
         </div>
       </div>
 
       <!-- Career Recommendations -->
-      <div class="section">
+      <div class="section" style="margin-bottom: 1.5rem;">
         <div class="section-header">
-          <div class="section-icon"><i class="fas fa-briefcase"></i></div>
+          <div class="section-icon"><i class="fas fa-rocket"></i></div>
           <h2>Career Recommendations</h2>
         </div>
-        <div class="career-grid">
+        <div class="career-list">
           {% if predicted_career is mapping %}
             <div class="career-card primary">
-              <div class="career-title">🏆 {{ predicted_career.predicted_career }}</div>
-              <div class="confidence-text">Confidence: {{ "%.1f"|format(predicted_career.confidence) }}%</div>
-              <div class="confidence-bar-bg">
-                <div class="confidence-bar-fill" style="width: {{ predicted_career.confidence }}%"></div>
+              <div class="career-header">
+                <div class="career-title">{{ predicted_career.predicted_career }}</div>
+                <div class="career-score">{{ "%.0f"|format(predicted_career.confidence) }}% Match</div>
               </div>
-              <a href="/roadmap/{{ predicted_career.predicted_career | urlencode }}" class="roadmap-btn">
+              <div class="career-progress">
+                <div class="career-progress-fill" style="width: {{ predicted_career.confidence }}%"></div>
+              </div>
+              <a href="/roadmap/{{ predicted_career. predicted_career | urlencode }}" class="roadmap-btn">
                 <i class="fas fa-road"></i> View Learning Roadmap
               </a>
             </div>
             
             {% if predicted_career.top_careers %}
-              {% for career, confidence in predicted_career.top_careers %}
+              {% for career, confidence in predicted_career. top_careers %}
                 {% if loop.index > 1 %}
                   <div class="career-card">
-                    <div class="career-title">{{ career }}</div>
-                    <div class="confidence-text">Confidence: {{ "%.1f"|format(confidence) }}%</div>
-                    <div class="confidence-bar-bg">
-                      <div class="confidence-bar-fill" style="width: {{ confidence }}%"></div>
+                    <div class="career-header">
+                      <div class="career-title">{{ career }}</div>
+                      <div class="career-score">{{ "%.0f"|format(confidence) }}%</div>
+                    </div>
+                    <div class="career-progress">
+                      <div class="career-progress-fill" style="width: {{ confidence }}%"></div>
                     </div>
                   </div>
                 {% endif %}
               {% endfor %}
             {% endif %}
-          {% else %}
-            <div class="career-card primary">
-              <div class="career-title">{{ predicted_career }}</div>
-            </div>
           {% endif %}
         </div>
       </div>
 
-      <!-- Salary Estimation -->
-      <div class="section">
-        <div class="section-header">
-          <div class="section-icon"><i class="fas fa-rupee-sign"></i></div>
-          <h2>Estimated Salary Range</h2>
-        </div>
-        <div class="salary-display">
-          <div class="salary-amount">{{ predicted_salary }}</div>
-          <div class="salary-note">Based on your skills, experience, and market trends</div>
+      <!-- Salary & Skills -->
+      <div class="grid grid-2" style="margin-bottom: 1.5rem;">
+        <div class="section salary-card">
+          <div class="section-header" style="justify-content: center;">
+            <div class="section-icon"><i class="fas fa-rupee-sign"></i></div>
+            <h2>Expected Salary</h2>
+          </div>
+          <div class="salary-main">
+            <div class="salary-amount">{{ predicted_salary if predicted_salary else '₹6L - ₹10L' }}</div>
+            <div class="salary-label">per year</div>
+          </div>
           {% if salary_data %}
-          <div class="salary-details">
-            <div class="salary-detail">
-              <div class="salary-detail-label">Minimum</div>
-              <div class="salary-detail-value">₹{{ (salary_data.min / 100000)|round(2) }}L</div>
+          <div class="salary-breakdown">
+            <div class="salary-item">
+              <div class="salary-item-label">Min</div>
+              <div class="salary-item-value">₹{{ (salary_data.min / 100000)|round(1) }}L</div>
             </div>
-            <div class="salary-detail">
-              <div class="salary-detail-label">Expected</div>
-              <div class="salary-detail-value">₹{{ (salary_data.mid / 100000)|round(2) }}L</div>
+            <div class="salary-item">
+              <div class="salary-item-label">Expected</div>
+              <div class="salary-item-value">₹{{ (salary_data.mid / 100000)|round(1) }}L</div>
             </div>
-            <div class="salary-detail">
-              <div class="salary-detail-label">Maximum</div>
-              <div class="salary-detail-value">₹{{ (salary_data.max / 100000)|round(2) }}L</div>
+            <div class="salary-item">
+              <div class="salary-item-label">Max</div>
+              <div class="salary-item-value">₹{{ (salary_data. max / 100000)|round(1) }}L</div>
             </div>
           </div>
           {% endif %}
         </div>
-      </div>
 
-      <!-- Skills Detected -->
-      <div class="section">
-        <div class="section-header">
-          <div class="section-icon"><i class="fas fa-code"></i></div>
-          <h2>Skills Detected</h2>
-        </div>
-        {% if technical_skills and technical_skills != 'Not detected' and technical_skills.strip() %}
-          <div class="skills-container">
-            {% set skills_list = technical_skills.split(',') %}
-            {% for skill in skills_list %}
-              <span class="skill-badge tech">{{ skill.strip() }}</span>
-            {% endfor %}
+        <div class="section">
+          <div class="section-header">
+            <div class="section-icon"><i class="fas fa-code"></i></div>
+            <h2>Skills Detected</h2>
           </div>
-        {% else %}
-          <p class="error-text">No skills detected. Consider adding a skills section to your resume.</p>
-        {% endif %}
+          {% if technical_skills and technical_skills != 'Not detected' and technical_skills. strip() %}
+            <div class="skills-container">
+              {% for skill in technical_skills.split(',') %}
+                <span class="skill-badge tech">{{ skill. strip() }}</span>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="empty-state">
+              <i class="fas fa-search"></i>
+              <p>No skills detected</p>
+            </div>
+          {% endif %}
+        </div>
       </div>
 
       <!-- Skill Gaps -->
       {% if skill_gaps and skill_gaps|length > 0 %}
-      <div class="section">
+      <div class="section" style="margin-bottom: 1.5rem;">
         <div class="section-header">
-          <div class="section-icon"><i class="fas fa-exclamation-triangle"></i></div>
-          <h2>Skills to Develop</h2>
+          <div class="section-icon"><i class="fas fa-plus-circle"></i></div>
+          <h2>Skills to Learn</h2>
         </div>
-        <p style="margin-bottom: 1rem;" class="muted-text">These skills can help you advance in your target career:</p>
         <div class="skills-container">
           {% for gap in skill_gaps %}
-            <span class="skill-gap-badge"><i class="fas fa-plus-circle"></i> {{ gap }}</span>
+            <span class="skill-badge gap"><i class="fas fa-plus"></i> {{ gap }}</span>
           {% endfor %}
         </div>
       </div>
       {% endif %}
 
-      <!-- Education -->
-      <div class="section">
-        <div class="section-header">
-          <div class="section-icon"><i class="fas fa-graduation-cap"></i></div>
-          <h2>Education</h2>
-        </div>
-        {% if education and education != 'Not detected' %}
-          <p>{{ education }}</p>
-        {% else %}
-          <p class="error-text">Education information not detected</p>
-        {% endif %}
-      </div>
-
-      <!-- Quality Score -->
-      <div class="section">
-        <div class="section-header">
-          <div class="section-icon"><i class="fas fa-chart-line"></i></div>
-          <h2>Resume Quality Score</h2>
-        </div>
-        <div class="quality-score">
-          <div class="quality-score-value">{{ quality_score }}</div>
-          <div class="quality-score-label">out of 100</div>
-          <div class="quality-bar-bg">
-            <div class="quality-bar-fill" style="width: {{ quality_score }}%"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Improvement Suggestions -->
+      <!-- Improvements -->
       {% if improvements %}
-      <div class="section">
+      <div class="section" style="margin-bottom: 1. 5rem;">
         <div class="section-header">
           <div class="section-icon"><i class="fas fa-lightbulb"></i></div>
-          <h2>Improvement Suggestions</h2>
+          <h2>Improvement Tips</h2>
         </div>
         <ul class="improvement-list">
           {% for improvement in improvements %}
             <li class="improvement-item">
-              <i class="fas fa-check-circle"></i>
-              <span>{{ improvement }}</span>
+              <div class="improvement-icon"><i class="fas fa-check"></i></div>
+              <span class="improvement-text">{{ improvement }}</span>
             </li>
           {% endfor %}
         </ul>
       </div>
       {% endif %}
-
-      <!-- Certifications -->
-      <div class="section">
-        <div class="section-header">
-          <div class="section-icon"><i class="fas fa-certificate"></i></div>
-          <h2>Certifications</h2>
-        </div>
-        {% if certificates and certificates != 'Not detected' and certificates.strip() %}
-          <p>{{ certificates }}</p>
-        {% else %}
-          <p class="muted-text">No certifications detected. Consider adding relevant certifications like AWS, Azure, PMP, etc.</p>
-        {% endif %}
-      </div>
-
-      <!-- Projects -->
-      <div class="section">
-        <div class="section-header">
-          <div class="section-icon"><i class="fas fa-project-diagram"></i></div>
-          <h2>Projects</h2>
-        </div>
-        {% if projects and projects != 'Not detected' %}
-          <p>{{ projects }}</p>
-        {% else %}
-          <p class="muted-text">No projects detected. Adding projects can strengthen your resume.</p>
-        {% endif %}
-      </div>
 
       <!-- Action Buttons -->
       <div class="action-buttons">
@@ -687,6 +792,140 @@
         </a>
       </div>
     </div>
+
+  {% elif mode == "manual" %}
+    <!-- ==================== MANUAL FORM MODE ==================== -->
+    <div class="header">
+      <div class="header-icon">🎯</div>
+      <h1>Your Career Matches</h1>
+      <p>Based on your skills and interests</p>
+    </div>
+
+    <div class="container">
+      <a href="/" class="back-link">
+        <i class="fas fa-arrow-left"></i> Back to Home
+      </a>
+
+      <!-- Profile -->
+      <div class="section" style="margin-bottom: 1.5rem;">
+        <div class="section-header">
+          <div class="section-icon"><i class="fas fa-user"></i></div>
+          <h2>Your Profile</h2>
+        </div>
+        <div class="profile-grid">
+          <div class="profile-item">
+            <div class="profile-label">Name</div>
+            <div class="profile-value">{{ name }}</div>
+          </div>
+          <div class="profile-item">
+            <div class="profile-label">Qualification</div>
+            <div class="profile-value">{{ qualification }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Skills & Interests -->
+      <div class="grid grid-2" style="margin-bottom: 1.5rem;">
+        <div class="section">
+          <div class="section-header">
+            <div class="section-icon"><i class="fas fa-code"></i></div>
+            <h2>Your Skills</h2>
+          </div>
+          {% if skills %}
+            <div class="skills-container">
+              {% for skill in skills. split(',') %}
+                <span class="skill-badge tech">{{ skill.strip() }}</span>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="empty-state">
+              <p>No skills entered</p>
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="section">
+          <div class="section-header">
+            <div class="section-icon"><i class="fas fa-heart"></i></div>
+            <h2>Your Interests</h2>
+          </div>
+          {% if interests %}
+            <div class="skills-container">
+              {% for interest in interests.split(',') %}
+                <span class="skill-badge interest">{{ interest.strip() }}</span>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="empty-state">
+              <p>No interests entered</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Career Recommendations -->
+      <div class="section" style="margin-bottom: 1. 5rem;">
+        <div class="section-header">
+          <div class="section-icon"><i class="fas fa-rocket"></i></div>
+          <h2>Recommended Careers</h2>
+        </div>
+        <div class="career-list">
+          {% for career in top_3_careers %}
+            <div class="career-card {% if loop.first %}primary{% endif %}">
+              <div class="career-header">
+                <div class="career-title">{{ career.career }}</div>
+                <div class="career-score">{{ "%.0f"|format(career.confidence) }}% Match</div>
+              </div>
+              <p class="career-description">{{ career.description }}</p>
+              <div class="career-progress">
+                <div class="career-progress-fill" style="width: {{ career. confidence }}%"></div>
+              </div>
+              {% if loop.first %}
+              <a href="/roadmap/{{ career. career | urlencode }}" class="roadmap-btn">
+                <i class="fas fa-road"></i> View Learning Roadmap
+              </a>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <a href="/form" class="action-btn primary">
+          <i class="fas fa-redo"></i> Try Again
+        </a>
+        <a href="/upload" class="action-btn secondary">
+          <i class="fas fa-upload"></i> Upload Resume
+        </a>
+        <a href="/" class="action-btn secondary">
+          <i class="fas fa-home"></i> Home
+        </a>
+      </div>
+    </div>
+
+  {% else %}
+    <!-- ==================== ERROR STATE ==================== -->
+    <div class="header">
+      <div class="header-icon">⚠️</div>
+      <h1>Something Went Wrong</h1>
+      <p>We couldn't process your request</p>
+    </div>
+
+    <div class="container">
+      <div class="section" style="text-align: center; padding: 3rem;">
+        <i class="fas fa-exclamation-circle" style="font-size: 3rem; color: var(--error); margin-bottom: 1rem;"></i>
+        <h3 style="margin-bottom: 0.5rem;">Oops! </h3>
+        <p style="color: var(--text-muted);">Please try again or go back to home.</p>
+      </div>
+
+      <div class="action-buttons">
+        <a href="/" class="action-btn primary">
+          <i class="fas fa-home"></i> Back to Home
+        </a>
+      </div>
+    </div>
   {% endif %}
+
 </body>
 </html>
