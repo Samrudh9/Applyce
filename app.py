@@ -76,19 +76,28 @@ if not os.path. exists(instance_path):
     os. makedirs(instance_path)
 
 # ===== Database Configuration =====
-import os
 
 # Get database URL from environment (Render) or use SQLite (local)
-database_url = os. environ.get('postgresql://userdata_k6df_user:FfXGM4MRaNfyLUFVjFyFptytmnhpyN2r@dpg-d4jgb3f5r7bs73fe9co0-a/userdata_k6df', 'sqlite:///instance/skillfit.db')
+# ===== Database Configuration =====
 
-# Fix for Render: They use 'postgres://' but SQLAlchemy needs 'postgresql://'
-if database_url.startswith('postgres://'):
-    database_url = database_url. replace('postgres://', 'postgresql://', 1)
+database_url = os. environ.get('DATABASE_URL')
+
+if database_url:
+    # Fix for Render: postgres:// → postgresql://
+    if database_url.startswith('postgres://'):
+        database_url = database_url. replace('postgres://', 'postgresql://', 1)
+    print("📦 Using PostgreSQL (Render)")
+else:
+    # Local: Use SQLite
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    instance_path = os.path.join(basedir, 'instance')
+    if not os.path. exists(instance_path):
+        os. makedirs(instance_path)
+    database_url = f'sqlite:///{os.path.join(instance_path, "skillfit.db")}'
+    print("📦 Using SQLite (Local)")
 
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-print(f"📦 Database: {'PostgreSQL (Render)' if 'postgresql' in database_url else 'SQLite (Local)'}")
 # Initialize database
 from models import db
 db.init_app(app)
