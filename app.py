@@ -537,18 +537,30 @@ def handle_resume_upload():
     certifications_display = format_list_for_display(certifications)
     
     # Quality checking with proper error handling
+    # Build extracted_data dict for quality checker
+    extracted_data_for_quality = {
+        'skills': skills_found,
+        'education': education_display,
+        'experience': experience_display,
+        'contact': {
+            'email': contact_info if '@' in contact_info else None,
+            'phone': contact_info if any(c.isdigit() for c in contact_info) else None
+        }
+    }
+    
     try:
-        quality_report = check_resume_quality(extracted_text)
+        quality_report = check_resume_quality(extracted_text, extracted_data_for_quality)
         if isinstance(quality_report, dict):
-            resume_score = quality_report.get("score", 70)
-            quality_tips = quality_report.get("tips", ["Resume analysis completed"])
+            resume_score = quality_report.get("score", analysis_result.get("quality_score", 50))
+            quality_tips = quality_report.get("feedback", ["Resume analysis completed"])
         else:
-            # If quality_report is not a dict, use fallback values
-            resume_score = 70
+            # If quality_report is not a dict, use score from basic analysis
+            resume_score = analysis_result.get("quality_score", 50)
             quality_tips = ["Resume analysis completed"]
     except Exception as e:
         print(f"Quality check error: {e}")
-        resume_score = 70
+        # Fall back to basic analysis score
+        resume_score = analysis_result.get("quality_score", 50)
         quality_tips = ["Resume analysis completed"]
 
     # Generate personalized improvement suggestions
@@ -626,7 +638,7 @@ def handle_resume_upload():
                           technical_skills=skills_text,
                           certificates=certifications_display,
                           predicted_career=create_career_dict(predictions),
-                          quality_score=analysis_result.get("quality_score", resume_score),
+                          quality_score=resume_score,
                           skill_gaps=skill_gap_data.get("skills_analysis", {}).get("missing_required", []) if skill_gap_data else [],
                           improvements=improvement_suggestions,
                           predicted_salary=predicted_salary,
@@ -773,15 +785,86 @@ def basic_skill_detection(text):
 
 def basic_resume_analysis(text):
     """Fallback resume analysis when enhanced analyzer is not available"""
+    skills = basic_skill_detection(text)
+    education = extract_education_basic(text)
+    experience = extract_experience_basic(text)
+    projects = extract_projects_basic(text)
+    certifications = extract_certifications_basic(text)
+    
+    # Calculate quality score based on actual resume content
+    quality_score = calculate_basic_quality_score(text, skills, education, experience, projects, certifications)
+    
     analysis = {
-        "skills": basic_skill_detection(text),
-        "education": extract_education_basic(text),
-        "experience": extract_experience_basic(text),
-        "projects": extract_projects_basic(text),
-        "certifications": extract_certifications_basic(text),
-        "quality_score": 70  # Default score
+        "skills": skills,
+        "education": education,
+        "experience": experience,
+        "projects": projects,
+        "certifications": certifications,
+        "quality_score": quality_score
     }
     return analysis
+
+
+def calculate_basic_quality_score(text, skills, education, experience, projects, certifications):
+    """Calculate a quality score based on resume content analysis"""
+    score = 0
+    text_lower = text.lower()
+    
+    # Skills scoring (25 points max)
+    if skills:
+        skill_count = len(skills)
+        if skill_count >= 10:
+            score += 25
+        elif skill_count >= 7:
+            score += 20
+        elif skill_count >= 5:
+            score += 15
+        elif skill_count >= 3:
+            score += 10
+        else:
+            score += 5
+    
+    # Education scoring (20 points max)
+    if education and education != ["Not detected"]:
+        score += 10
+        # Bonus for relevant degrees
+        education_text = ' '.join(education).lower()
+        if any(deg in education_text for deg in ['bachelor', 'master', 'phd', 'degree', 'b.tech', 'm.tech', 'b.e', 'm.e', 'bsc', 'msc']):
+            score += 10
+    
+    # Experience scoring (20 points max)
+    if experience and experience != ["Not detected"]:
+        exp_count = len(experience)
+        if exp_count >= 3:
+            score += 20
+        elif exp_count >= 2:
+            score += 15
+        else:
+            score += 10
+    
+    # Projects scoring (15 points max)
+    if projects and projects != ["Not detected"]:
+        proj_count = len(projects)
+        if proj_count >= 3:
+            score += 15
+        elif proj_count >= 2:
+            score += 10
+        else:
+            score += 5
+    
+    # Certifications scoring (10 points max)
+    if certifications and certifications != ["Not detected"]:
+        score += 10
+    
+    # Contact info scoring (10 points max)
+    if '@' in text:  # Has email
+        score += 5
+    phone_pattern = r'\b\d{10}\b|\b\d{3}[-.\s]\d{3}[-.\s]\d{4}\b|\+\d{1,3}[-.\s]\d+'
+    if re.search(phone_pattern, text):
+        score += 5
+    
+    # Ensure score is between 0 and 100
+    return min(100, max(0, score))
 
 def extract_education_basic(text):
     """Basic education extraction"""
