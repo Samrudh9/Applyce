@@ -942,14 +942,14 @@ def feedback():
                 'message': 'Thank you for your feedback!'
             })
         else:
-            # Log the error but return success to user
-            print(f"Feedback storage warning: {message}")
+            # Log the error using logging module
+            logging.warning(f"Feedback storage warning: {message}")
             return jsonify({
                 'success': True,
                 'message': 'Thank you for your feedback!'
             })
     except Exception as e:
-        print(f"Feedback error: {e}")
+        logging.error(f"Feedback error: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 

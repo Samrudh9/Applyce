@@ -71,13 +71,28 @@ class SkillPattern(db.Model):
     
     @classmethod
     def get_or_create(cls, skill, career):
-        """Get existing pattern or create new one."""
-        pattern = cls.query.filter_by(skill=skill.lower(), career=career.lower()).first()
-        if not pattern:
-            pattern = cls(skill=skill.lower(), career=career.lower())
+        """Get existing pattern or create new one with race condition handling."""
+        skill_lower = skill.lower()
+        career_lower = career.lower()
+        
+        pattern = cls.query.filter_by(skill=skill_lower, career=career_lower).first()
+        if pattern:
+            return pattern
+        
+        # Try to create, handle race condition
+        try:
+            pattern = cls(skill=skill_lower, career=career_lower)
             db.session.add(pattern)
-            db.session.commit()
-        return pattern
+            db.session.flush()  # Attempt to insert
+            return pattern
+        except Exception:
+            # Race condition - another thread created it
+            db.session.rollback()
+            pattern = cls.query.filter_by(skill=skill_lower, career=career_lower).first()
+            if pattern:
+                return pattern
+            # Re-raise if still not found
+            raise
     
     @classmethod
     def get_career_confidence(cls, skills, career):

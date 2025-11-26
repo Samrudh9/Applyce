@@ -11,6 +11,8 @@ from models.skill_pattern import SkillPattern
 class FeedbackService:
     """Service for handling user feedback on career predictions."""
     
+    VALID_FEEDBACK_TYPES = {'positive', 'negative'}
+    
     @staticmethod
     def record_feedback(feedback_type, predicted_career, skills=None, 
                        correct_career=None, user_id=None, resume_id=None, 
@@ -30,6 +32,10 @@ class FeedbackService:
         Returns:
             tuple: (success: bool, message: str)
         """
+        # Validate feedback_type
+        if feedback_type not in FeedbackService.VALID_FEEDBACK_TYPES:
+            return False, f"Invalid feedback_type. Must be one of: {FeedbackService.VALID_FEEDBACK_TYPES}"
+        
         try:
             # Create feedback record
             feedback = Feedback(

@@ -134,9 +134,9 @@ class LearningEngine:
         total_patterns = SkillPattern.query.count()
         total_feedback = Feedback.query.count()
         
-        # Get average confidence
-        patterns = SkillPattern.query.all()
-        avg_confidence = sum(p.confidence for p in patterns) / len(patterns) if patterns else 0.5
+        # Get average confidence using database aggregate function
+        avg_result = db.session.query(db.func.avg(SkillPattern.confidence)).scalar()
+        avg_confidence = avg_result if avg_result is not None else 0.5
         
         # Get most learned skills (highest occurrence)
         top_skills = db.session.query(
