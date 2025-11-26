@@ -19,6 +19,11 @@
       <li><a href="/form" class="nav-link">Enter Manually</a></li>
       <li><a href="/upload" class="nav-link nav-cta">Upload Resume</a></li>
       <li><a href="/about" class="nav-link">About</a></li>
+      {% if current_user.is_authenticated %}
+        <li><a href="{{ url_for('logout') }}" class="nav-link nav-auth">Logout</a></li>
+      {% else %}
+        <li><a href="{{ url_for('login') }}" class="nav-link nav-auth">Login</a></li>
+      {% endif %}
     </ul>
   </div>
 </nav>
@@ -105,6 +110,17 @@
   transform: translateY(-2px);
   box-shadow: 0 4px 15px rgba(0, 194, 255, 0.4);
   color: #000;
+}
+
+.nav-link.nav-auth {
+  border: 1px solid var(--accent, #00c2ff);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+}
+
+.nav-link.nav-auth:hover {
+  background: rgba(0, 194, 255, 0.1);
 }
 
 /* Hamburger Button - Hidden on Desktop */
