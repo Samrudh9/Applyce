@@ -66,7 +66,19 @@ app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
 
 # ===== Database Configuration =====
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///skillfit.db')
+# ===== Database Configuration =====
+
+basedir = os.path.abspath(os.path.dirname(__file__))
+instance_path = os. path.join(basedir, 'instance')
+
+# Create instance folder if it doesn't exist
+if not os.path. exists(instance_path):
+    os. makedirs(instance_path)
+
+app. config['SQLALCHEMY_DATABASE_URI'] = os.environ. get(
+    'DATABASE_URL', 
+    f'sqlite:///{os.path.join(instance_path, "skillfit.db")}'
+)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize database
@@ -345,26 +357,32 @@ def register():
         return redirect(url_for('home'))
     
     if request.method == 'POST':
-        username = request.form.get('username', '').strip()
-        email = request.form.get('email', '').strip()
-        password = request.form.get('password', '')
-        confirm_password = request.form.get('confirm_password', '')
+        try:
+            username = request.form.get('username', '').strip()
+            email = request. form.get('email', '').strip()
+            password = request.form.get('password', '')
+            confirm_password = request. form.get('confirm_password', '')
+            
+            if not all([username, email, password, confirm_password]):
+                flash('Please fill in all fields. ', 'error')
+                return render_template('register.html')
+            
+            if password != confirm_password:
+                flash('Passwords do not match.', 'error')
+                return render_template('register.html')
+            
+            success, result = AuthService.register_user(username, email, password)
+            
+            if success:
+                flash('Registration successful! Please log in.', 'success')
+                return redirect(url_for('login'))
+            else:
+                flash(result, 'error')
         
-        if not all([username, email, password, confirm_password]):
-            flash('Please fill in all fields.', 'error')
-            return render_template('register.html')
-        
-        if password != confirm_password:
-            flash('Passwords do not match.', 'error')
-            return render_template('register.html')
-        
-        success, result = AuthService.register_user(username, email, password)
-        
-        if success:
-            flash('Registration successful! Please log in.', 'success')
-            return redirect(url_for('login'))
-        else:
-            flash(result, 'error')
+        except Exception as e:
+            print(f"❌ Registration Error: {e}")
+            db.session.rollback()  # <-- ADD THIS
+            flash('An error occurred. Please try again.', 'error')
     
     return render_template('register.html')
 
@@ -1099,5 +1117,5 @@ def init_db():
 
 # ===== Run =====
 if __name__ == '__main__':
-    init_db()
+    init_db()  # <-- This MUST be here
     app.run(debug=True)
