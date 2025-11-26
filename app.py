@@ -812,7 +812,12 @@ def guide():
 def feedback():
     """Collect user feedback"""
     try:
-        data = request.get_json(force=True, silent=True)
+        # Parse JSON with explicit error handling
+        try:
+            data = request.get_json()
+        except Exception:
+            return jsonify({'success': False, 'error': 'Invalid JSON format'}), 400
+        
         if not data:
             return jsonify({'success': False, 'error': 'No data provided'}), 400
         

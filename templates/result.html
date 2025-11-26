@@ -1013,6 +1013,9 @@
         <div id="feedback-thanks" style="display: none; text-align: center; padding: 1rem; color: var(--success);">
           <i class="fas fa-check-circle"></i> Thank you for your feedback!
         </div>
+        <div id="feedback-error" style="display: none; text-align: center; padding: 1rem; color: var(--error);">
+          <i class="fas fa-exclamation-circle"></i> Sorry, something went wrong. Please try again.
+        </div>
       </div>
 
       <script>
@@ -1024,13 +1027,25 @@
             },
             body: JSON.stringify({ feedback_type: type })
           })
-          .then(response => response.json())
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            return response.json();
+          })
           .then(data => {
-            document.getElementById('feedback-buttons').style.display = 'none';
-            document.getElementById('feedback-thanks').style.display = 'block';
+            if (data.success) {
+              document.getElementById('feedback-buttons').style.display = 'none';
+              document.getElementById('feedback-thanks').style.display = 'block';
+            } else {
+              document.getElementById('feedback-buttons').style.display = 'none';
+              document.getElementById('feedback-error').style.display = 'block';
+            }
           })
           .catch(error => {
             console.error('Error:', error);
+            document.getElementById('feedback-buttons').style.display = 'none';
+            document.getElementById('feedback-error').style.display = 'block';
           });
         }
       </script>

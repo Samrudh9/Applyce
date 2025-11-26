@@ -24,6 +24,11 @@ from typing import Dict, List, Tuple, Any
 class ResumeEvaluator:
     """Advanced resume evaluation engine."""
     
+    # Configuration constants
+    MIN_WORD_COUNT = 200
+    MAX_WORD_COUNT = 1500
+    IMAGE_FILE_EXTENSIONS = r'\.(jpg|jpeg|png|gif|bmp|svg)'
+    
     # 50+ Action verbs database
     ACTION_VERBS = [
         # Leadership verbs
@@ -268,9 +273,9 @@ class ResumeEvaluator:
         
         # Check resume length (word count)
         word_count = len(text.split())
-        if word_count < 200:
+        if word_count < self.MIN_WORD_COUNT:
             flags['other'].append('Resume too short - add more detail')
-        elif word_count > 1500:
+        elif word_count > self.MAX_WORD_COUNT:
             flags['other'].append('Resume too long - consider condensing')
         
         total_flags = (
@@ -324,7 +329,7 @@ class ResumeEvaluator:
             issues.append('May contain tables that ATS cannot read')
         
         # Check for images (common image file references)
-        if re.search(r'\.(jpg|jpeg|png|gif|bmp|svg)', text, re.IGNORECASE):
+        if re.search(self.IMAGE_FILE_EXTENSIONS, text, re.IGNORECASE):
             issues.append('Contains image references - ensure important info is in text')
         
         # Check section coverage
@@ -459,20 +464,23 @@ class ResumeEvaluator:
             }
         }
         
+        # Helper function to check if keyword exists in found list
+        found_keywords = [k.lower() for k in keywords.get('found', [])]
+        
         recommended = {
             'linkedin': {
                 'label': 'LinkedIn Profile',
-                'checked': keywords.get('found', []) and 'linkedin' in str(keywords.get('found', [])).lower(),
+                'checked': 'linkedin' in found_keywords,
                 'icon': '🔗'
             },
             'github': {
                 'label': 'GitHub Profile',
-                'checked': 'github' in str(keywords.get('found', [])).lower(),
+                'checked': 'github' in found_keywords,
                 'icon': '🐙'
             },
             'projects': {
                 'label': 'Projects Section',
-                'checked': any('project' in str(k).lower() for k in keywords.get('found', [])),
+                'checked': any('project' in k for k in found_keywords),
                 'icon': '💻'
             },
             'certifications': {
