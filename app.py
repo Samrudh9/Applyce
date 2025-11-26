@@ -84,7 +84,11 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # Initialize database
 from models import db
 db.init_app(app)
-
+# Create tables on startup (needed for Render)
+with app.app_context():
+    db. create_all()
+    print("✅ Database tables created!")
+    
 # Initialize Flask-Login
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -1100,10 +1104,9 @@ def api_skill_gap():
 # ===== Database Initialization =====
 def init_db():
     """Initialize database and seed data on first run"""
-   # Create tables on startup (needed for Render)
     with app.app_context():
-        db. create_all()
-        print("✅ Database tables created!")
+        # Create all tables
+        db.create_all()
         
         # Seed careers data if empty
         from models.career import Career
