@@ -450,7 +450,7 @@
       border-radius: 50%;
       background: conic-gradient(
         var(--accent) calc(var(--score) * 3.6deg),
-        rgba(255, 255, 255, 0.1) 0deg
+        rgba(255, 255, 255, 0.1) calc(var(--score) * 3.6deg)
       );
       display: flex;
       align-items: center;
@@ -888,7 +888,7 @@
                 <div class="career-progress-fill" style="width: {{ career.confidence }}%"></div>
               </div>
               <a href="/roadmap/{{ career.career | urlencode }}" class="roadmap-btn">
-                <i class="fas fa-road"></i> View {% if loop.first %}Learning {% endif %}Roadmap
+                <i class="fas fa-road"></i> View Roadmap
               </a>
             </div>
           {% endfor %}
