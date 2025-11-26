@@ -380,8 +380,11 @@ def register():
                 flash(result, 'error')
         
         except Exception as e:
-            print(f"❌ Registration Error: {e}")
-            db.session.rollback()  # <-- ADD THIS
+            import traceback
+            print(f"❌ REGISTRATION ERROR: {e}")           # DEBUG
+            print(f"❌ ERROR TYPE: {type(e).__name__}")    # DEBUG
+            traceback.print_exc()                          # DEBUG - Full stack trace
+            db.session.rollback()
             flash('An error occurred. Please try again.', 'error')
     
     return render_template('register.html')
