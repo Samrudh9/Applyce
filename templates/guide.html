@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Resume Writing Guide - Career Recommendation</title>
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-color: #0a0b0f;
+      --bg-secondary: #12131a;
+      --card-bg: #1a1b22;
+      --card-bg-hover: #22232d;
+      --text-color: #e0e0e0;
+      --text-muted: #888;
+      --accent: #00c2ff;
+      --accent-secondary: #00ffe0;
+      --accent-purple: #a855f7;
+      --success: #00ff88;
+      --warning: #ffaa00;
+      --error: #ff4444;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --glow: 0 0 40px rgba(0, 194, 255, 0.15);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      min-height: 100vh;
+      line-height: 1.6;
+      overflow-x: hidden;
+      padding-top: 70px;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(ellipse at 20% 20%, rgba(0, 194, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(0, 255, 224, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(168, 85, 247, 0.05) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .header {
+      background: linear-gradient(180deg, var(--bg-secondary) 0%, transparent 100%);
+      padding: 3rem 2rem;
+      text-align: center;
+      position: relative;
+    }
+
+    .header::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), var(--accent-secondary), transparent);
+    }
+
+    .header-icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+      font-size: 2rem;
+      box-shadow: var(--glow);
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, #fff 0%, var(--accent) 50%, var(--accent-secondary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header p {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 500;
+      margin-bottom: 2rem;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .back-link:hover {
+      color: var(--accent);
+      background: rgba(0, 194, 255, 0.1);
+    }
+
+    /* Table of Contents */
+    .toc {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      border: 1px solid var(--border-color);
+    }
+
+    .toc h3 {
+      color: var(--accent);
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+    }
+
+    .toc-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .toc-item {
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 20px;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+    }
+
+    .toc-item:hover {
+      background: rgba(0, 194, 255, 0.1);
+      color: var(--accent);
+    }
+
+    /* Section Cards */
+    .section {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 2rem;
+      border: 1px solid var(--border-color);
+      margin-bottom: 2rem;
+      transition: all 0.3s ease;
+    }
+
+    .section:hover {
+      border-color: rgba(0, 194, 255, 0.3);
+      box-shadow: var(--glow);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, rgba(0, 194, 255, 0.2), rgba(0, 255, 224, 0.2));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+      font-size: 1.25rem;
+    }
+
+    .section-header h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    /* Career Tips */
+    .tips-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .tip-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 1.25rem;
+      background: rgba(0, 194, 255, 0.05);
+      border-radius: 12px;
+      border: 1px solid rgba(0, 194, 255, 0.2);
+    }
+
+    .tip-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #000;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .tip-text {
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    /* Good vs Bad Examples */
+    .examples-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .examples-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .example-column {
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 16px;
+      padding: 1.5rem;
+      border: 2px solid;
+    }
+
+    .example-column.good {
+      border-color: rgba(0, 255, 136, 0.3);
+      background: rgba(0, 255, 136, 0.03);
+    }
+
+    .example-column.bad {
+      border-color: rgba(255, 68, 68, 0.3);
+      background: rgba(255, 68, 68, 0.03);
+    }
+
+    .example-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .example-column.good .example-header {
+      color: var(--success);
+    }
+
+    .example-column.bad .example-header {
+      color: var(--error);
+    }
+
+    .example-list {
+      list-style: none;
+    }
+
+    .example-list li {
+      padding: 0.75rem;
+      margin-bottom: 0.5rem;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .example-column.good .example-list li {
+      border-left: 3px solid var(--success);
+    }
+
+    .example-column.bad .example-list li {
+      border-left: 3px solid var(--error);
+      text-decoration: line-through;
+      opacity: 0.8;
+    }
+
+    /* Action Verbs */
+    .verbs-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .verb-tag {
+      padding: 0.5rem 1rem;
+      background: rgba(168, 85, 247, 0.15);
+      color: var(--accent-purple);
+      border-radius: 25px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .verb-tag:hover {
+      background: rgba(168, 85, 247, 0.25);
+      transform: translateY(-2px);
+    }
+
+    /* Verb Categories */
+    .verb-category {
+      margin-bottom: 1.5rem;
+    }
+
+    .verb-category-title {
+      color: var(--accent);
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Sample Bullets */
+    .sample-bullets {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .sample-bullet {
+      padding: 1.25rem;
+      background: rgba(0, 255, 224, 0.05);
+      border-radius: 12px;
+      border: 1px solid rgba(0, 255, 224, 0.2);
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    .sample-bullet::before {
+      content: '•';
+      color: var(--accent-secondary);
+      margin-right: 0.75rem;
+      font-weight: bold;
+    }
+
+    .sample-bullet strong {
+      color: var(--success);
+    }
+
+    /* Career Selector */
+    .career-selector {
+      margin-bottom: 2rem;
+    }
+
+    .career-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .career-tab {
+      padding: 0.75rem 1.5rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      border-radius: 25px;
+      color: var(--text-muted);
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+
+    .career-tab:hover, .career-tab.active {
+      background: rgba(0, 194, 255, 0.15);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      padding: 2rem;
+      background: linear-gradient(180deg, transparent 0%, rgba(0, 194, 255, 0.05) 100%);
+      border-radius: 20px;
+    }
+
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1rem 2rem;
+      border-radius: 30px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      font-size: 1rem;
+    }
+
+    .action-btn.primary {
+      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+      color: #000;
+      box-shadow: 0 4px 20px rgba(0, 194, 255, 0.4);
+    }
+
+    .action-btn.secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-color);
+      border: 2px solid var(--accent);
+    }
+
+    .action-btn:hover {
+      transform: translateY(-3px);
+    }
+
+    .action-btn.primary:hover {
+      box-shadow: 0 8px 30px rgba(0, 194, 255, 0.5);
+    }
+
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 1.75rem;
+      }
+
+      .container {
+        padding: 1rem;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .action-btn {
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  {% include 'components/navbar.html' %}
+
+  <div class="header">
+    <div class="header-icon">📖</div>
+    <h1>Resume Writing Guide</h1>
+    <p>Master the art of crafting a winning resume</p>
+  </div>
+
+  <div class="container">
+    <a href="javascript:history.back()" class="back-link">
+      <i class="fas fa-arrow-left"></i> Back
+    </a>
+
+    <!-- Table of Contents -->
+    <div class="toc">
+      <h3><i class="fas fa-list"></i> Quick Navigation</h3>
+      <div class="toc-list">
+        <a href="#tips" class="toc-item">💡 Career Tips</a>
+        <a href="#examples" class="toc-item">✅ Good vs Bad</a>
+        <a href="#verbs" class="toc-item">⚡ Action Verbs</a>
+        <a href="#bullets" class="toc-item">📝 Sample Bullets</a>
+      </div>
+    </div>
+
+    <!-- Career-Specific Tips -->
+    <div id="tips" class="section">
+      <div class="section-header">
+        <div class="section-icon"><i class="fas fa-lightbulb"></i></div>
+        <h2>Career-Specific Tips</h2>
+      </div>
+      
+      {% if target_career %}
+      <div style="margin-bottom: 1rem; padding: 0.75rem 1rem; background: rgba(168, 85, 247, 0.1); border-radius: 8px; border: 1px solid rgba(168, 85, 247, 0.3);">
+        <span style="color: var(--text-muted);">Showing tips for:</span>
+        <span style="color: var(--accent-purple); font-weight: 600; margin-left: 0.5rem;">{{ target_career | title }}</span>
+      </div>
+      {% endif %}
+
+      <div class="tips-list">
+        {% for tip in career_tips %}
+        <div class="tip-item">
+          <div class="tip-icon">{{ loop.index }}</div>
+          <div class="tip-text">{{ tip }}</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Good vs Bad Examples -->
+    <div id="examples" class="section">
+      <div class="section-header">
+        <div class="section-icon"><i class="fas fa-balance-scale"></i></div>
+        <h2>Good vs Bad Examples</h2>
+      </div>
+      <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+        See the difference between impactful and weak bullet points
+      </p>
+      <div class="examples-grid">
+        <div class="example-column good">
+          <div class="example-header">
+            <i class="fas fa-check-circle"></i> Strong Examples
+          </div>
+          <ul class="example-list">
+            {% for example in good_examples %}
+            <li>{{ example }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+        <div class="example-column bad">
+          <div class="example-header">
+            <i class="fas fa-times-circle"></i> Weak Examples
+          </div>
+          <ul class="example-list">
+            {% for example in bad_examples %}
+            <li>{{ example }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Verbs -->
+    <div id="verbs" class="section">
+      <div class="section-header">
+        <div class="section-icon"><i class="fas fa-bolt"></i></div>
+        <h2>Power Action Verbs</h2>
+      </div>
+      <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+        Start your bullet points with these impactful action verbs to make your achievements stand out
+      </p>
+
+      <div class="verb-category">
+        <div class="verb-category-title"><i class="fas fa-crown"></i> Leadership</div>
+        <div class="verbs-grid">
+          {% for verb in action_verbs[:11] %}
+          <span class="verb-tag">{{ verb | title }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="verb-category">
+        <div class="verb-category-title"><i class="fas fa-trophy"></i> Achievement</div>
+        <div class="verbs-grid">
+          {% for verb in action_verbs[11:21] %}
+          <span class="verb-tag">{{ verb | title }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="verb-category">
+        <div class="verb-category-title"><i class="fas fa-hammer"></i> Creation</div>
+        <div class="verbs-grid">
+          {% for verb in action_verbs[21:31] %}
+          <span class="verb-tag">{{ verb | title }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="verb-category">
+        <div class="verb-category-title"><i class="fas fa-chart-line"></i> Improvement</div>
+        <div class="verbs-grid">
+          {% for verb in action_verbs[31:41] %}
+          <span class="verb-tag">{{ verb | title }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="verb-category">
+        <div class="verb-category-title"><i class="fas fa-search"></i> Analysis & Technical</div>
+        <div class="verbs-grid">
+          {% for verb in action_verbs[41:] %}
+          <span class="verb-tag">{{ verb | title }}</span>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Sample Bullet Points -->
+    <div id="bullets" class="section">
+      <div class="section-header">
+        <div class="section-icon"><i class="fas fa-pen"></i></div>
+        <h2>Sample Bullet Points</h2>
+      </div>
+      <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+        Notice how each bullet starts with an action verb and includes quantifiable results
+      </p>
+      <div class="sample-bullets">
+        <div class="sample-bullet">
+          <strong>Led</strong> a team of 5 developers to deliver a customer portal that <strong>increased user engagement by 40%</strong>
+        </div>
+        <div class="sample-bullet">
+          <strong>Reduced</strong> server response time by <strong>60%</strong> through database optimization and caching strategies
+        </div>
+        <div class="sample-bullet">
+          <strong>Managed</strong> <strong>$2M</strong> annual budget while cutting operational costs by <strong>15%</strong>
+        </div>
+        <div class="sample-bullet">
+          <strong>Developed</strong> automated testing framework that <strong>reduced QA time by 50%</strong>
+        </div>
+        <div class="sample-bullet">
+          <strong>Spearheaded</strong> migration to cloud infrastructure, saving <strong>$100K annually</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Tips Summary -->
+    <div class="section" style="background: linear-gradient(135deg, rgba(0, 194, 255, 0.1), rgba(0, 255, 224, 0.1));">
+      <div class="section-header">
+        <div class="section-icon"><i class="fas fa-magic"></i></div>
+        <h2>Quick Tips Summary</h2>
+      </div>
+      <div class="tips-list">
+        <div class="tip-item">
+          <div class="tip-icon">📊</div>
+          <div class="tip-text"><strong>Quantify Everything:</strong> Use numbers, percentages, and dollar amounts to show impact</div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-icon">⚡</div>
+          <div class="tip-text"><strong>Start with Action:</strong> Begin each bullet with a strong action verb</div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-icon">🎯</div>
+          <div class="tip-text"><strong>Tailor Content:</strong> Customize your resume for each job application</div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-icon">📝</div>
+          <div class="tip-text"><strong>Keep it Concise:</strong> Aim for 1-2 pages; respect the reader's time</div>
+        </div>
+        <div class="tip-item">
+          <div class="tip-icon">🔍</div>
+          <div class="tip-text"><strong>Use Keywords:</strong> Include industry-specific terms from the job description</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <a href="/upload" class="action-btn primary">
+        <i class="fas fa-upload"></i> Analyze Your Resume
+      </a>
+      <a href="/checklist" class="action-btn secondary">
+        <i class="fas fa-clipboard-list"></i> View Checklist
+      </a>
+      <a href="/" class="action-btn secondary">
+        <i class="fas fa-home"></i> Back to Home
+      </a>
+    </div>
+  </div>
+
+</body>
+</html>

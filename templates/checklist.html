@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Resume Checklist - Career Recommendation</title>
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-color: #0a0b0f;
+      --bg-secondary: #12131a;
+      --card-bg: #1a1b22;
+      --card-bg-hover: #22232d;
+      --text-color: #e0e0e0;
+      --text-muted: #888;
+      --accent: #00c2ff;
+      --accent-secondary: #00ffe0;
+      --accent-purple: #a855f7;
+      --success: #00ff88;
+      --warning: #ffaa00;
+      --error: #ff4444;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --glow: 0 0 40px rgba(0, 194, 255, 0.15);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      min-height: 100vh;
+      line-height: 1.6;
+      overflow-x: hidden;
+      padding-top: 70px;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(ellipse at 20% 20%, rgba(0, 194, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(0, 255, 224, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(168, 85, 247, 0.05) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .header {
+      background: linear-gradient(180deg, var(--bg-secondary) 0%, transparent 100%);
+      padding: 3rem 2rem;
+      text-align: center;
+      position: relative;
+    }
+
+    .header::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), var(--accent-secondary), transparent);
+    }
+
+    .header-icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+      font-size: 2rem;
+      box-shadow: var(--glow);
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, #fff 0%, var(--accent) 50%, var(--accent-secondary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header p {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 500;
+      margin-bottom: 2rem;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .back-link:hover {
+      color: var(--accent);
+      background: rgba(0, 194, 255, 0.1);
+    }
+
+    /* Score Overview */
+    .score-overview {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .score-card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 1.5rem;
+      text-align: center;
+      border: 1px solid var(--border-color);
+      transition: all 0.3s ease;
+    }
+
+    .score-card:hover {
+      border-color: rgba(0, 194, 255, 0.3);
+      box-shadow: var(--glow);
+    }
+
+    .score-card-value {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .score-card-label {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-top: 0.25rem;
+    }
+
+    /* Section Cards */
+    .section {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 1.75rem;
+      border: 1px solid var(--border-color);
+      margin-bottom: 1.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .section:hover {
+      border-color: rgba(0, 194, 255, 0.3);
+      box-shadow: var(--glow);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .section-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, rgba(0, 194, 255, 0.2), rgba(0, 255, 224, 0.2));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+      font-size: 1.25rem;
+    }
+
+    .section-header h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .section-header .score-badge {
+      margin-left: auto;
+      background: rgba(0, 194, 255, 0.15);
+      color: var(--accent);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    /* Checklist Items */
+    .checklist-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1rem;
+    }
+
+    .checklist-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 1.25rem;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      transition: all 0.3s ease;
+    }
+
+    .checklist-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(0, 194, 255, 0.3);
+    }
+
+    .checklist-item.checked {
+      border-color: rgba(0, 255, 136, 0.3);
+      background: rgba(0, 255, 136, 0.05);
+    }
+
+    .checklist-item.unchecked {
+      border-color: rgba(255, 170, 0, 0.3);
+      background: rgba(255, 170, 0, 0.05);
+    }
+
+    .check-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+
+    .check-icon.pass {
+      background: rgba(0, 255, 136, 0.2);
+      color: var(--success);
+    }
+
+    .check-icon.fail {
+      background: rgba(255, 170, 0, 0.2);
+      color: var(--warning);
+    }
+
+    .checklist-text {
+      flex: 1;
+    }
+
+    .checklist-label {
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .checklist-emoji {
+      font-size: 1.25rem;
+    }
+
+    /* Red Flags */
+    .red-flags-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .red-flag-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 1rem;
+      background: rgba(255, 68, 68, 0.1);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 68, 68, 0.2);
+    }
+
+    .red-flag-icon {
+      width: 32px;
+      height: 32px;
+      background: rgba(255, 68, 68, 0.2);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--error);
+      flex-shrink: 0;
+    }
+
+    .red-flag-text {
+      color: var(--text-color);
+    }
+
+    .red-flag-category {
+      font-size: 0.8rem;
+      color: var(--error);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.25rem;
+    }
+
+    /* Suggestions */
+    .suggestions-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .suggestion-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 1.25rem;
+      background: rgba(0, 255, 136, 0.05);
+      border-radius: 12px;
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .suggestion-item:hover {
+      background: rgba(0, 255, 136, 0.1);
+      transform: translateX(5px);
+    }
+
+    .suggestion-number {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--success), var(--accent-secondary));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #000;
+      font-weight: 700;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+
+    .suggestion-text {
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      padding: 2rem;
+      background: linear-gradient(180deg, transparent 0%, rgba(0, 194, 255, 0.05) 100%);
+      border-radius: 20px;
+    }
+
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1rem 2rem;
+      border-radius: 30px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      font-size: 1rem;
+    }
+
+    .action-btn.primary {
+      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+      color: #000;
+      box-shadow: 0 4px 20px rgba(0, 194, 255, 0.4);
+    }
+
+    .action-btn.secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-color);
+      border: 2px solid var(--accent);
+    }
+
+    .action-btn.purple {
+      background: rgba(168, 85, 247, 0.2);
+      color: var(--accent-purple);
+      border: 2px solid var(--accent-purple);
+    }
+
+    .action-btn:hover {
+      transform: translateY(-3px);
+    }
+
+    .action-btn.primary:hover {
+      box-shadow: 0 8px 30px rgba(0, 194, 255, 0.5);
+    }
+
+    .action-btn.secondary:hover {
+      background: rgba(0, 194, 255, 0.15);
+      border-color: var(--accent-secondary);
+    }
+
+    .action-btn.purple:hover {
+      background: rgba(168, 85, 247, 0.3);
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-muted);
+    }
+
+    .empty-state i {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      opacity: 0.5;
+    }
+
+    /* Career Target */
+    .career-target {
+      text-align: center;
+      padding: 1rem;
+      background: rgba(168, 85, 247, 0.1);
+      border-radius: 12px;
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      margin-bottom: 2rem;
+    }
+
+    .career-target-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+
+    .career-target-value {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--accent-purple);
+    }
+
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 1.75rem;
+      }
+
+      .container {
+        padding: 1rem;
+      }
+
+      .score-overview {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .checklist-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .action-btn {
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  {% include 'components/navbar.html' %}
+
+  <div class="header">
+    <div class="header-icon">📋</div>
+    <h1>Resume Checklist</h1>
+    <p>Complete evaluation of your resume against best practices</p>
+  </div>
+
+  <div class="container">
+    <a href="javascript:history.back()" class="back-link">
+      <i class="fas fa-arrow-left"></i> Back to Results
+    </a>
+
+    {% if evaluation_data %}
+    <!-- Career Target -->
+    {% if evaluation_data.target_career %}
+    <div class="career-target">
+      <div class="career-target-label">Evaluating for:</div>
+      <div class="career-target-value">{{ evaluation_data.target_career | title }}</div>
+    </div>
+    {% endif %}
+
+    <!-- Score Overview -->
+    <div class="score-overview">
+      <div class="score-card">
+        <div class="score-card-value">{{ evaluation_data.overall_score }}</div>
+        <div class="score-card-label">Overall Score</div>
+      </div>
+      <div class="score-card">
+        <div class="score-card-value">{{ evaluation_data.checklist.essential_score }}</div>
+        <div class="score-card-label">Essential Items</div>
+      </div>
+      <div class="score-card">
+        <div class="score-card-value">{{ evaluation_data.checklist.recommended_score }}</div>
+        <div class="score-card-label">Recommended Items</div>
+      </div>
+      <div class="score-card">
+        <div class="score-card-value">{{ evaluation_data.red_flags.count }}</div>
+        <div class="score-card-label">Red Flags</div>
+      </div>
+    </div>
+
+    <!-- Essential Items Checklist -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon"><i class="fas fa-check-double"></i></div>
+        <h2>Essential Items</h2>
+        <span class="score-badge">{{ evaluation_data.checklist.essential_score }}</span>
+      </div>
+      <div class="checklist-grid">
+        {% for key, item in evaluation_data.checklist.essential.items() %}
+        <div class="checklist-item {% if item.checked %}checked{% else %}unchecked{% endif %}">
+          <div class="check-icon {% if item.checked %}pass{% else %}fail{% endif %}">
+            <i class="fas fa-{% if item.checked %}check{% else %}times{% endif %}"></i>
+          </div>
+          <span class="checklist-emoji">{{ item.icon }}</span>
+          <div class="checklist-text">
+            <div class="checklist-label">{{ item.label }}</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Recommended Items Checklist -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon"><i class="fas fa-star"></i></div>
+        <h2>Recommended Items</h2>
+        <span class="score-badge">{{ evaluation_data.checklist.recommended_score }}</span>
+      </div>
+      <div class="checklist-grid">
+        {% for key, item in evaluation_data.checklist.recommended.items() %}
+        <div class="checklist-item {% if item.checked %}checked{% else %}unchecked{% endif %}">
+          <div class="check-icon {% if item.checked %}pass{% else %}fail{% endif %}">
+            <i class="fas fa-{% if item.checked %}check{% else %}times{% endif %}"></i>
+          </div>
+          <span class="checklist-emoji">{{ item.icon }}</span>
+          <div class="checklist-text">
+            <div class="checklist-label">{{ item.label }}</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Red Flags Section -->
+    {% if evaluation_data.red_flags.count > 0 %}
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon" style="background: rgba(255, 68, 68, 0.2);"><i class="fas fa-exclamation-triangle" style="color: var(--error);"></i></div>
+        <h2>Red Flags Detected</h2>
+        <span class="score-badge" style="background: rgba(255, 68, 68, 0.15); color: var(--error);">{{ evaluation_data.red_flags.count }}</span>
+      </div>
+      <div class="red-flags-list">
+        {% if evaluation_data.red_flags.flags.generic_phrases %}
+          {% for phrase in evaluation_data.red_flags.flags.generic_phrases[:3] %}
+          <div class="red-flag-item">
+            <div class="red-flag-icon"><i class="fas fa-ban"></i></div>
+            <div class="red-flag-text">
+              <div class="red-flag-category">Generic Phrase</div>
+              Avoid using "{{ phrase }}" - be more specific about your achievements
+            </div>
+          </div>
+          {% endfor %}
+        {% endif %}
+        {% if evaluation_data.red_flags.flags.outdated_skills %}
+          {% for skill in evaluation_data.red_flags.flags.outdated_skills[:2] %}
+          <div class="red-flag-item">
+            <div class="red-flag-icon"><i class="fas fa-clock"></i></div>
+            <div class="red-flag-text">
+              <div class="red-flag-category">Outdated Skill</div>
+              "{{ skill }}" is outdated - consider removing or updating to modern alternatives
+            </div>
+          </div>
+          {% endfor %}
+        {% endif %}
+        {% if evaluation_data.red_flags.flags.personal_info %}
+          {% for info in evaluation_data.red_flags.flags.personal_info %}
+          <div class="red-flag-item">
+            <div class="red-flag-icon"><i class="fas fa-user-shield"></i></div>
+            <div class="red-flag-text">
+              <div class="red-flag-category">Personal Information</div>
+              {{ info }} - modern resumes should not include personal details like age or marital status
+            </div>
+          </div>
+          {% endfor %}
+        {% endif %}
+        {% if evaluation_data.red_flags.flags.other %}
+          {% for flag in evaluation_data.red_flags.flags.other %}
+          <div class="red-flag-item">
+            <div class="red-flag-icon"><i class="fas fa-info-circle"></i></div>
+            <div class="red-flag-text">
+              <div class="red-flag-category">Format Issue</div>
+              {{ flag }}
+            </div>
+          </div>
+          {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Top Suggestions -->
+    {% if evaluation_data.suggestions %}
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon"><i class="fas fa-lightbulb"></i></div>
+        <h2>Top 3 Improvement Suggestions</h2>
+      </div>
+      <div class="suggestions-list">
+        {% for suggestion in evaluation_data.suggestions %}
+        <div class="suggestion-item">
+          <div class="suggestion-number">{{ loop.index }}</div>
+          <div class="suggestion-text">{{ suggestion }}</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <!-- No Data State -->
+    <div class="section">
+      <div class="empty-state">
+        <i class="fas fa-file-alt"></i>
+        <h3 style="margin-bottom: 0.5rem;">No Evaluation Data Available</h3>
+        <p>Please upload a resume first to see your checklist.</p>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <a href="/guide" class="action-btn purple">
+        <i class="fas fa-book"></i> Resume Guide
+      </a>
+      <a href="/upload" class="action-btn primary">
+        <i class="fas fa-upload"></i> Upload New Resume
+      </a>
+      <a href="javascript:history.back()" class="action-btn secondary">
+        <i class="fas fa-arrow-left"></i> Back to Results
+      </a>
+    </div>
+  </div>
+
+</body>
+</html>
