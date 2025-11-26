@@ -139,6 +139,10 @@ GITHUB_INTEGRATION_ENABLED = config.get('GITHUB_INTEGRATION_ENABLED', False)
 RESUME_ANALYZER_SUPPORT = ENHANCED_ANALYZER_SUPPORT
 resume_analyzer = None
 
+# Resume quality scoring constants
+DEGREE_KEYWORDS = ['bachelor', 'master', 'phd', 'degree', 'b.tech', 'm.tech', 'b.e', 'm.e', 'bsc', 'msc']
+PHONE_PATTERN = r'\b\d{10}\b|\b\d{3}[-.\s]\d{3}[-.\s]\d{4}\b|\+\d{1,3}[-.\s]\d+'
+
 
 # ===== Utility Functions =====
 def format_list_for_display(items):
@@ -538,13 +542,14 @@ def handle_resume_upload():
     
     # Quality checking with proper error handling
     # Build extracted_data dict for quality checker
+    contact_info_str = contact_info if contact_info else ""
     extracted_data_for_quality = {
         'skills': skills_found,
         'education': education_display,
         'experience': experience_display,
         'contact': {
-            'email': contact_info if '@' in contact_info else None,
-            'phone': contact_info if any(c.isdigit() for c in contact_info) else None
+            'email': contact_info_str if '@' in contact_info_str else None,
+            'phone': contact_info_str if contact_info_str and any(c.isdigit() for c in contact_info_str) else None
         }
     }
     
@@ -829,7 +834,7 @@ def calculate_basic_quality_score(text, skills, education, experience, projects,
         score += 10
         # Bonus for relevant degrees
         education_text = ' '.join(education).lower()
-        if any(deg in education_text for deg in ['bachelor', 'master', 'phd', 'degree', 'b.tech', 'm.tech', 'b.e', 'm.e', 'bsc', 'msc']):
+        if any(deg in education_text for deg in DEGREE_KEYWORDS):
             score += 10
     
     # Experience scoring (20 points max)
@@ -859,8 +864,7 @@ def calculate_basic_quality_score(text, skills, education, experience, projects,
     # Contact info scoring (10 points max)
     if '@' in text:  # Has email
         score += 5
-    phone_pattern = r'\b\d{10}\b|\b\d{3}[-.\s]\d{3}[-.\s]\d{4}\b|\+\d{1,3}[-.\s]\d+'
-    if re.search(phone_pattern, text):
+    if re.search(PHONE_PATTERN, text):
         score += 5
     
     # Ensure score is between 0 and 100
