@@ -17,7 +17,7 @@ class ATSAnalyzer:
         target_keywords = self.career_keywords.get(predicted_career, [])
         found = [k for k in target_keywords if k in resume_lower]
         missing = [k for k in target_keywords if k not in resume_lower]
-        keyword_score = min(100, (len(found) / max(len(target_keywords), 1)) * 100)
+        keyword_score = min(100.0, (float(len(found)) / max(len(target_keywords), 1)) * 100)
 
         # Section analysis
         sections = {
@@ -31,7 +31,8 @@ class ATSAnalyzer:
 
         # Format analysis
         has_email = bool(re.search(r'[\w\.-]+@[\w\.-]+\.\w+', resume_text))
-        has_phone = bool(re.search(r'[\d\s\-\(\)]{10,}', resume_text))
+        # Phone pattern requires at least one digit in the sequence
+        has_phone = bool(re.search(r'(?=.*\d)[\d\s\-\(\)]{10,}', resume_text))
         format_score = 50 + (25 if has_email else 0) + (25 if has_phone else 0)
 
         # Overall score

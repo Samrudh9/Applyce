@@ -762,6 +762,7 @@ def ats_report():
     """Show detailed ATS analysis report"""
     ats_data = session.get('ats_data', {})
     if not ats_data:
+        flash('Please upload a resume first to view the ATS report.')
         return redirect(url_for('upload'))
     return render_template('ats_report.html', ats_data=ats_data)
 
