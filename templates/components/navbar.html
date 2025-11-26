@@ -54,7 +54,7 @@
   text-decoration: none;
   font-weight: 700;
   font-size: 1.5rem;
-  background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+  background: linear-gradient(90deg, var(--accent, #00c2ff), var(--accent-secondary, #00ffe0));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -66,7 +66,7 @@
 }
 
 .logo-text {
-  background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+  background: linear-gradient(90deg, var(--accent, #00c2ff), var(--accent-secondary, #00ffe0));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -82,7 +82,7 @@
 }
 
 .nav-link {
-  color: var(--text-muted);
+  color: var(--text-muted, #888);
   text-decoration: none;
   font-weight: 500;
   transition: color 0.3s ease;
@@ -90,11 +90,11 @@
 }
 
 .nav-link:hover {
-  color: var(--accent);
+  color: var(--accent, #00c2ff);
 }
 
 .nav-link.nav-cta {
-  background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+  background: linear-gradient(90deg, var(--accent, #00c2ff), var(--accent-secondary, #00ffe0));
   color: #000;
   padding: 0.6rem 1.25rem;
   border-radius: 25px;
@@ -121,7 +121,7 @@
   display: block;
   width: 25px;
   height: 3px;
-  background: var(--text-color);
+  background: var(--text-color, #e0e0e0);
   border-radius: 3px;
   position: relative;
   transition: all 0.3s ease;
@@ -133,7 +133,7 @@
   position: absolute;
   width: 25px;
   height: 3px;
-  background: var(--text-color);
+  background: var(--text-color, #e0e0e0);
   border-radius: 3px;
   transition: all 0.3s ease;
 }
