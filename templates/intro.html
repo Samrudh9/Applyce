@@ -35,51 +35,9 @@
       line-height: 1.6;
     }
 
-    /* Navigation */
-    .navbar {
-      position: fixed;
-      top: 0;
-      width: 100%;
-      padding: 1rem 2rem;
-      background: rgba(10, 11, 15, 0.95);
-      backdrop-filter: blur(10px);
-      z-index: 1000;
-      box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .nav-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .logo {
-      font-size: 1.5rem;
-      font-weight: 700;
-      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .nav-links {
-      display: flex;
-      list-style: none;
-      gap: 2rem;
-    }
-
-    .nav-links a {
-      text-decoration: none;
-      color: var(--text-color);
-      font-weight: 500;
-      transition: color 0.3s ease;
-    }
-
-    .nav-links a:hover {
-      color: var(--accent);
+    /* Body padding for fixed navbar */
+    body {
+      padding-top: 70px;
     }
 
     /* Hero Section */
@@ -350,10 +308,6 @@
         font-size: 2.5rem;
       }
 
-      .nav-links {
-        display: none;
-      }
-
       .features-grid {
         grid-template-columns: 1fr;
       }
@@ -392,19 +346,7 @@
 
 <body>
   <!-- Navigation -->
-  <nav class="navbar">
-    <div class="nav-container">
-      <div class="logo"> SkillFit</div>
-      <ul class="nav-links">
-        <li><a href="#">Home</a></li>
-        <li><a href="#features">Features</a></li>
-        <li><a href="#how-it-works">How It Works</a></li>
-        <li><a href="/form">Enter Manually</a></li>
-        <li><a href="/upload">Upload Resume</a></li>
-        <li><a href="/about">About</a></li>
-      </ul>
-    </div>
-  </nav>
+  {% include 'components/navbar.html' %}
 
   <!-- Hero Section -->
   <section class="hero">
