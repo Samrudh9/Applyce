@@ -15,7 +15,7 @@ class ResumeHistory(db.Model):
     
     # Resume metadata
     filename = db.Column(db.String(255), nullable=False)
-    upload_date = db.Column(db.DateTime, default=datetime.utcnow)
+    upload_date = db.Column(db.DateTime, default=lambda: datetime.utcnow())
     
     # Scores
     overall_score = db.Column(db.Integer, default=0)

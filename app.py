@@ -143,6 +143,10 @@ resume_analyzer = None
 DEGREE_KEYWORDS = ['bachelor', 'master', 'phd', 'degree', 'b.tech', 'm.tech', 'b.e', 'm.e', 'bsc', 'msc']
 PHONE_PATTERN = r'\b\d{10}\b|\b\d{3}[-.\s]\d{3}[-.\s]\d{4}\b|\+\d{1,3}[-.\s]\d+'
 
+# Score calculation multipliers for sub-scores
+KEYWORD_SCORE_MULTIPLIER = 1.1  # Keywords are weighted 10% higher
+FORMAT_SCORE_MULTIPLIER = 0.9   # Format is weighted 10% lower
+
 
 # ===== Utility Functions =====
 def format_list_for_display(items):
@@ -442,9 +446,9 @@ def dashboard():
         latest_score = latest.overall_score
         best_score = max(h.overall_score for h in history)
         
-        # Calculate improvement
+        # Calculate improvement (compare with previous upload, not oldest)
         if len(history) >= 2:
-            improvement = latest.overall_score - history[-1].overall_score
+            improvement = latest.overall_score - history[1].overall_score
         else:
             improvement = 0
         
@@ -464,8 +468,8 @@ def dashboard():
                 try:
                     skills = json.loads(h.skills_detected)
                     all_skills.update(skills)
-                except json.JSONDecodeError:
-                    pass
+                except json.JSONDecodeError as e:
+                    logging.warning(f"Failed to parse skills JSON for history id {h.id}: {e}")
         
         top_career = latest.predicted_career
         career_confidence = latest.career_confidence
@@ -485,7 +489,7 @@ def dashboard():
         latest_score=latest_score,
         best_score=best_score,
         improvement=improvement,
-        score_history=json.dumps(score_history),
+        score_history=score_history,
         all_skills=list(all_skills),
         top_career=top_career,
         career_confidence=career_confidence
@@ -751,13 +755,18 @@ def handle_resume_upload():
             from models.resume_history import ResumeHistory
             import json as json_lib
             
+            # Calculate sub-scores using defined multipliers
+            base_score = resume_score if resume_score else 0
+            keyword_score = min(int(base_score * KEYWORD_SCORE_MULTIPLIER), 100)
+            format_score = int(base_score * FORMAT_SCORE_MULTIPLIER)
+            
             history_entry = ResumeHistory(
                 user_id=current_user.id,
                 filename=secure_filename(resume.filename),
-                overall_score=resume_score if resume_score else 0,
-                keyword_score=int(resume_score * 1.1) if resume_score else 0,
-                format_score=int(resume_score * 0.9) if resume_score else 0,
-                section_score=resume_score if resume_score else 0,
+                overall_score=base_score,
+                keyword_score=keyword_score,
+                format_score=format_score,
+                section_score=base_score,
                 predicted_career=predictions[0][0] if predictions else None,
                 career_confidence=predictions[0][1] if predictions else 0,
                 top_careers=json_lib.dumps([(c, conf) for c, conf in predictions[:3]]) if predictions else '[]',
@@ -770,7 +779,7 @@ def handle_resume_upload():
             db.session.add(history_entry)
             db.session.commit()
         except Exception as e:
-            print(f"Resume history save error: {e}")
+            logging.error(f"Resume history save error: {e}")
             db.session.rollback()
 
     return render_template('result.html',

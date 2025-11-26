@@ -705,7 +705,7 @@
   {% if total_resumes > 0 %}
   <script>
     // Score Progress Chart
-    const scoreHistory = {{ score_history | safe }};
+    const scoreHistory = {{ score_history | tojson }};
     
     if (scoreHistory && scoreHistory.length > 0) {
       const ctx = document.getElementById('scoreChart').getContext('2d');
