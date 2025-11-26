@@ -302,9 +302,95 @@
 
   <script>
     const suggestionMap = {
-      skills: ["python", "sql", "java", "android", "communication", "leadership", "css", "html", "javascript", "c++", "algorithms", "R", "statistics", "tensorflow", "cybersecurity", "networking", "linux", "shell scripting", "adobe photoshop", "illustrator", "3D modeling", "cad", "excel", "flask", "salesforce", "CRM", "SEO", "google analytics", "pandas", "numpy", "UI/UX design", "figma", "financial modeling", "MATLAB", "control system", "SAP", "AWS", "Docker", "kubernetes", "Spring boot", "react", "angular", "vue", "nodejs", "mongodb", "postgresql", "machine learning", "deep learning", "data analysis", "project management", "recruitment", "talent acquisition", "payroll", "marketing", "content writing", "negotiation", "sales"],
-      interest: ["Data Analysis", "Problem Solving", "App Development", "UI Design", "Teamwork", "Public Speaking", "Web Design", "UX", "Competitive Programming", "Logic Building", "Data Visualization", "Research", "AI", "Neural Networks", "Security Systems", "Hacking Prevention", "System Administration", "Server Management", "Graphic Design", "Branding", "Architecture", "Product Design", "Market Trends", "Reporting", "Web Apps", "APIs", "Customer Relations", "Automation", "Marketing", "Content Optimization", "Big Data", "Data Cleaning", "Robotics", "Resource Planning", "Business Integration", "Deep Learning", "Computer Vision", "Cloud Infrastructure", "DevOps", "Investing", "Forecasting", "Writing", "Editing", "People Management", "Policies", "Finance", "Law", "Education", "Learning", "Logistics", "Coordination", "Customer Interaction", "Retail", "Journalism", "Investigative Reporting", "Design Thinking", "User Experience", "Server-side Development", "HR", "Recruiting", "Training"],
-      qualification: ["10th", "12th", "Diploma", "B.Tech", "B.E", "B.Sc", "B.Com", "BBA", "BCA", "BA", "MBA", "M.Tech", "M.E", "M.Sc", "M.Com", "MCA", "MA", "Ph.D", "Doctorate"]
+      skills: [
+        // Programming Languages
+        "Python", "Java", "JavaScript", "TypeScript", "C", "C++", "C#", "Go", "Rust", "Ruby", "PHP", "Swift", "Kotlin", "Scala", "R", "MATLAB", "Perl", "Shell/Bash", "PowerShell",
+        // Web Frontend
+        "HTML", "CSS", "SASS/SCSS", "React", "Angular", "Vue.js", "Next.js", "Nuxt.js", "Svelte", "jQuery", "Bootstrap", "Tailwind CSS", "Material UI", "Redux", "Webpack", "Vite",
+        // Web Backend
+        "Node.js", "Express.js", "Django", "Flask", "FastAPI", "Spring Boot", "ASP.NET", "Ruby on Rails", "Laravel", "NestJS",
+        // Mobile Development
+        "Flutter", "React Native", "Android SDK", "iOS Development", "Xamarin", "Ionic",
+        // Databases
+        "SQL", "MySQL", "PostgreSQL", "MongoDB", "Redis", "Cassandra", "Oracle", "SQLite", "Firebase", "DynamoDB", "Elasticsearch",
+        // Cloud Platforms
+        "AWS", "Azure", "Google Cloud", "Heroku", "DigitalOcean", "Vercel", "Netlify",
+        // DevOps
+        "Docker", "Kubernetes", "Jenkins", "GitLab CI", "GitHub Actions", "Terraform", "Ansible", "Chef", "Puppet",
+        // Data Science
+        "Pandas", "NumPy", "Scikit-learn", "TensorFlow", "PyTorch", "Keras", "Matplotlib", "Seaborn", "Jupyter",
+        // AI/ML
+        "Machine Learning", "Deep Learning", "NLP", "Computer Vision", "Neural Networks", "LLMs", "Transformers", "OpenAI", "LangChain",
+        // Other Tech
+        "Git", "Linux", "REST APIs", "GraphQL", "WebSockets", "Microservices", "System Design", "Agile", "Scrum",
+        // Project Management
+        "Project Management", "Product Management", "Business Analysis", "Strategic Planning", "Risk Management", "Kanban", "Lean", "Six Sigma", "PMP", "PRINCE2",
+        // Leadership & Management
+        "Leadership", "Team Management", "Change Management", "Stakeholder Management", "Budgeting", "Forecasting", "P&L Management", "KPI Tracking",
+        // Digital Marketing
+        "Digital Marketing", "SEO", "SEM", "PPC", "Google Ads", "Facebook Ads", "LinkedIn Ads", "Content Marketing", "Social Media Marketing", "Email Marketing", "Influencer Marketing",
+        // Marketing Tools & Analytics
+        "Brand Management", "Market Research", "Consumer Behavior", "Marketing Analytics", "Google Analytics", "HubSpot", "Mailchimp", "Hootsuite", "Buffer", "Canva",
+        // Content & Writing
+        "Copywriting", "Content Writing", "Blog Writing", "Video Marketing", "Technical Writing", "Creative Writing",
+        // Finance & Accounting
+        "Financial Analysis", "Financial Modeling", "Valuation", "Accounting", "Bookkeeping", "Auditing", "Taxation", "GAAP", "IFRS",
+        // Finance Tools
+        "Excel", "Advanced Excel", "VBA", "Power BI", "Tableau", "QuickBooks", "SAP", "Oracle Financials", "Bloomberg Terminal",
+        // Investment & Banking
+        "Investment Banking", "Equity Research", "Portfolio Management", "CFA", "CPA", "FRM", "ACCA",
+        // HR & Recruitment
+        "Recruitment", "Talent Acquisition", "Sourcing", "Screening", "Interviewing", "Onboarding", "Employee Relations", "Performance Management", "Training & Development",
+        // HR Systems
+        "HRIS", "Workday", "BambooHR", "SAP SuccessFactors", "ADP",
+        // HR Operations
+        "Compensation & Benefits", "Payroll", "Labor Law", "Compliance", "Organizational Development", "DEI", "Employee Engagement",
+        // Sales
+        "Sales", "B2B Sales", "B2C Sales", "Inside Sales", "Field Sales", "Lead Generation", "Cold Calling", "Prospecting", "Negotiation", "Closing",
+        // Sales Tools & Management
+        "CRM", "Salesforce", "HubSpot CRM", "Pipedrive", "Zoho CRM", "Account Management", "Key Account Management", "Customer Success", "Sales Strategy", "Territory Management", "Pipeline Management",
+        // Design
+        "UI Design", "UX Design", "Graphic Design", "Visual Design", "Interaction Design", "Wireframing", "Prototyping", "User Research", "Usability Testing", "Design Thinking", "Information Architecture", "Responsive Design",
+        // Design Tools
+        "Figma", "Sketch", "Adobe XD", "InVision", "Zeplin", "Adobe Photoshop", "Adobe Illustrator", "Adobe InDesign", "Adobe After Effects", "Adobe Premiere Pro",
+        // Healthcare
+        "Patient Care", "Clinical Research", "Medical Terminology", "HIPAA", "EHR/EMR", "Epic", "Cerner", "Medical Billing", "Medical Coding", "Healthcare Administration", "Public Health", "Epidemiology", "Nursing", "Pharmacy", "Physical Therapy", "Radiology",
+        // Legal
+        "Legal Research", "Contract Drafting", "Contract Review", "Litigation", "Corporate Law", "Intellectual Property", "Employment Law", "Due Diligence", "M&A", "Regulatory Affairs", "LexisNexis", "Westlaw", "Case Management",
+        // Operations & Supply Chain
+        "Supply Chain Management", "Logistics", "Inventory Management", "Procurement", "Vendor Management", "Warehouse Management", "Distribution", "Lean Manufacturing", "Process Improvement", "Quality Control", "ERP Systems",
+        // Soft Skills - Communication
+        "Communication", "Public Speaking", "Presentation Skills", "Writing", "Interpersonal Skills", "Active Listening",
+        // Soft Skills - Problem Solving
+        "Problem Solving", "Critical Thinking", "Analytical Skills", "Decision Making", "Strategic Thinking", "Creativity", "Innovation",
+        // Soft Skills - Personal Effectiveness
+        "Time Management", "Organization", "Multitasking", "Prioritization", "Adaptability", "Flexibility", "Work Ethic", "Self-Motivation",
+        // Soft Skills - Interpersonal
+        "Teamwork", "Collaboration", "Emotional Intelligence", "Conflict Resolution", "Customer Service", "Attention to Detail",
+        // Languages
+        "English", "Hindi", "Spanish", "French", "German", "Mandarin", "Japanese", "Arabic", "Portuguese"
+      ],
+      interest: [
+        // Technology & Engineering
+        "Artificial Intelligence", "Machine Learning", "Data Science", "Robotics", "Web Development", "Mobile App Development", "Game Development", "Cybersecurity", "Cloud Computing", "Blockchain", "IoT", "AR/VR", "Software Engineering", "Computer Science", "Electronics", "Embedded Systems",
+        // Business & Finance
+        "Entrepreneurship", "Startups", "Business Strategy", "Consulting", "Finance", "Investment Banking", "Stock Market", "Cryptocurrency", "Marketing", "Advertising", "Branding", "E-commerce", "Real Estate", "Venture Capital", "Private Equity",
+        // Creative & Design
+        "Graphic Design", "UI/UX Design", "Animation", "3D Modeling", "Photography", "Videography", "Film Making", "Content Creation", "Music", "Art", "Writing", "Blogging", "Podcasting", "Fashion", "Interior Design", "Architecture",
+        // Science & Research
+        "Biology", "Chemistry", "Physics", "Mathematics", "Statistics", "Medical Research", "Pharmaceutical", "Biotechnology", "Genetics", "Environmental Science", "Climate Change", "Sustainability", "Space", "Astronomy", "Aerospace",
+        // Social & Humanities
+        "Psychology", "Sociology", "Philosophy", "History", "Education", "Teaching", "Training", "Mentoring", "Social Work", "Non-profit", "NGO", "Community Service", "Politics", "Public Policy", "International Relations",
+        // Health & Wellness
+        "Healthcare", "Medicine", "Nursing", "Public Health", "Fitness", "Nutrition", "Sports", "Yoga", "Mental Health", "Pharmacy", "Dentistry", "Veterinary",
+        // Media & Communication
+        "Journalism", "News", "Media", "Broadcasting", "Public Relations", "Corporate Communications", "Social Media", "Digital Content", "Influencer Marketing",
+        // Others
+        "Travel", "Tourism", "Hospitality", "Event Management", "Food", "Culinary Arts", "Restaurant Management", "Automotive", "Aviation", "Transportation", "Logistics", "Gaming", "Esports", "Entertainment", "Sports Management", "Legal", "Law", "Compliance", "Governance",
+        // Additional interests from original
+        "Data Analysis", "Problem Solving", "App Development", "UI Design", "Teamwork", "Public Speaking", "Web Design", "UX", "Competitive Programming", "Logic Building", "Data Visualization", "Research", "AI", "Neural Networks", "Security Systems", "System Administration", "Server Management", "Product Design", "Market Trends", "Reporting", "Web Apps", "APIs", "Customer Relations", "Automation", "Content Optimization", "Big Data", "Data Cleaning", "Resource Planning", "Business Integration", "Deep Learning", "Computer Vision", "Cloud Infrastructure", "DevOps", "Investing", "Forecasting", "Editing", "People Management", "Policies", "Learning", "Coordination", "Customer Interaction", "Retail", "Investigative Reporting", "Design Thinking", "User Experience", "Server-side Development", "HR", "Recruiting"
+      ],
+      qualification: ["10th", "12th", "Diploma", "B.Tech", "B.E", "B.Sc", "B.Com", "BBA", "BCA", "BA", "MBA", "M.Tech", "M.E", "M.Sc", "M.Com", "MCA", "MA", "Ph.D", "Doctorate", "LLB", "LLM", "MD", "MBBS", "BDS", "MDS", "B.Pharm", "M.Pharm", "CA", "CS", "CMA", "B.Ed", "M.Ed", "B.Arch", "M.Arch", "BFA", "MFA", "B.Des", "M.Des"]
     };
 
     function setupAutoSuggest(inputId, suggestionBoxId, isMulti = false, maxItems = 3) {
