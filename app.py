@@ -74,6 +74,13 @@ from services.unified_scorer import (
 )
 unified_scorer = UnifiedResumeScorer()
 
+# Deep Intelligence Engine
+from services.deep_intelligence import (
+    DeepIntelligenceEngine,
+    get_deep_intelligence_engine
+)
+deep_intelligence_engine = get_deep_intelligence_engine()
+
 print("✅ All imports loaded successfully")
 
 app = Flask(__name__)
@@ -859,6 +866,21 @@ def handle_resume_upload():
     if ats_data and 'overall_score' in ats_data:
         resume_score = ats_data['overall_score']
     
+    # Deep Intelligence Analysis
+    deep_analysis = None
+    try:
+        deep_analysis = deep_intelligence_engine.analyze_resume(
+            resume_text=extracted_text,
+            target_role=target_role,
+            predicted_career=primary_career,
+            detected_skills=skills_found,
+            projects=projects if projects != ["Not detected"] else [],
+            experience=experience if experience != ["Not detected"] else []
+        )
+    except Exception as e:
+        print(f"Deep intelligence analysis error: {e}")
+        deep_analysis = None
+    
     # Save resume history for logged-in users
     if current_user.is_authenticated:
         try:
@@ -903,7 +925,9 @@ def handle_resume_upload():
                           improvements=improvement_suggestions,
                           predicted_salary=predicted_salary,
                           salary_data=salary_data,
-                          roadmap_available=ROADMAP_SUPPORT)
+                          roadmap_available=ROADMAP_SUPPORT,
+                          deep_analysis=deep_analysis,
+                          target_role=target_role)
 
 def create_career_dict(predictions):
     """Create a properly formatted career dictionary for the template"""
