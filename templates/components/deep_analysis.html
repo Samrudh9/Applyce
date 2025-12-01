@@ -1,0 +1,1237 @@
+<!-- Deep Analysis Component -->
+<!-- Displays comprehensive resume analysis with skill depth, project complexity, weaknesses, and fixes -->
+
+{% if deep_analysis %}
+<div class="deep-analysis-section">
+    
+    <!-- Match Summary -->
+    <div class="section deep-match-summary" id="deep-match-summary">
+        <div class="section-header">
+            <div class="section-icon"><i class="fas fa-crosshairs"></i></div>
+            <h2>Career Match Analysis</h2>
+        </div>
+        
+        <div class="match-comparison">
+            <div class="match-target">
+                <span class="match-label">Your Target</span>
+                <span class="match-role">{{ deep_analysis.target_role | title }}</span>
+            </div>
+            
+            <div class="match-vs">
+                {% if deep_analysis.is_mismatch %}
+                    <span class="match-icon mismatch"><i class="fas fa-exchange-alt"></i></span>
+                    <span class="match-status mismatch">Mismatch</span>
+                {% else %}
+                    <span class="match-icon match"><i class="fas fa-check-circle"></i></span>
+                    <span class="match-status match">Match!</span>
+                {% endif %}
+            </div>
+            
+            <div class="match-predicted">
+                <span class="match-label">Currently Shows</span>
+                <span class="match-role">{{ deep_analysis.predicted_career | title }}</span>
+            </div>
+        </div>
+        
+        <!-- Match Score Bar -->
+        <div class="match-score-container">
+            <div class="match-score-header">
+                <span>Match Score</span>
+                <span class="match-score-value {% if deep_analysis.scores.overall_match >= 70 %}good{% elif deep_analysis.scores.overall_match >= 40 %}medium{% else %}poor{% endif %}">
+                    {{ deep_analysis.scores.overall_match | round(0) }}%
+                </span>
+            </div>
+            <div class="match-score-bar">
+                <div class="match-score-fill" style="width: {{ deep_analysis.scores.overall_match }}%"></div>
+            </div>
+        </div>
+        
+        {% if deep_analysis.explanation %}
+        <div class="match-explanation">
+            <i class="fas fa-info-circle"></i>
+            <p>{{ deep_analysis.explanation | replace('\n', '<br>') | safe }}</p>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Score Breakdown -->
+    <div class="section deep-scores">
+        <div class="section-header">
+            <div class="section-icon"><i class="fas fa-chart-bar"></i></div>
+            <h2>Score Breakdown</h2>
+        </div>
+        
+        <div class="score-grid">
+            <div class="score-item">
+                <div class="score-circle" style="--score: {{ deep_analysis.scores.overall }}">
+                    <span class="score-value">{{ deep_analysis.scores.overall | round(0) }}</span>
+                    <span class="score-grade">{{ deep_analysis.scores.grade }}</span>
+                </div>
+                <span class="score-label">Overall</span>
+            </div>
+            
+            <div class="score-bars">
+                <div class="score-bar-item">
+                    <div class="score-bar-header">
+                        <span>Role Match</span>
+                        <span>{{ deep_analysis.scores.overall_match | round(0) }}%</span>
+                    </div>
+                    <div class="score-bar">
+                        <div class="score-bar-fill" style="width: {{ deep_analysis.scores.overall_match }}%"></div>
+                    </div>
+                </div>
+                
+                <div class="score-bar-item">
+                    <div class="score-bar-header">
+                        <span>Skill Depth</span>
+                        <span>{{ deep_analysis.scores.skill_depth | round(0) }}%</span>
+                    </div>
+                    <div class="score-bar">
+                        <div class="score-bar-fill" style="width: {{ deep_analysis.scores.skill_depth }}%"></div>
+                    </div>
+                </div>
+                
+                <div class="score-bar-item">
+                    <div class="score-bar-header">
+                        <span>Evidence Score</span>
+                        <span>{{ deep_analysis.scores.evidence_score | round(0) }}%</span>
+                    </div>
+                    <div class="score-bar">
+                        <div class="score-bar-fill" style="width: {{ deep_analysis.scores.evidence_score }}%"></div>
+                    </div>
+                </div>
+                
+                <div class="score-bar-item">
+                    <div class="score-bar-header">
+                        <span>Projects</span>
+                        <span>{{ deep_analysis.scores.project_score | round(0) }}%</span>
+                    </div>
+                    <div class="score-bar">
+                        <div class="score-bar-fill" style="width: {{ deep_analysis.scores.project_score }}%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Skill Depth Analysis -->
+    <div class="section deep-skills">
+        <div class="section-header">
+            <div class="section-icon"><i class="fas fa-layer-group"></i></div>
+            <h2>Skill Depth Analysis</h2>
+        </div>
+        
+        {% if deep_analysis.skill_analysis.category_strengths %}
+        <div class="skill-categories">
+            {% for cat, data in deep_analysis.skill_analysis.category_strengths.items() %}
+            <div class="skill-category {% if data.strength == 'weak' %}weak{% elif data.strength == 'strong' %}strong{% else %}moderate{% endif %}">
+                <div class="category-header">
+                    <span class="category-name">{{ cat | replace('_', ' ') | title }}</span>
+                    <span class="category-badge {{ data.strength }}">
+                        {% if data.strength == 'strong' %}
+                            <i class="fas fa-check-circle"></i> Strong
+                        {% elif data.strength == 'weak' %}
+                            <i class="fas fa-exclamation-triangle"></i> Weak
+                        {% else %}
+                            <i class="fas fa-minus-circle"></i> Moderate
+                        {% endif %}
+                    </span>
+                </div>
+                
+                <div class="category-score-bar">
+                    <div class="score-bar">
+                        <div class="score-bar-fill {{ data.strength }}" style="width: {{ data.actual_score }}%"></div>
+                    </div>
+                    <span class="category-score">{{ data.actual_score | round(0) }}%</span>
+                </div>
+                
+                <div class="category-details">
+                    <span class="detail-item">
+                        <i class="fas fa-cubes"></i> {{ data.skills_count }} skills
+                    </span>
+                    <span class="detail-item">
+                        <i class="fas fa-weight-hanging"></i> {{ (data.required_weight * 100) | round(0) }}% weight
+                    </span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <!-- Individual Skills -->
+        {% if deep_analysis.skill_analysis.skill_details %}
+        <div class="individual-skills">
+            <h3 class="subsection-title">
+                <i class="fas fa-code"></i> Individual Skills
+            </h3>
+            
+            <div class="skills-list">
+                {% for skill in deep_analysis.skill_analysis.skill_details[:12] %}
+                <div class="skill-item">
+                    <div class="skill-header">
+                        <span class="skill-name">{{ skill.name }}</span>
+                        <span class="skill-level {{ skill.level }}">{{ skill.level | title }}</span>
+                    </div>
+                    <div class="skill-bar">
+                        <div class="skill-bar-fill" style="width: {{ skill.percentage }}%"></div>
+                    </div>
+                    <div class="skill-details">
+                        <span>{{ skill.percentage }}%</span>
+                        {% if skill.evidence %}
+                        <span class="skill-evidence">
+                            <i class="fas fa-check"></i> {{ skill.evidence | join(', ') }}
+                        </span>
+                        {% else %}
+                        <span class="skill-no-evidence">
+                            <i class="fas fa-question-circle"></i> No evidence
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Skills Warning -->
+        {% if deep_analysis.skill_analysis.skills_just_listed %}
+        <div class="skills-warning">
+            <div class="warning-icon"><i class="fas fa-exclamation-triangle"></i></div>
+            <div class="warning-content">
+                <h4>Skills Without Evidence</h4>
+                <p>These skills are listed but not demonstrated in projects/experience:</p>
+                <div class="warning-skills">
+                    {% for skill in deep_analysis.skill_analysis.skills_just_listed[:8] %}
+                    <span class="warning-skill-badge">{{ skill }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Project Analysis -->
+    <div class="section deep-projects">
+        <div class="section-header">
+            <div class="section-icon"><i class="fas fa-project-diagram"></i></div>
+            <h2>Project Complexity</h2>
+        </div>
+        
+        <div class="project-overview">
+            <div class="project-stat">
+                <span class="stat-value">{{ deep_analysis.project_analysis.total_projects }}</span>
+                <span class="stat-label">Projects</span>
+            </div>
+            
+            {% set total_proj = deep_analysis.project_analysis.total_projects if deep_analysis.project_analysis.total_projects > 0 else 1 %}
+            <div class="complexity-bars">
+                <div class="complexity-item high">
+                    <span class="complexity-label">High</span>
+                    <div class="complexity-bar">
+                        <div class="complexity-fill" style="width: {{ (deep_analysis.project_analysis.complexity_distribution.high / total_proj * 100)|round(0) }}%"></div>
+                    </div>
+                    <span class="complexity-count">{{ deep_analysis.project_analysis.complexity_distribution.high }}</span>
+                </div>
+                
+                <div class="complexity-item medium">
+                    <span class="complexity-label">Medium</span>
+                    <div class="complexity-bar">
+                        <div class="complexity-fill" style="width: {{ (deep_analysis.project_analysis.complexity_distribution.medium / total_proj * 100)|round(0) }}%"></div>
+                    </div>
+                    <span class="complexity-count">{{ deep_analysis.project_analysis.complexity_distribution.medium }}</span>
+                </div>
+                
+                <div class="complexity-item low">
+                    <span class="complexity-label">Low</span>
+                    <div class="complexity-bar">
+                        <div class="complexity-fill" style="width: {{ (deep_analysis.project_analysis.complexity_distribution.low / total_proj * 100)|round(0) }}%"></div>
+                    </div>
+                    <span class="complexity-count">{{ deep_analysis.project_analysis.complexity_distribution.low }}</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Project Types -->
+        <div class="project-types">
+            <h4>Project Types</h4>
+            <div class="type-tags">
+                {% for type, count in deep_analysis.project_analysis.project_types.items() if count > 0 %}
+                <span class="type-tag {{ type }}">
+                    <i class="fas {% if type == 'frontend' %}fa-palette{% elif type == 'backend' %}fa-server{% elif type == 'fullstack' %}fa-layer-group{% elif type == 'mobile' %}fa-mobile-alt{% elif type == 'data' %}fa-database{% else %}fa-code{% endif %}"></i>
+                    {{ type | title }}: {{ count }}
+                </span>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Weaknesses -->
+    {% if deep_analysis.weaknesses %}
+    <div class="section deep-weaknesses">
+        <div class="section-header">
+            <div class="section-icon"><i class="fas fa-exclamation-circle"></i></div>
+            <h2>Weaknesses Found</h2>
+        </div>
+        
+        <div class="weaknesses-list">
+            {% for weakness in deep_analysis.weaknesses %}
+            <div class="weakness-card {{ weakness.severity }}">
+                <div class="weakness-header">
+                    <span class="weakness-badge {{ weakness.severity }}">
+                        {% if weakness.severity == 'critical' %}
+                            <i class="fas fa-times-circle"></i> Critical
+                        {% elif weakness.severity == 'high' %}
+                            <i class="fas fa-exclamation-circle"></i> High
+                        {% elif weakness.severity == 'medium' %}
+                            <i class="fas fa-exclamation-triangle"></i> Medium
+                        {% else %}
+                            <i class="fas fa-info-circle"></i> Low
+                        {% endif %}
+                    </span>
+                    <span class="weakness-category">{{ weakness.category | title }}</span>
+                </div>
+                
+                <h4 class="weakness-title">{{ weakness.title }}</h4>
+                <p class="weakness-description">{{ weakness.description }}</p>
+                
+                {% if weakness.impact %}
+                <div class="weakness-impact">
+                    <i class="fas fa-bolt"></i>
+                    <span>{{ weakness.impact }}</span>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Fixes -->
+    {% if deep_analysis.fixes %}
+    <div class="section deep-fixes">
+        <div class="section-header">
+            <div class="section-icon"><i class="fas fa-tools"></i></div>
+            <h2>How to Fix</h2>
+        </div>
+        
+        <div class="fixes-list">
+            {% for fix in deep_analysis.fixes %}
+            <div class="fix-card">
+                <div class="fix-header">
+                    <span class="fix-priority {{ fix.priority }}">
+                        {% if fix.priority == 'critical' %}🔴{% elif fix.priority == 'high' %}🟡{% else %}🟢{% endif %}
+                        {{ fix.priority | upper }}
+                    </span>
+                    <span class="fix-effort {{ fix.effort }}">
+                        <i class="fas fa-clock"></i> {{ fix.effort | title }} Effort
+                    </span>
+                </div>
+                
+                <h4 class="fix-title">{{ fix.title }}</h4>
+                <p class="fix-description">{{ fix.description }}</p>
+                
+                {% if fix.example_before and fix.example_after %}
+                <div class="fix-examples">
+                    <div class="example before">
+                        <div class="example-header">
+                            <i class="fas fa-times-circle"></i> Before
+                        </div>
+                        <pre class="example-code">{{ fix.example_before }}</pre>
+                    </div>
+                    
+                    <div class="example-arrow">
+                        <i class="fas fa-arrow-down"></i>
+                    </div>
+                    
+                    <div class="example after">
+                        <div class="example-header">
+                            <i class="fas fa-check-circle"></i> After
+                        </div>
+                        <pre class="example-code">{{ fix.example_after }}</pre>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Improvement Potential -->
+    <div class="section deep-improvement">
+        <div class="section-header">
+            <div class="section-icon"><i class="fas fa-chart-line"></i></div>
+            <h2>Improvement Potential</h2>
+        </div>
+        
+        <div class="improvement-comparison">
+            <div class="improvement-before">
+                <span class="improvement-label">Current</span>
+                <div class="improvement-bar">
+                    <div class="improvement-fill current" style="width: {{ deep_analysis.improvement_potential.current_score }}%"></div>
+                </div>
+                <span class="improvement-value">{{ deep_analysis.improvement_potential.current_score | round(0) }}%</span>
+            </div>
+            
+            <div class="improvement-arrow">
+                <span class="improvement-delta">+{{ deep_analysis.improvement_potential.improvement_possible | round(0) }}%</span>
+            </div>
+            
+            <div class="improvement-after">
+                <span class="improvement-label">Potential</span>
+                <div class="improvement-bar">
+                    <div class="improvement-fill potential" style="width: {{ deep_analysis.improvement_potential.potential_score }}%"></div>
+                </div>
+                <span class="improvement-value">{{ deep_analysis.improvement_potential.potential_score | round(0) }}%</span>
+            </div>
+        </div>
+        
+        <div class="improvement-summary">
+            <div class="summary-item">
+                <span class="summary-value">{{ deep_analysis.improvement_potential.fixes_count }}</span>
+                <span class="summary-label">Total Fixes</span>
+            </div>
+            <div class="summary-item critical">
+                <span class="summary-value">{{ deep_analysis.improvement_potential.critical_fixes }}</span>
+                <span class="summary-label">Critical</span>
+            </div>
+            <div class="summary-item high">
+                <span class="summary-value">{{ deep_analysis.improvement_potential.high_fixes }}</span>
+                <span class="summary-label">High Priority</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-value">{{ deep_analysis.improvement_potential.effort_required | title }}</span>
+                <span class="summary-label">Effort Needed</span>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+<style>
+/* Deep Analysis Styles */
+.deep-analysis-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Match Summary */
+.match-comparison {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem;
+    background: rgba(255,255,255,0.02);
+    border-radius: 16px;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.match-target, .match-predicted {
+    flex: 1;
+    min-width: 150px;
+    text-align: center;
+}
+
+.match-label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+}
+
+.match-role {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.match-vs {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.match-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.match-icon.match {
+    background: rgba(0, 255, 136, 0.2);
+    color: var(--success);
+}
+
+.match-icon.mismatch {
+    background: rgba(255, 68, 68, 0.2);
+    color: var(--error);
+}
+
+.match-status {
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.match-status.match {
+    color: var(--success);
+}
+
+.match-status.mismatch {
+    color: var(--error);
+}
+
+/* Match Score Bar */
+.match-score-container {
+    margin-top: 1.5rem;
+}
+
+.match-score-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.match-score-value {
+    font-weight: 700;
+}
+
+.match-score-value.good { color: var(--success); }
+.match-score-value.medium { color: var(--warning); }
+.match-score-value.poor { color: var(--error); }
+
+.match-score-bar {
+    height: 8px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.match-score-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+    border-radius: 4px;
+    transition: width 1s ease;
+}
+
+.match-explanation {
+    display: flex;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: rgba(0, 194, 255, 0.1);
+    border-radius: 12px;
+    margin-top: 1rem;
+    border-left: 3px solid var(--accent);
+}
+
+.match-explanation i {
+    color: var(--accent);
+    margin-top: 0.25rem;
+}
+
+.match-explanation p {
+    color: var(--text-color);
+    margin: 0;
+    line-height: 1.6;
+}
+
+/* Score Grid */
+.score-grid {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.score-item {
+    text-align: center;
+}
+
+.score-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: conic-gradient(
+        var(--accent) calc(var(--score) * 3.6deg),
+        rgba(255,255,255,0.1) calc(var(--score) * 3.6deg)
+    );
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.score-circle::before {
+    content: '';
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    background: var(--card-bg);
+    border-radius: 50%;
+}
+
+.score-value {
+    position: relative;
+    z-index: 1;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--accent);
+}
+
+.score-grade {
+    position: relative;
+    z-index: 1;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.score-label {
+    display: block;
+    margin-top: 0.5rem;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.score-bars {
+    flex: 1;
+    min-width: 250px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.score-bar-item {
+    width: 100%;
+}
+
+.score-bar-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    margin-bottom: 0.25rem;
+}
+
+.score-bar {
+    height: 8px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.score-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+.score-bar-fill.strong { background: linear-gradient(90deg, var(--success), var(--accent-secondary)); }
+.score-bar-fill.weak { background: linear-gradient(90deg, var(--error), var(--warning)); }
+
+/* Skill Categories */
+.skill-categories {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+}
+
+.skill-category {
+    padding: 1rem;
+    background: rgba(255,255,255,0.03);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.skill-category.strong {
+    border-color: rgba(0, 255, 136, 0.3);
+}
+
+.skill-category.weak {
+    border-color: rgba(255, 68, 68, 0.3);
+}
+
+.category-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.category-name {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.category-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.category-badge.strong {
+    background: rgba(0, 255, 136, 0.2);
+    color: var(--success);
+}
+
+.category-badge.weak {
+    background: rgba(255, 68, 68, 0.2);
+    color: var(--error);
+}
+
+.category-badge.moderate {
+    background: rgba(255, 170, 0, 0.2);
+    color: var(--warning);
+}
+
+.category-score-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.category-score-bar .score-bar {
+    flex: 1;
+}
+
+.category-score {
+    font-weight: 700;
+    font-size: 0.9rem;
+    min-width: 40px;
+}
+
+.category-details {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.detail-item i {
+    margin-right: 0.25rem;
+}
+
+/* Individual Skills */
+.subsection-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 1.5rem 0 1rem;
+    color: var(--text-color);
+}
+
+.subsection-title i {
+    color: var(--accent);
+    margin-right: 0.5rem;
+}
+
+.skills-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 0.75rem;
+}
+
+.skill-item {
+    padding: 0.75rem;
+    background: rgba(255,255,255,0.03);
+    border-radius: 8px;
+}
+
+.skill-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.skill-name {
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+.skill-level {
+    font-size: 0.7rem;
+    padding: 0.15rem 0.4rem;
+    border-radius: 8px;
+    text-transform: uppercase;
+}
+
+.skill-level.expert { background: rgba(0, 255, 136, 0.2); color: var(--success); }
+.skill-level.advanced { background: rgba(0, 194, 255, 0.2); color: var(--accent); }
+.skill-level.intermediate { background: rgba(168, 85, 247, 0.2); color: var(--accent-purple); }
+.skill-level.basic { background: rgba(255, 170, 0, 0.2); color: var(--warning); }
+.skill-level.mentioned { background: rgba(255, 255, 255, 0.1); color: var(--text-muted); }
+
+.skill-bar {
+    height: 6px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.skill-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+    border-radius: 3px;
+}
+
+.skill-details {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+    color: var(--text-muted);
+}
+
+.skill-evidence {
+    color: var(--success);
+}
+
+.skill-no-evidence {
+    color: var(--warning);
+}
+
+/* Skills Warning */
+.skills-warning {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(255, 170, 0, 0.1);
+    border: 1px solid rgba(255, 170, 0, 0.3);
+    border-radius: 12px;
+    margin-top: 1rem;
+}
+
+.warning-icon {
+    color: var(--warning);
+    font-size: 1.25rem;
+}
+
+.warning-content h4 {
+    margin: 0 0 0.5rem;
+    color: var(--warning);
+}
+
+.warning-content p {
+    margin: 0 0 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text-color);
+}
+
+.warning-skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.warning-skill-badge {
+    padding: 0.25rem 0.5rem;
+    background: rgba(255, 170, 0, 0.15);
+    border-radius: 12px;
+    font-size: 0.8rem;
+    color: var(--warning);
+}
+
+/* Project Analysis */
+.project-overview {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.project-stat {
+    text-align: center;
+    padding: 1rem;
+    background: rgba(0, 194, 255, 0.1);
+    border-radius: 12px;
+}
+
+.stat-value {
+    display: block;
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--accent);
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.complexity-bars {
+    flex: 1;
+    min-width: 200px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.complexity-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.complexity-label {
+    width: 60px;
+    font-size: 0.85rem;
+}
+
+.complexity-bar {
+    flex: 1;
+    height: 8px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.complexity-item.high .complexity-fill { background: var(--success); }
+.complexity-item.medium .complexity-fill { background: var(--warning); }
+.complexity-item.low .complexity-fill { background: var(--error); }
+
+.complexity-count {
+    width: 30px;
+    text-align: right;
+    font-weight: 600;
+}
+
+.project-types {
+    margin-top: 1rem;
+}
+
+.project-types h4 {
+    margin: 0 0 0.75rem;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.type-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.type-tag {
+    padding: 0.35rem 0.75rem;
+    background: rgba(255,255,255,0.08);
+    border-radius: 20px;
+    font-size: 0.85rem;
+}
+
+.type-tag i { margin-right: 0.25rem; }
+.type-tag.frontend { color: var(--accent-purple); }
+.type-tag.backend { color: var(--success); }
+.type-tag.fullstack { color: var(--accent); }
+.type-tag.mobile { color: var(--warning); }
+.type-tag.data { color: var(--accent-secondary); }
+
+/* Weaknesses */
+.weaknesses-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.weakness-card {
+    padding: 1.25rem;
+    background: rgba(255,255,255,0.03);
+    border-radius: 12px;
+    border-left: 4px solid;
+}
+
+.weakness-card.critical { border-left-color: var(--error); }
+.weakness-card.high { border-left-color: var(--warning); }
+.weakness-card.medium { border-left-color: #ffcc00; }
+.weakness-card.low { border-left-color: var(--success); }
+
+.weakness-header {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.weakness-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.weakness-badge.critical { background: rgba(255, 68, 68, 0.2); color: var(--error); }
+.weakness-badge.high { background: rgba(255, 170, 0, 0.2); color: var(--warning); }
+.weakness-badge.medium { background: rgba(255, 204, 0, 0.2); color: #ffcc00; }
+.weakness-badge.low { background: rgba(0, 255, 136, 0.2); color: var(--success); }
+
+.weakness-category {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.weakness-title {
+    margin: 0 0 0.5rem;
+    font-size: 1rem;
+}
+
+.weakness-description {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.weakness-impact {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border-color);
+    font-size: 0.85rem;
+    color: var(--accent);
+}
+
+/* Fixes */
+.fixes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.fix-card {
+    padding: 1.5rem;
+    background: rgba(255,255,255,0.03);
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+}
+
+.fix-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.fix-priority {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.25rem 0.5rem;
+    border-radius: 8px;
+}
+
+.fix-priority.critical { background: rgba(255, 68, 68, 0.2); color: var(--error); }
+.fix-priority.high { background: rgba(255, 170, 0, 0.2); color: var(--warning); }
+.fix-priority.medium { background: rgba(0, 194, 255, 0.2); color: var(--accent); }
+.fix-priority.low { background: rgba(0, 255, 136, 0.2); color: var(--success); }
+
+.fix-effort {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.fix-effort i { margin-right: 0.25rem; }
+
+.fix-title {
+    margin: 0 0 0.5rem;
+    font-size: 1.1rem;
+}
+
+.fix-description {
+    color: var(--text-muted);
+    margin: 0 0 1rem;
+    line-height: 1.5;
+}
+
+.fix-examples {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.example {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.example.before {
+    background: rgba(255, 68, 68, 0.1);
+    border: 1px solid rgba(255, 68, 68, 0.2);
+}
+
+.example.after {
+    background: rgba(0, 255, 136, 0.1);
+    border: 1px solid rgba(0, 255, 136, 0.2);
+}
+
+.example-header {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.example.before .example-header {
+    background: rgba(255, 68, 68, 0.1);
+    color: var(--error);
+}
+
+.example.after .example-header {
+    background: rgba(0, 255, 136, 0.1);
+    color: var(--success);
+}
+
+.example-code {
+    padding: 1rem;
+    margin: 0;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.8rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    color: var(--text-color);
+}
+
+.example-arrow {
+    text-align: center;
+    color: var(--accent);
+    font-size: 1.25rem;
+}
+
+/* Improvement Potential */
+.improvement-comparison {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: rgba(255,255,255,0.03);
+    border-radius: 16px;
+    flex-wrap: wrap;
+}
+
+.improvement-before, .improvement-after {
+    flex: 1;
+    min-width: 150px;
+}
+
+.improvement-label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+}
+
+.improvement-bar {
+    height: 16px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.improvement-fill {
+    height: 100%;
+    border-radius: 8px;
+    transition: width 1s ease;
+}
+
+.improvement-fill.current {
+    background: linear-gradient(90deg, var(--error), var(--warning));
+}
+
+.improvement-fill.potential {
+    background: linear-gradient(90deg, var(--accent), var(--success));
+}
+
+.improvement-value {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-top: 0.5rem;
+}
+
+.improvement-before .improvement-value { color: var(--warning); }
+.improvement-after .improvement-value { color: var(--success); }
+
+.improvement-arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.improvement-delta {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--success);
+    background: rgba(0, 255, 136, 0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+}
+
+.improvement-summary {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.summary-item {
+    text-align: center;
+    padding: 1rem;
+    background: rgba(255,255,255,0.03);
+    border-radius: 12px;
+    min-width: 80px;
+}
+
+.summary-item.critical .summary-value { color: var(--error); }
+.summary-item.high .summary-value { color: var(--warning); }
+
+.summary-value {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--accent);
+}
+
+.summary-label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .match-comparison {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .match-vs {
+        margin: 1rem 0;
+    }
+    
+    .score-grid {
+        flex-direction: column;
+    }
+    
+    .skill-categories {
+        grid-template-columns: 1fr;
+    }
+    
+    .improvement-comparison {
+        flex-direction: column;
+    }
+    
+    .improvement-arrow {
+        transform: rotate(90deg);
+    }
+}
+</style>
+{% endif %}
