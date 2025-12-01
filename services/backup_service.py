@@ -7,6 +7,7 @@ import os
 import json
 import csv
 import io
+import logging
 from datetime import datetime, timezone
 from typing import Dict, List, Any, Optional, Tuple
 from pathlib import Path
@@ -16,6 +17,8 @@ from models.user import User
 from models.feedback import Feedback
 from models.skill_pattern import SkillPattern
 from models.resume_history import ResumeHistory
+
+logger = logging.getLogger(__name__)
 
 
 class BackupService:
@@ -78,8 +81,8 @@ class BackupService:
                     "created_at": pattern.created_at.isoformat() if pattern.created_at else None,
                     "updated_at": pattern.updated_at.isoformat() if pattern.updated_at else None
                 })
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"Error exporting skill patterns: {e}")
         return patterns
     
     @classmethod
@@ -98,8 +101,8 @@ class BackupService:
                     "comments": feedback.comments,
                     "created_at": feedback.created_at.isoformat() if feedback.created_at else None
                 })
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"Error exporting feedback: {e}")
         return feedbacks
     
     @classmethod
@@ -116,8 +119,8 @@ class BackupService:
                     "last_login": user.last_login.isoformat() if user.last_login else None,
                     "is_active": user.is_active
                 })
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"Error exporting users: {e}")
         return users
     
     @classmethod
@@ -140,8 +143,8 @@ class BackupService:
                     "experience_level": resume.experience_level,
                     "target_role": resume.target_role
                 })
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"Error exporting resume history: {e}")
         return history
     
     @classmethod

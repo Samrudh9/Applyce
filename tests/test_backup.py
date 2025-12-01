@@ -181,5 +181,5 @@ class TestAdminBackupRoutes:
         response = client.get('/api/admin/stats')
         assert response.status_code == 200
         data = json.loads(response.data)
-        assert data['success'] == True
+        assert data['success'] is True
         assert 'stats' in data
