@@ -8,10 +8,21 @@ db = SQLAlchemy()
 
 # Import all models after db is defined
 from models.user import User
-from models.resume import Resume
+from models.resume import Resume, ResumeVersion
 from models.feedback import Feedback
 from models.career import Career
 from models.skill_pattern import SkillPattern
 from models.resume_history import ResumeHistory
+from models.user_preferences import UserPreferences
 
-__all__ = ['db', 'User', 'Resume', 'Feedback', 'Career', 'SkillPattern', 'ResumeHistory']
+__all__ = [
+    'db', 
+    'User', 
+    'Resume', 
+    'ResumeVersion',
+    'Feedback', 
+    'Career', 
+    'SkillPattern', 
+    'ResumeHistory',
+    'UserPreferences'
+]
