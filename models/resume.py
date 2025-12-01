@@ -86,6 +86,8 @@ class Resume(db.Model):
     @staticmethod
     def compute_file_hash(file_content):
         """Compute SHA-256 hash of file content to detect duplicates."""
+        if file_content is None:
+            return None
         if isinstance(file_content, str):
             file_content = file_content.encode('utf-8')
         return hashlib.sha256(file_content).hexdigest()
