@@ -300,6 +300,68 @@
       box-shadow: none;
     }
 
+    /* Selection inputs for experience level and target role */
+    .selection-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .selection-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-color);
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+    }
+
+    .selection-label i {
+      color: var(--accent);
+    }
+
+    .selection-label .required {
+      color: var(--error);
+    }
+
+    .selection-input {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      color: var(--text-color);
+      font-size: 0.95rem;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .selection-input:hover {
+      border-color: var(--accent);
+      background: rgba(0, 194, 255, 0.05);
+    }
+
+    .selection-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(0, 194, 255, 0.15);
+    }
+
+    .selection-input option {
+      background: var(--card-bg);
+      color: var(--text-color);
+      padding: 0.5rem;
+    }
+
+    .custom-role-group {
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     .submit-btn.loading {
       pointer-events: none;
     }
@@ -423,6 +485,46 @@
     </div>
 
     <form action="/resume" method="post" enctype="multipart/form-data" id="uploadForm">
+      <!-- Experience Level Selection -->
+      <div class="selection-group">
+        <label for="experience_level" class="selection-label">
+          <i class="fas fa-user-tie"></i> Experience Level <span class="required">*</span>
+        </label>
+        <select id="experience_level" name="experience_level" class="selection-input" required>
+          <option value="" disabled selected>Select your experience level</option>
+          <option value="beginner">Beginner (0-2 years) - Students, Fresh Graduates</option>
+          <option value="mid-level">Mid-level (3-7 years) - Professionals with Experience</option>
+          <option value="senior-level">Senior-level (8+ years) - Leadership Roles</option>
+        </select>
+      </div>
+
+      <!-- Target Role Selection -->
+      <div class="selection-group">
+        <label for="target_role" class="selection-label">
+          <i class="fas fa-briefcase"></i> Target Role <span class="required">*</span>
+        </label>
+        <select id="target_role" name="target_role" class="selection-input" required>
+          <option value="" disabled selected>Select your target role</option>
+          <option value="data scientist">Data Scientist</option>
+          <option value="frontend developer">Frontend Developer</option>
+          <option value="backend developer">Backend Developer</option>
+          <option value="full stack developer">Full Stack Developer</option>
+          <option value="mobile app developer">Mobile App Developer</option>
+          <option value="devops engineer">DevOps Engineer</option>
+          <option value="project manager">Project Manager</option>
+          <option value="other">Other (Custom)</option>
+        </select>
+      </div>
+
+      <!-- Custom Role Input (shown when "Other" is selected) -->
+      <div class="selection-group custom-role-group" id="customRoleGroup" style="display: none;">
+        <label for="custom_role" class="selection-label">
+          <i class="fas fa-edit"></i> Specify Your Target Role
+        </label>
+        <input type="text" id="custom_role" name="custom_role" class="selection-input" 
+               placeholder="e.g., Machine Learning Engineer, Cloud Architect">
+      </div>
+
       <div class="drop-zone" id="dropZone">
         <div class="drop-zone-icon">
           <i class="fas fa-cloud-upload-alt"></i>
@@ -524,11 +626,45 @@
         dropZone.classList.add('uploaded');
         fileInfo.classList.add('show');
         fileName.textContent = file.name;
-        submitBtn.disabled = false;
+        checkFormValidity();
       } else {
         alert('Please upload a PDF or DOCX file.');
         fileInput.value = '';
       }
+    }
+
+    // Target role "Other" selection handling
+    const targetRoleSelect = document.getElementById('target_role');
+    const customRoleGroup = document.getElementById('customRoleGroup');
+    const customRoleInput = document.getElementById('custom_role');
+    const experienceLevel = document.getElementById('experience_level');
+
+    targetRoleSelect.addEventListener('change', () => {
+      if (targetRoleSelect.value === 'other') {
+        customRoleGroup.style.display = 'block';
+        customRoleInput.required = true;
+      } else {
+        customRoleGroup.style.display = 'none';
+        customRoleInput.required = false;
+        customRoleInput.value = '';
+      }
+      checkFormValidity();
+    });
+
+    experienceLevel.addEventListener('change', checkFormValidity);
+
+    function checkFormValidity() {
+      const hasFile = fileInput.files.length > 0;
+      const hasExperienceLevel = experienceLevel.value !== '';
+      const hasTargetRole = targetRoleSelect.value !== '' && 
+        (targetRoleSelect.value !== 'other' || customRoleInput.value.trim() !== '');
+      
+      submitBtn.disabled = !(hasFile && hasExperienceLevel && hasTargetRole);
+    }
+
+    // Also check validity when custom role input changes
+    if (customRoleInput) {
+      customRoleInput.addEventListener('input', checkFormValidity);
     }
 
     form.addEventListener('submit', () => {
