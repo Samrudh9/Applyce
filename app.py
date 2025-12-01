@@ -6,9 +6,10 @@ import tempfile
 import uuid
 import re
 import functools
+import json
 from typing import List
 from flask_migrate import Migrate
-from flask import Flask, request, render_template, jsonify, redirect, url_for, flash, session
+from flask import Flask, request, render_template, jsonify, redirect, url_for, flash, session, Response
 from werkzeug.utils import secure_filename
 import logging
 from flask_login import LoginManager, login_required, current_user
@@ -1571,7 +1572,6 @@ def create_backup():
     if backup_format == 'csv':
         # Export skill patterns as CSV
         csv_content = BackupService.export_skill_patterns_csv()
-        from flask import Response
         return Response(
             csv_content,
             mimetype='text/csv',
@@ -1580,8 +1580,6 @@ def create_backup():
     else:
         # Export all data as JSON
         data = BackupService.export_all_data()
-        from flask import Response
-        import json
         return Response(
             json.dumps(data, indent=2),
             mimetype='application/json',
@@ -1598,7 +1596,6 @@ def download_backup(filename):
     content = BackupService.get_backup_file_content(safe_filename)
     
     if content:
-        from flask import Response
         return Response(
             content,
             mimetype='application/json',
