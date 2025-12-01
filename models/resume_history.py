@@ -17,8 +17,13 @@ class ResumeHistory(db.Model):
     filename = db.Column(db.String(255), nullable=False)
     upload_date = db.Column(db.DateTime, default=lambda: datetime.utcnow())
     
-    # Scores
+    # User context
+    experience_level = db.Column(db.String(50))  # beginner, mid-level, senior-level
+    target_role = db.Column(db.String(100))  # e.g., "Backend Developer"
+    
+    # Scores - Overall and ATS score are the same for consistency
     overall_score = db.Column(db.Integer, default=0)
+    ats_score = db.Column(db.Integer, default=0)  # Same as overall_score for consistency
     keyword_score = db.Column(db.Integer, default=0)
     format_score = db.Column(db.Integer, default=0)
     section_score = db.Column(db.Integer, default=0)
@@ -47,7 +52,10 @@ class ResumeHistory(db.Model):
             'id': self.id,
             'filename': self.filename,
             'upload_date': self.upload_date.isoformat() if self.upload_date else None,
+            'experience_level': self.experience_level,
+            'target_role': self.target_role,
             'overall_score': self.overall_score,
+            'ats_score': self.ats_score,
             'keyword_score': self.keyword_score,
             'format_score': self.format_score,
             'section_score': self.section_score,

@@ -758,6 +758,7 @@ def handle_resume_upload():
     resources = recommend_resources(primary_career)
 
     # ATS Analysis
+    ats_data = {}
     try:
         ats_data = ats_analyzer.analyze(extracted_text, skills_found, primary_career)
         session['ats_data'] = ats_data
@@ -775,35 +776,34 @@ def handle_resume_upload():
         print(f"Resume evaluation error: {e}")
         session['evaluation_data'] = {}
 
+    # Make Resume Score consistent with ATS Score
+    # The ATS score becomes the primary resume score for consistency
+    if ats_data and 'overall_score' in ats_data:
+        resume_score = ats_data['overall_score']
+    
     # Save resume history for logged-in users
     if current_user.is_authenticated:
         try:
-            from models.resume_history import ResumeHistory
-            import json as json_lib
+            from services.resume_service import ResumeService
             
-            # Calculate sub-scores using defined multipliers
-            base_score = resume_score if resume_score else 0
-            keyword_score = min(int(base_score * KEYWORD_SCORE_MULTIPLIER), 100)
-            format_score = int(base_score * FORMAT_SCORE_MULTIPLIER)
-            
-            history_entry = ResumeHistory(
+            # Use ResumeService to save to history with consistent ATS score
+            ResumeService.save_to_history(
                 user_id=current_user.id,
                 filename=secure_filename(resume.filename),
-                overall_score=base_score,
-                keyword_score=keyword_score,
-                format_score=format_score,
-                section_score=base_score,
-                predicted_career=predictions[0][0] if predictions else None,
-                career_confidence=predictions[0][1] if predictions else 0,
-                top_careers=json_lib.dumps([(c, conf) for c, conf in predictions[:3]]) if predictions else '[]',
-                skills_detected=json_lib.dumps(skills_found) if skills_found else '[]',
-                skills_missing=json_lib.dumps(skill_gap_data.get("skills_analysis", {}).get("missing_required", [])) if skill_gap_data else '[]',
-                skill_count=len(skills_found) if skills_found else 0,
-                predicted_salary_min=salary_data.get('min', 0) if salary_data else 0,
-                predicted_salary_max=salary_data.get('max', 0) if salary_data else 0
+                overall_score=resume_score,
+                ats_data=ats_data,
+                predictions=predictions,
+                skills_found=skills_found,
+                skill_gap_data=skill_gap_data,
+                salary_data=salary_data,
+                experience_level=experience_level,
+                target_role=target_role
             )
-            db.session.add(history_entry)
-            db.session.commit()
+            
+            # Store resume_id in session for potential future use
+            session['experience_level'] = experience_level
+            session['target_role'] = target_role
+            
         except Exception as e:
             logging.error(f"Resume history save error: {e}")
             db.session.rollback()
@@ -820,6 +820,7 @@ def handle_resume_upload():
                           certificates=certifications_display,
                           predicted_career=create_career_dict(predictions),
                           quality_score=resume_score,
+                          ats_score=resume_score,  # ATS and Resume score are the same
                           skill_gaps=skill_gap_data.get("skills_analysis", {}).get("missing_required", []) if skill_gap_data else [],
                           improvements=improvement_suggestions,
                           predicted_salary=predicted_salary,
