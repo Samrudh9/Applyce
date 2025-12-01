@@ -2,11 +2,11 @@
 
 An intelligent, self-learning career recommendation platform that analyzes resumes, predicts optimal career paths, evaluates ATS compatibility, and continuously improves through user feedback.
 
-![Python](https://img. shields.io/badge/Python-3.8+-blue.svg)
-![Flask](https://img.shields. io/badge/Flask-2.0+-green.svg)
+![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
+![Flask](https://img.shields.io/badge/Flask-2.0+-green.svg)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-blue.svg)
-![ML](https://img. shields.io/badge/Machine%20Learning-Scikit--learn-orange.svg)
-![License](https://img. shields.io/badge/License-MIT-yellow.svg)
+![ML](https://img.shields.io/badge/Machine%20Learning-Scikit--learn-orange.svg)
+![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
 🌐 **Live Demo**: [https://skillfit. onrender.com](https://skillfit.onrender.com)
 
@@ -354,10 +354,10 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 | Name | Role | LinkedIn |
 |------|------|----------|
 | Dishita Kotian | Backend/Lead Developer | [LinkedIn](https://www.linkedin.com/in/dishita-kotian-15357129b/) |
-| Khyathi Jain | Data Specialist | [LinkedIn](https://www.linkedin. com/in/khyathi-j-975201290/) |
+| Khyathi Jain | Data Specialist | [LinkedIn](https://www.linkedin.com/in/khyathi-j-975201290/) |
 | Shaabdhik M Jain | Frontend Developer | [LinkedIn](https://www.linkedin.com/in/shaabdhik-jain-19181528b/) |
 | Sathwik R Shetty | UI/UX Designer | [LinkedIn](https://www.linkedin.com/in/sathwik-shetty-6847172b2/) |
-| Samrudh S Shetty | Developer | [LinkedIn](https://www.linkedin. com/in/samrudhsshetty/) |
+| Samrudh S Shetty | Developer | [LinkedIn](https://www.linkedin.com/in/samrudhsshetty/) |
 
 ---
 
@@ -371,7 +371,7 @@ This project is licensed under the MIT License.
 
 If you found this project helpful, please give it a star!  ⭐
 
-**Repository**: [github.com/Samrudh9/Career-Recommendation-demo](https://github. com/Samrudh9/Career-Recommendation-demo)
+**Repository**: [github.com/Samrudh9/Career-Recommendation-demo](https://github.com/Samrudh9/Career-Recommendation-demo)
 
 ---
 
