@@ -18,6 +18,9 @@
       <li><a href="/#how-it-works" class="nav-link">How It Works</a></li>
       <li><a href="/form" class="nav-link">Enter Manually</a></li>
       <li><a href="/upload" class="nav-link nav-cta">Upload Resume</a></li>
+      <li><a href="/jobs" class="nav-link">
+      <i class="fas fa-briefcase"></i> Jobs
+      </a></li>
       <li><a href="/about" class="nav-link">About</a></li>
       {% if current_user.is_authenticated %}
         <li><a href="{{ url_for('dashboard') }}" class="nav-link">Dashboard</a></li>
