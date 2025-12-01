@@ -1,0 +1,632 @@
+<! DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if career %}{{ career | title }} Jobs{% else %}Job Search{% endif %} - SkillFit</title>
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon. svg') }}">
+    <link href="https://fonts. googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0a0b0f;
+            --card-bg: #1a1b22;
+            --text-color: #e0e0e0;
+            --text-muted: #888;
+            --accent: #00c2ff;
+            --accent-secondary: #00ffe0;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --error: #ff4444;
+            --border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            padding-top: 80px;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+
+        .page-header { text-align: center; margin-bottom: 2rem; }
+        
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-header p { color: var(--text-muted); }
+
+        /* Search Box */
+        .search-box {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .search-form { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-color);
+            font-size: 1rem;
+        }
+
+        .search-input:focus { outline: none; border-color: var(--accent); }
+
+        .search-btn {
+            padding: 0.75rem 2rem;
+            background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0. 3s ease;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 194, 255, 0.4);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent);
+        }
+
+        /* API Status */
+        .api-status {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .api-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            background: rgba(0, 255, 136, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .api-badge.inactive {
+            background: rgba(255, 68, 68, 0.1);
+            color: var(--error);
+            border-color: rgba(255, 68, 68, 0.3);
+        }
+
+        /* Insights Grid */
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .insight-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .insight-card .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .insight-card .label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        /* Hot Skills */
+        .hot-skills {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1. 25rem;
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+        }
+
+        .hot-skills h3 {
+            color: var(--accent);
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .skills-list, .companies-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .hot-skill {
+            padding: 0.4rem 0.8rem;
+            background: rgba(0, 194, 255, 0.1);
+            border: 1px solid rgba(0, 194, 255, 0.3);
+            border-radius: 15px;
+            color: var(--accent);
+            font-size: 0. 85rem;
+        }
+
+        .company-tag {
+            padding: 0.3rem 0.75rem;
+            background: rgba(255, 255, 255, 0. 05);
+            border-radius: 15px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Jobs List */
+        .jobs-section h2 {
+            margin-bottom: 1.5rem;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .jobs-section h2 .count {
+            color: var(--accent);
+        }
+
+        .jobs-list { display: flex; flex-direction: column; gap: 1rem; }
+
+        .job-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            transition: all 0. 3s ease;
+        }
+
+        .job-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 194, 255, 0.1);
+        }
+
+        .job-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .job-title {
+            font-size: 1. 25rem;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 0.25rem;
+        }
+
+        .job-company {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .job-meta {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .job-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .match-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        .match-high { background: rgba(0, 255, 136, 0.2); color: var(--success); }
+        .match-medium { background: rgba(255, 170, 0, 0.2); color: var(--warning); }
+        .match-low { background: rgba(255, 68, 68, 0.2); color: var(--error); }
+
+        .remote-badge {
+            padding: 0.25rem 0.5rem;
+            background: rgba(138, 43, 226, 0. 2);
+            color: #a855f7;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .job-skills { margin-bottom: 1rem; }
+
+        .skills-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .skill-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+
+        .skill-tag {
+            padding: 0.3rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .skill-match {
+            background: rgba(0, 255, 136, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .skill-missing {
+            background: rgba(255, 68, 68, 0.15);
+            color: var(--error);
+            border: 1px solid rgba(255, 68, 68, 0. 3);
+        }
+
+        .job-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.6rem 1.25rem;
+            border-radius: 8px;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0. 3s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+            color: #000;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn:hover { transform: translateY(-2px); }
+
+        .source-badge {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            background: rgba(255, 255, 255, 0. 1);
+            border-radius: 4px;
+            color: var(--text-muted);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            color: var(--border-color);
+        }
+
+        .empty-state h3 {
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .quick-searches {
+            margin-top: 2rem;
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        /* Error Message */
+        .error-message {
+            background: rgba(255, 68, 68, 0.1);
+            border: 1px solid rgba(255, 68, 68, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            color: var(--error);
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        /* Loading */
+        .loading {
+            display: flex;
+            justify-content: center;
+            padding: 3rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            .page-header h1 { font-size: 1. 8rem; }
+            .search-form { flex-direction: column; }
+            .search-input, .search-btn { width: 100%; }
+            .job-header { flex-direction: column; }
+            .insights-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    {% include 'components/navbar.html' %}
+
+    <div class="container">
+        <div class="page-header">
+            <h1>💼 Find Your Dream Job</h1>
+            <p>Real jobs from LinkedIn, Indeed, Glassdoor & more</p>
+        </div>
+
+        <!-- Search Box -->
+        <div class="search-box">
+            <form class="search-form" action="/jobs" method="GET">
+                <input type="text" name="career" class="search-input" 
+                       placeholder="Job title (e.g., Data Scientist, React Developer)" 
+                       value="{{ career }}" required>
+                <input type="text" name="location" class="search-input" 
+                       placeholder="Location (e.g., Bangalore, Remote)" 
+                       value="{{ location or 'India' }}" style="max-width: 200px;">
+                <label class="checkbox-group">
+                    <input type="checkbox" name="remote" value="true" {% if remote_only %}checked{% endif %}>
+                    Remote only
+                </label>
+                <button type="submit" class="search-btn">
+                    <i class="fas fa-search"></i> Search Jobs
+                </button>
+            </form>
+            
+            <!-- API Status -->
+            <div class="api-status">
+                <span class="api-badge">LinkedIn/Indeed</span>
+                <span class="api-badge">Adzuna</span>
+                <span class="api-badge">RemoteOK</span>
+                <span class="api-badge">Arbeitnow</span>
+            </div>
+        </div>
+
+        {% if error_message %}
+        <div class="error-message">
+            <i class="fas fa-exclamation-triangle"></i> {{ error_message }}
+        </div>
+        {% endif %}
+
+        {% if career %}
+            <!-- Market Insights -->
+            {% if insights %}
+            <div class="insights-grid">
+                <div class="insight-card">
+                    <div class="value">{{ "{:,}".format(insights.total_jobs) }}+</div>
+                    <div class="label">Open Positions</div>
+                </div>
+                <div class="insight-card">
+                    <div class="value">{{ insights.growth_rate }}</div>
+                    <div class="label">Growth Rate</div>
+                </div>
+                <div class="insight-card">
+                    <div class="value">{{ insights.demand_level }}</div>
+                    <div class="label">Demand Level</div>
+                </div>
+                <div class="insight-card">
+                    <div class="value">{{ insights.remote_percentage }}%</div>
+                    <div class="label">Remote Jobs</div>
+                </div>
+                <div class="insight-card">
+                    <div class="value">
+                        ₹{{ (insights.avg_salary_min / 100000) | round(0) | int }}-{{ (insights. avg_salary_max / 100000) | round(0) | int }}L
+                    </div>
+                    <div class="label">Salary Range (LPA)</div>
+                </div>
+            </div>
+
+            <!-- Hot Skills & Companies -->
+            <div class="hot-skills">
+                <h3>🔥 In-Demand Skills for {{ career | title }}</h3>
+                <div class="skills-list">
+                    {% for skill in insights.hot_skills[:8] %}
+                        <span class="hot-skill">{{ skill }}</span>
+                    {% endfor %}
+                </div>
+                
+                {% if insights. top_companies %}
+                <h3 style="margin-top: 1. 5rem;">🏢 Top Hiring Companies</h3>
+                <div class="companies-list">
+                    {% for company in insights.top_companies[:6] %}
+                        <span class="company-tag">{{ company }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- Jobs List -->
+            <div class="jobs-section">
+                <h2>
+                    📋 <span class="count">{{ jobs | length }}</span> Real Jobs Found
+                    {% if insights and insights.jobs_fetched %}
+                        <small style="color: var(--text-muted); font-size: 0.8rem; font-weight: 400;">
+                            (from {{ insights.jobs_fetched }} fetched)
+                        </small>
+                    {% endif %}
+                </h2>
+                
+                {% if jobs %}
+                <div class="jobs-list">
+                    {% for job in jobs %}
+                    <div class="job-card">
+                        <div class="job-header">
+                            <div>
+                                <div class="job-title">
+                                    {{ job.title }}
+                                    {% if job.is_remote %}
+                                        <span class="remote-badge">REMOTE</span>
+                                    {% endif %}
+                                </div>
+                                <div class="job-company">🏢 {{ job.company }}</div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <div class="match-badge {% if job.match_score >= 70 %}match-high{% elif job.match_score >= 40 %}match-medium{% else %}match-low{% endif %}">
+                                    🎯 {{ job. match_score | round(0) | int }}% Match
+                                </div>
+                                <span class="source-badge">{{ job.source }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="job-meta">
+                            <span><i class="fas fa-map-marker-alt"></i> {{ job. location }}</span>
+                            {% if job.salary_min and job.salary_max %}
+                            <span><i class="fas fa-rupee-sign"></i> 
+                                {% if job.salary_currency == 'INR' %}
+                                    {{ (job.salary_min / 100000) | round(1) }}-{{ (job. salary_max / 100000) | round(1) }} LPA
+                                {% else %}
+                                    ${{ (job.salary_min / 1000) | round(0) | int }}K-{{ (job.salary_max / 1000) | round(0) | int }}K
+                                {% endif %}
+                            </span>
+                            {% endif %}
+                            <span><i class="fas fa-briefcase"></i> {{ job.job_type }}</span>
+                            <span><i class="fas fa-layer-group"></i> {{ job.experience_level }}</span>
+                        </div>
+
+                        <!-- Skills Match -->
+                        <div class="job-skills">
+                            {% if job.matching_skills %}
+                            <div class="skill-label">✅ Skills You Have:</div>
+                            <div class="skills-row">
+                                {% for skill in job. matching_skills[:6] %}
+                                    <span class="skill-tag skill-match">{{ skill }}</span>
+                                {% endfor %}
+                                {% if job.matching_skills | length > 6 %}
+                                    <span class="skill-tag skill-match">+{{ job. matching_skills | length - 6 }} more</span>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                            
+                            {% if job.missing_skills %}
+                            <div class="skill-label" style="margin-top: 0.75rem;">❌ Skills to Learn:</div>
+                            <div class="skills-row">
+                                {% for skill in job.missing_skills[:5] %}
+                                    <span class="skill-tag skill-missing">{{ skill }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+
+                            {% if not job.matching_skills and not job.missing_skills and job.skills_required %}
+                            <div class="skill-label">📋 Required Skills:</div>
+                            <div class="skills-row">
+                                {% for skill in job.skills_required[:8] %}
+                                    <span class="skill-tag" style="background: rgba(255,255,255,0.1); color: var(--text-color);">{{ skill }}</span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="job-actions">
+                            <a href="{{ job.url }}" target="_blank" rel="noopener" class="btn btn-primary">
+                                <i class="fas fa-external-link-alt"></i> Apply Now
+                            </a>
+                            {% if job.missing_skills %}
+                            <a href="/roadmap/{{ career | urlencode }}" class="btn btn-secondary">
+                                <i class="fas fa-road"></i> Learn Missing Skills
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-search"></i>
+                    <h3>No jobs found</h3>
+                    <p>Try a different job title or location</p>
+                </div>
+                {% endif %}
+            </div>
+
+        {% else %}
+            <!-- Empty State -->
+            <div class="empty-state">
+                <i class="fas fa-briefcase"></i>
+                <h3>Search for Real Jobs</h3>
+                <p>Enter a job title to find opportunities from LinkedIn, Indeed, Glassdoor & more</p>
+                
+                <div class="quick-searches">
+                    <p style="margin-right: 1rem;">Popular:</p>
+                    <a href="/jobs?career=data+scientist&location=India" class="btn btn-secondary">Data Scientist</a>
+                    <a href="/jobs?career=frontend+developer&location=India" class="btn btn-secondary">Frontend Developer</a>
+                    <a href="/jobs?career=full+stack+developer&location=India" class="btn btn-secondary">Full Stack</a>
+                    <a href="/jobs?career=devops+engineer&location=India" class="btn btn-secondary">DevOps</a>
+                    <a href="/jobs?career=machine+learning&location=Remote&remote=true" class="btn btn-secondary">ML Engineer (Remote)</a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    {% include 'components/footer.html' %}
+</body>
+</html>
