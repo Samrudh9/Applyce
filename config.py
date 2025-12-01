@@ -58,6 +58,12 @@ class Config:
         self.ML_CLASSIFIER_ENABLED = os.getenv('ML_CLASSIFIER_ENABLED', 'false').lower() == 'true'
         self.GITHUB_INTEGRATION_ENABLED = os.getenv('GITHUB_INTEGRATION_ENABLED', 'false').lower() == 'true'
         
+        # Admin credentials for backup access
+        # Set these environment variables for production security
+        # Example: ADMIN_ID=myadmin, ADMIN_PASSWORD=mysecurepassword
+        self.ADMIN_ID = os.getenv('ADMIN_ID', 'admin')
+        self.ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', 'skillfit2024')
+        
         # File upload settings
         self.UPLOAD_FOLDER = os.getenv('UPLOAD_FOLDER', self.base_dir / 'uploads')
         self.MAX_CONTENT_LENGTH = self.security.max_file_size_mb * 1024 * 1024
