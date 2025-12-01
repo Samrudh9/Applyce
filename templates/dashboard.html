@@ -1069,7 +1069,7 @@
 
     // Pagination functionality
     let currentPage = 1;
-    const totalPages = {{ ((history|length - 1) // 10) + 1 }};
+    const totalPages = Math.max(1, Math.ceil({{ history|length }} / 10));
 
     function changePage(delta) {
       const newPage = currentPage + delta;
