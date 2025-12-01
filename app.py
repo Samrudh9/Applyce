@@ -9,8 +9,8 @@ import functools
 import json
 from typing import List
 from services.job_service import job_service, Job
-from dataclasses import asdictfrom,flask_migrate 
-import Migrate
+from dataclasses import asdict
+from flask_migrate import Migrate
 from flask import Flask, request, render_template, jsonify, redirect, url_for, flash, session, Response
 from werkzeug.utils import secure_filename
 import logging
