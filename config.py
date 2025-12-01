@@ -61,8 +61,8 @@ class Config:
         # Admin credentials for backup access
         # Set these environment variables for production security
         # Example: ADMIN_ID=myadmin, ADMIN_PASSWORD=mysecurepassword
-        self.ADMIN_ID = os.getenv('ADMIN_ID', 'admin')
-        self.ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', 'skillfit2024')
+        self.ADMIN_ID = os.getenv('ADMIN_ID', 'admin@skillfit.onrender.com')
+        self.ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', 'skillfit@admin')
         
         # File upload settings
         self.UPLOAD_FOLDER = os.getenv('UPLOAD_FOLDER', self.base_dir / 'uploads')
