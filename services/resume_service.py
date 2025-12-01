@@ -26,25 +26,18 @@ def convert_numpy_types(value):
     if value is None:
         return value
     
-    # Check if value has .item() method (numpy scalars)
-    if hasattr(value, 'item'):
-        return value.item()
+    # Check if value is from numpy module by checking the module name
+    type_module = type(value).__module__
     
-    # Check if value is a numpy ndarray
-    if hasattr(value, 'tolist'):
-        return value.tolist()
+    if type_module == 'numpy':
+        # Handle numpy scalars with .item() method
+        if hasattr(value, 'item'):
+            return value.item()
+        # Handle numpy arrays
+        if hasattr(value, 'tolist'):
+            return value.tolist()
     
-    # Handle specific numpy type names
-    type_name = type(value).__name__
-    if type_name.startswith(('float', 'int', 'uint', 'bool')):
-        # Try to convert to Python native type
-        if 'float' in type_name:
-            return float(value)
-        elif 'int' in type_name or 'uint' in type_name:
-            return int(value)
-        elif 'bool' in type_name:
-            return bool(value)
-    
+    # For non-numpy types, return as-is
     return value
 
 

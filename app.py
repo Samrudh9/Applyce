@@ -534,10 +534,22 @@ def dashboard():
                     for phase in roadmap_data['phases']:
                         phase_skills = [s.lower() for s in phase.get('skills', [])]
                         if phase_skills:
-                            matching = sum(1 for s in phase_skills if any(
-                                skill_word in s or s in skill_word 
-                                for skill_word in skills_lower
-                            ))
+                            # Use set intersection for exact matches first
+                            phase_skills_set = set(phase_skills)
+                            exact_matches = len(skills_lower & phase_skills_set)
+                            
+                            # For partial matches, use a more efficient approach
+                            # Only check unmatched phase skills
+                            unmatched_phase_skills = phase_skills_set - skills_lower
+                            partial_matches = 0
+                            for ps in unmatched_phase_skills:
+                                # Check if any user skill contains this phase skill or vice versa
+                                for us in skills_lower:
+                                    if ps in us or us in ps:
+                                        partial_matches += 1
+                                        break
+                            
+                            matching = exact_matches + partial_matches
                             progress = min(100, int((matching / len(phase_skills)) * 100))
                         else:
                             progress = 0
