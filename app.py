@@ -6,9 +6,10 @@ import tempfile
 import uuid
 import re
 import functools
+import json
 from typing import List
 from flask_migrate import Migrate
-from flask import Flask, request, render_template, jsonify, redirect, url_for, flash, session
+from flask import Flask, request, render_template, jsonify, redirect, url_for, flash, session, Response
 from werkzeug.utils import secure_filename
 import logging
 from flask_login import LoginManager, login_required, current_user
@@ -1509,6 +1510,144 @@ def api_skill_gap():
         })
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+
+
+# ===== Admin Backup Routes =====
+from services.backup_service import BackupService
+
+def admin_required(f):
+    """Decorator to require admin authentication for backup routes."""
+    @functools.wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('admin_authenticated'):
+            return redirect(url_for('admin_login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+@app.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    """Admin login page for backup access"""
+    if session.get('admin_authenticated'):
+        return redirect(url_for('admin_backup_page'))
+    
+    error = None
+    if request.method == 'POST':
+        admin_id = request.form.get('admin_id', '').strip()
+        admin_password = request.form.get('admin_password', '')
+        
+        # Check credentials against config
+        if admin_id == config.ADMIN_ID and admin_password == config.ADMIN_PASSWORD:
+            session['admin_authenticated'] = True
+            return redirect(url_for('admin_backup_page'))
+        else:
+            error = 'Invalid admin credentials'
+    
+    return render_template('admin/login.html', error=error)
+
+
+@app.route('/admin/logout')
+def admin_logout():
+    """Logout from admin session"""
+    session.pop('admin_authenticated', None)
+    flash('Logged out from admin panel.', 'info')
+    return redirect(url_for('home'))
+
+
+@app.route('/admin/backup')
+@admin_required
+def admin_backup_page():
+    """Backup management dashboard"""
+    stats = BackupService._get_statistics()
+    backups = BackupService.get_backup_status()
+    return render_template('admin/backup.html', stats=stats, backups=backups)
+
+
+@app.route('/admin/backup/create', methods=['POST'])
+@admin_required
+def create_backup():
+    """Create and download backup"""
+    backup_format = request.form.get('format', 'json')
+    
+    if backup_format == 'csv':
+        # Export skill patterns as CSV
+        csv_content = BackupService.export_skill_patterns_csv()
+        return Response(
+            csv_content,
+            mimetype='text/csv',
+            headers={'Content-Disposition': 'attachment;filename=skillfit_patterns.csv'}
+        )
+    else:
+        # Export all data as JSON
+        data = BackupService.export_all_data()
+        return Response(
+            json.dumps(data, indent=2),
+            mimetype='application/json',
+            headers={'Content-Disposition': 'attachment;filename=skillfit_backup.json'}
+        )
+
+
+@app.route('/admin/backup/download/<filename>')
+@admin_required
+def download_backup(filename):
+    """Download a specific backup file"""
+    # Sanitize filename to prevent path traversal
+    safe_filename = os.path.basename(filename)
+    content = BackupService.get_backup_file_content(safe_filename)
+    
+    if content:
+        return Response(
+            content,
+            mimetype='application/json',
+            headers={'Content-Disposition': f'attachment;filename={safe_filename}'}
+        )
+    else:
+        flash('Backup file not found.', 'error')
+        return redirect(url_for('admin_backup_page'))
+
+
+@app.route('/admin/backup/restore/<filename>', methods=['POST'])
+@admin_required
+def restore_backup(filename):
+    """Restore data from backup"""
+    # Sanitize filename to prevent path traversal
+    safe_filename = os.path.basename(filename)
+    success, message, stats = BackupService.restore_from_backup(safe_filename)
+    
+    if success:
+        flash(f'✅ {message}', 'success')
+    else:
+        flash(f'❌ {message}', 'error')
+    
+    return redirect(url_for('admin_backup_page'))
+
+
+@app.route('/api/admin/backup/save', methods=['POST'])
+@admin_required
+def api_save_backup():
+    """API endpoint to save backup to server"""
+    success, message, filepath = BackupService.save_backup_to_file()
+    
+    if success:
+        return jsonify({'success': True, 'message': message, 'filepath': filepath})
+    else:
+        return jsonify({'success': False, 'error': message}), 500
+
+
+@app.route('/api/backup/export')
+@admin_required
+def api_export_data():
+    """Export all data as JSON API"""
+    data = BackupService.export_all_data()
+    return jsonify(data)
+
+
+@app.route('/api/admin/stats')
+@admin_required
+def api_admin_stats():
+    """Get database statistics"""
+    stats = BackupService._get_statistics()
+    return jsonify({'success': True, 'stats': stats})
 
 
 # ===== Database Auto-Migration =====
