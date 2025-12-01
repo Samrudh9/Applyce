@@ -13,6 +13,13 @@ from werkzeug.utils import secure_filename
 import logging
 from flask_login import LoginManager, login_required, current_user
 
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
 # Clean imports - no more try/catch chaos
 from analyzer.resume_parser import extract_text_from_pdf
 from analyzer.quality_checker import check_resume_quality
@@ -1411,15 +1418,194 @@ def api_skill_gap():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+# ===== Database Auto-Migration =====
+def auto_migrate_db():
+    """
+    Automatically ensure database schema matches models.
+    This handles cases where new columns are added to existing tables.
+    
+    Since db.create_all() only creates new tables and doesn't add new columns
+    to existing tables, this function checks if required columns exist and
+    adds missing columns using ALTER TABLE (preserves data).
+    """
+    from sqlalchemy import inspect
+    
+    inspector = inspect(db.engine)
+    existing_tables = inspector.get_table_names()
+    
+    # Get database dialect (sqlite vs postgresql)
+    dialect = db.engine.dialect.name
+    
+    # Define required columns for each table based on models
+    # The columns are defined with their SQL type for ALTER TABLE
+    # Format: column_name: (sql_type_sqlite, sql_type_postgresql)
+    table_schemas = {
+        'resume_history': {
+            'id': ('INTEGER', 'INTEGER'),
+            'user_id': ('INTEGER', 'INTEGER'),
+            'filename': ('VARCHAR(255)', 'VARCHAR(255)'),
+            'upload_date': ('DATETIME', 'TIMESTAMP'),
+            'experience_level': ('VARCHAR(50)', 'VARCHAR(50)'),
+            'target_role': ('VARCHAR(100)', 'VARCHAR(100)'),
+            'overall_score': ('INTEGER', 'INTEGER'),
+            'ats_score': ('INTEGER', 'INTEGER'),
+            'keyword_score': ('INTEGER', 'INTEGER'),
+            'format_score': ('INTEGER', 'INTEGER'),
+            'section_score': ('INTEGER', 'INTEGER'),
+            'predicted_career': ('VARCHAR(100)', 'VARCHAR(100)'),
+            'career_confidence': ('FLOAT', 'FLOAT'),
+            'top_careers': ('TEXT', 'TEXT'),
+            'skills_detected': ('TEXT', 'TEXT'),
+            'skills_missing': ('TEXT', 'TEXT'),
+            'skill_count': ('INTEGER', 'INTEGER'),
+            'predicted_salary_min': ('INTEGER', 'INTEGER'),
+            'predicted_salary_max': ('INTEGER', 'INTEGER'),
+        },
+        'users': {
+            'id': ('INTEGER', 'INTEGER'),
+            'username': ('VARCHAR(80)', 'VARCHAR(80)'),
+            'email': ('VARCHAR(120)', 'VARCHAR(120)'),
+            'password_hash': ('VARCHAR(256)', 'VARCHAR(256)'),
+            'created_at': ('DATETIME', 'TIMESTAMP'),
+            'last_login': ('DATETIME', 'TIMESTAMP'),
+            'is_active': ('BOOLEAN', 'BOOLEAN'),
+        },
+        'feedbacks': {
+            'id': ('INTEGER', 'INTEGER'),
+            'user_id': ('INTEGER', 'INTEGER'),
+            'resume_id': ('INTEGER', 'INTEGER'),
+            'feedback_type': ('VARCHAR(20)', 'VARCHAR(20)'),
+            'predicted_career': ('VARCHAR(100)', 'VARCHAR(100)'),
+            'correct_career': ('VARCHAR(100)', 'VARCHAR(100)'),
+            'skills': ('TEXT', 'TEXT'),
+            'comments': ('TEXT', 'TEXT'),
+            'created_at': ('DATETIME', 'TIMESTAMP'),
+        },
+        'resumes': {
+            'id': ('INTEGER', 'INTEGER'),
+            'user_id': ('INTEGER', 'INTEGER'),
+            'filename': ('VARCHAR(255)', 'VARCHAR(255)'),
+            'file_hash': ('VARCHAR(64)', 'VARCHAR(64)'),
+            'uploaded_at': ('DATETIME', 'TIMESTAMP'),
+            'experience_level': ('VARCHAR(50)', 'VARCHAR(50)'),
+            'target_role': ('VARCHAR(100)', 'VARCHAR(100)'),
+            'job_search_status': ('VARCHAR(50)', 'VARCHAR(50)'),
+            'raw_text': ('TEXT', 'TEXT'),
+            'extracted_text': ('TEXT', 'TEXT'),
+            'skills': ('TEXT', 'TEXT'),
+            'education': ('TEXT', 'TEXT'),
+            'experience': ('TEXT', 'TEXT'),
+            'projects': ('TEXT', 'TEXT'),
+            'certifications': ('TEXT', 'TEXT'),
+            'contact_info': ('TEXT', 'TEXT'),
+            'overall_score': ('INTEGER', 'INTEGER'),
+            'score_breakdown': ('TEXT', 'TEXT'),
+            'ats_score': ('INTEGER', 'INTEGER'),
+            'ats_issues': ('TEXT', 'TEXT'),
+            'quality_score': ('INTEGER', 'INTEGER'),
+            'confidence_score': ('FLOAT', 'FLOAT'),
+            'salary_estimate': ('VARCHAR(50)', 'VARCHAR(50)'),
+            'predicted_career': ('VARCHAR(100)', 'VARCHAR(100)'),
+            'career_confidence': ('FLOAT', 'FLOAT'),
+            'alternative_careers': ('TEXT', 'TEXT'),
+            'feedback': ('TEXT', 'TEXT'),
+            'missing_keywords': ('TEXT', 'TEXT'),
+            'created_at': ('DATETIME', 'TIMESTAMP'),
+        },
+        'skill_patterns': {
+            'id': ('INTEGER', 'INTEGER'),
+            'skill': ('VARCHAR(100)', 'VARCHAR(100)'),
+            'career': ('VARCHAR(100)', 'VARCHAR(100)'),
+            'occurrence_count': ('INTEGER', 'INTEGER'),
+            'positive_feedback_count': ('INTEGER', 'INTEGER'),
+            'negative_feedback_count': ('INTEGER', 'INTEGER'),
+            'confidence': ('FLOAT', 'FLOAT'),
+            'created_at': ('DATETIME', 'TIMESTAMP'),
+            'updated_at': ('DATETIME', 'TIMESTAMP'),
+        },
+        'user_preferences': {
+            'id': ('INTEGER', 'INTEGER'),
+            'user_id': ('INTEGER', 'INTEGER'),
+            'default_experience_level': ('VARCHAR(50)', 'VARCHAR(50)'),
+            'default_target_role': ('VARCHAR(100)', 'VARCHAR(100)'),
+            'preferred_industries': ('TEXT', 'TEXT'),
+            'target_salary_min': ('INTEGER', 'INTEGER'),
+            'target_salary_max': ('INTEGER', 'INTEGER'),
+            'preferred_locations': ('TEXT', 'TEXT'),
+            'remote_preference': ('VARCHAR(20)', 'VARCHAR(20)'),
+            'email_notifications': ('BOOLEAN', 'BOOLEAN'),
+            'created_at': ('DATETIME', 'TIMESTAMP'),
+            'updated_at': ('DATETIME', 'TIMESTAMP'),
+        },
+        'resume_versions': {
+            'id': ('INTEGER', 'INTEGER'),
+            'resume_id': ('INTEGER', 'INTEGER'),
+            'version': ('INTEGER', 'INTEGER'),
+            'overall_score': ('INTEGER', 'INTEGER'),
+            'ats_score': ('INTEGER', 'INTEGER'),
+            'score_breakdown': ('TEXT', 'TEXT'),
+            'changes_made': ('TEXT', 'TEXT'),
+            'created_at': ('DATETIME', 'TIMESTAMP'),
+        },
+    }
+    
+    columns_added = []
+    
+    for table_name, columns in table_schemas.items():
+        if table_name in existing_tables:
+            existing_columns = {col['name'] for col in inspector.get_columns(table_name)}
+            required_columns = set(columns.keys())
+            missing_columns = required_columns - existing_columns
+            
+            if missing_columns:
+                logger.warning(f"⚠️ Missing columns in {table_name}: {missing_columns}")
+                
+                for col_name in missing_columns:
+                    # Get the appropriate SQL type based on dialect
+                    col_types = columns[col_name]
+                    col_type = col_types[1] if dialect == 'postgresql' else col_types[0]
+                    
+                    try:
+                        # Use ALTER TABLE to add missing columns (preserves data)
+                        # All values (table_name, col_name, col_type) are from our
+                        # hardcoded schema dictionary, so they're safe
+                        sql = f"ALTER TABLE {table_name} ADD COLUMN {col_name} {col_type}"
+                        db.session.execute(db.text(sql))
+                        db.session.commit()
+                        columns_added.append(f"{table_name}.{col_name}")
+                        logger.info(f"✅ Added column {col_name} to {table_name}")
+                    except Exception as e:
+                        # Column might already exist or other database error
+                        error_msg = str(e).lower()
+                        if 'duplicate' in error_msg or 'already exists' in error_msg:
+                            logger.info(f"ℹ️ Column {col_name} already exists in {table_name}")
+                        else:
+                            logger.warning(f"⚠️ Could not add column {col_name} to {table_name}: {e}")
+                        db.session.rollback()
+        else:
+            logger.info(f"📋 Table {table_name} does not exist, will be created by db.create_all()")
+    
+    return columns_added
+
+
 # ===== Database Initialization =====
 def init_db():
-    """Initialize database and create tables"""
+    """Initialize database and create tables with auto-migration"""
     try:
         with app.app_context():
+            # First, check and add missing columns to existing tables
+            # This must happen BEFORE db.create_all() to preserve existing data
+            columns_added = auto_migrate_db()
+            
+            if columns_added:
+                logger.info(f"🔄 Auto-migration completed. Added columns: {columns_added}")
+            
+            # Then create any new tables that don't exist yet
             db.create_all()
-            print("✅ Database tables created!")
+            logger.info("✅ Database tables created/verified!")
+            logger.info("✅ Database ready!")
     except Exception as e:
-        print(f"⚠️ Database setup error: {e}")
+        logger.error(f"⚠️ Database setup error: {e}")
 
 # Call init_db
 init_db()
