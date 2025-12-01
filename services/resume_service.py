@@ -309,7 +309,7 @@ class ResumeService:
             ResumeHistory object
         """
         try:
-            # Use ATS overall score for consistency
+            # Use ATS overall score for consistency (both overall_score and ats_score are the same)
             ats_score = ats_data.get('overall_score', overall_score) if ats_data else overall_score
             
             # Build score breakdown from ATS data
@@ -322,7 +322,7 @@ class ResumeService:
                 filename=filename,
                 experience_level=experience_level,
                 target_role=target_role,
-                overall_score=ats_score,  # Use ATS score for consistency
+                overall_score=ats_score,
                 ats_score=ats_score,
                 keyword_score=keyword_score,
                 format_score=format_score,

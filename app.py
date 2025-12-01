@@ -758,12 +758,12 @@ def handle_resume_upload():
     resources = recommend_resources(primary_career)
 
     # ATS Analysis
+    ats_data = {}
     try:
         ats_data = ats_analyzer.analyze(extracted_text, skills_found, primary_career)
         session['ats_data'] = ats_data
     except Exception as e:
         print(f"ATS analysis error: {e}")
-        ats_data = {}
         session['ats_data'] = {}
 
     # Resume Evaluation for checklist
