@@ -110,10 +110,11 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # Initialize database
 from models import db
 db.init_app(app)
+migrate = Migrate(app, db)
 # Create tables on startup (needed for Render)
-with app.app_context():
-    db. create_all()
-    print("✅ Database tables created!")
+# with app.app_context():
+#     db. create_all()
+#     print("✅ Database tables created!")
     
 # Initialize Flask-Login
 login_manager = LoginManager()
