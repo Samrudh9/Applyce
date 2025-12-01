@@ -204,12 +204,24 @@
       color: #fff;
     }
 
-    .stat-value.positive {
+    .stat-change {
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .stat-change.positive {
       color: var(--success);
     }
 
-    .stat-value.negative {
+    .stat-change.negative {
       color: var(--error);
+    }
+
+    .stat-change.neutral {
+      color: var(--text-muted);
     }
 
     /* Section Cards */
@@ -259,6 +271,10 @@
     }
 
     /* History Table */
+    .table-container {
+      overflow-x: auto;
+    }
+
     .history-table {
       width: 100%;
       border-collapse: collapse;
@@ -299,6 +315,11 @@
       font-size: 0.85rem;
     }
 
+    .history-score.ats {
+      background: rgba(0, 194, 255, 0.15);
+      color: var(--accent);
+    }
+
     .history-career {
       color: var(--accent);
       font-weight: 500;
@@ -331,23 +352,114 @@
       background: rgba(255, 68, 68, 0.3);
     }
 
-    /* Skills Grid */
-    .skills-grid {
+    /* Two Column Layout */
+    .two-columns {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 1.5rem;
     }
 
     @media (max-width: 768px) {
-      .skills-grid {
+      .two-columns {
         grid-template-columns: 1fr;
       }
     }
 
+    /* Roadmap Progress */
+    .roadmap-section {
+      margin-top: 1rem;
+    }
+
+    .roadmap-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .roadmap-phase {
+      margin-bottom: 1rem;
+      padding: 0.75rem;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+    }
+
+    .phase-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .phase-name {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 500;
+    }
+
+    .phase-status {
+      font-size: 1rem;
+    }
+
+    .phase-percentage {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .progress-bar {
+      height: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.5s ease;
+    }
+
+    .progress-fill.complete {
+      background: linear-gradient(90deg, var(--success), #00cc6a);
+    }
+
+    .progress-fill.in-progress {
+      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+    }
+
+    .progress-fill.not-started {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .view-roadmap-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
+      background: rgba(0, 194, 255, 0.15);
+      color: var(--accent);
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: all 0.3s ease;
+    }
+
+    .view-roadmap-btn:hover {
+      background: rgba(0, 194, 255, 0.25);
+    }
+
+    /* Skills Section */
     .skills-container {
       display: flex;
       flex-wrap: wrap;
       gap: 0.5rem;
+      max-height: 200px;
+      overflow-y: auto;
     }
 
     .skill-badge {
@@ -364,6 +476,16 @@
     .skill-badge:hover {
       transform: translateY(-2px);
       box-shadow: 0 3px 10px rgba(0, 194, 255, 0.2);
+    }
+
+    .skill-badge.missing {
+      background: rgba(255, 170, 0, 0.15);
+      color: var(--warning);
+      border: 1px solid rgba(255, 170, 0, 0.3);
+    }
+
+    .skill-badge.missing:hover {
+      box-shadow: 0 3px 10px rgba(255, 170, 0, 0.2);
     }
 
     /* Recommendations */
@@ -407,6 +529,15 @@
       line-height: 1.5;
     }
 
+    .recommendation-text a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .recommendation-text a:hover {
+      text-decoration: underline;
+    }
+
     /* Empty State */
     .empty-state {
       text-align: center;
@@ -428,15 +559,6 @@
     .empty-state p {
       color: var(--text-muted);
       margin-bottom: 1.5rem;
-    }
-
-    /* Responsive Table */
-    @media (max-width: 768px) {
-      .history-table {
-        display: block;
-        overflow-x: auto;
-        white-space: nowrap;
-      }
     }
 
     /* Flash Messages */
@@ -471,39 +593,47 @@
       color: var(--accent);
     }
 
-    /* User Card */
-    .user-card {
+    /* Pagination */
+    .pagination {
       display: flex;
-      align-items: center;
-      gap: 1rem;
-      padding: 1rem;
-      background: rgba(0, 194, 255, 0.05);
-      border-radius: 12px;
-      margin-bottom: 1rem;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 1rem;
     }
 
-    .user-avatar {
-      width: 50px;
-      height: 50px;
-      background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-      font-weight: 700;
+    .pagination-btn {
+      padding: 0.5rem 1rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-color);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .pagination-btn:hover {
+      background: rgba(0, 194, 255, 0.15);
+      border-color: var(--accent);
+    }
+
+    .pagination-btn.active {
+      background: var(--accent);
       color: #000;
     }
 
-    .user-info h3 {
-      color: #fff;
-      font-size: 1rem;
-      font-weight: 600;
+    .pagination-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
 
-    .user-info p {
+    /* Sub-section titles */
+    .sub-section-title {
+      font-size: 0.9rem;
       color: var(--text-muted);
-      font-size: 0.85rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
   </style>
 </head>
@@ -548,35 +678,63 @@
       <div class="stats-grid">
         <div class="stat-card">
           <div class="stat-icon blue">
-            <i class="fas fa-chart-line"></i>
-          </div>
-          <div class="stat-label">Latest Score (ATS)</div>
-          <div class="stat-value">{{ latest_score }}/100</div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon purple">
             <i class="fas fa-file-alt"></i>
           </div>
-          <div class="stat-label">Total Uploads</div>
-          <div class="stat-value">{{ total_resumes }}</div>
+          <div class="stat-label">Resume Score</div>
+          <div class="stat-value">{{ latest_score }}/100</div>
+          <div class="stat-change {% if improvement > 0 %}positive{% elif improvement < 0 %}negative{% else %}neutral{% endif %}">
+            {% if improvement > 0 %}
+              <i class="fas fa-arrow-up"></i> +{{ improvement }}% vs last
+            {% elif improvement < 0 %}
+              <i class="fas fa-arrow-down"></i> {{ improvement }}% vs last
+            {% else %}
+              <i class="fas fa-minus"></i> No change
+            {% endif %}
+          </div>
         </div>
 
         <div class="stat-card">
           <div class="stat-icon green">
-            <i class="fas fa-trophy"></i>
+            <i class="fas fa-robot"></i>
           </div>
-          <div class="stat-label">Best Score (ATS)</div>
-          <div class="stat-value">{{ best_score }}/100</div>
+          <div class="stat-label">ATS Score</div>
+          <div class="stat-value">{{ latest_ats_score }}/100</div>
+          <div class="stat-change {% if ats_improvement > 0 %}positive{% elif ats_improvement < 0 %}negative{% else %}neutral{% endif %}">
+            {% if ats_improvement > 0 %}
+              <i class="fas fa-arrow-up"></i> +{{ ats_improvement }}% vs last
+            {% elif ats_improvement < 0 %}
+              <i class="fas fa-arrow-down"></i> {{ ats_improvement }}% vs last
+            {% else %}
+              <i class="fas fa-minus"></i> No change
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon purple">
+            <i class="fas fa-bullseye"></i>
+          </div>
+          <div class="stat-label">Career Match</div>
+          <div class="stat-value" style="font-size: 1.5rem;">
+            {% if top_career %}
+              {{ top_career[:20] }}{% if top_career|length > 20 %}...{% endif %}
+            {% else %}
+              N/A
+            {% endif %}
+          </div>
+          <div class="stat-change positive">
+            <i class="fas fa-check-circle"></i> {{ career_confidence|round(1) }}% confidence
+          </div>
         </div>
 
         <div class="stat-card">
           <div class="stat-icon yellow">
-            <i class="fas fa-arrow-up"></i>
+            <i class="fas fa-chart-line"></i>
           </div>
-          <div class="stat-label">Improvement</div>
-          <div class="stat-value {% if improvement > 0 %}positive{% elif improvement < 0 %}negative{% endif %}">
-            {% if improvement > 0 %}+{% endif %}{{ improvement }} pts
+          <div class="stat-label">Best Score</div>
+          <div class="stat-value">{{ best_score }}/100</div>
+          <div class="stat-change neutral">
+            <i class="fas fa-history"></i> {{ total_resumes }} upload{% if total_resumes > 1 %}s{% endif %}
           </div>
         </div>
       </div>
@@ -585,7 +743,7 @@
       <div class="section">
         <div class="section-header">
           <div class="section-icon"><i class="fas fa-chart-area"></i></div>
-          <h2>📈 Score Progress</h2>
+          <h2>📈 Score Progress Over Time</h2>
         </div>
         <div class="chart-container">
           <canvas id="scoreChart"></canvas>
@@ -598,96 +756,186 @@
           <div class="section-icon"><i class="fas fa-history"></i></div>
           <h2>📄 Resume History</h2>
         </div>
-        <table class="history-table">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Filename</th>
-              <th>Resume Score</th>
-              <th>ATS Score</th>
-              <th>Career Match</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for item in history %}
+        <div class="table-container">
+          <table class="history-table" id="historyTable">
+            <thead>
               <tr>
-                <td>{{ item.upload_date.strftime('%b %d, %Y') }}</td>
-                <td>{{ item.filename }}</td>
-                <td>
-                  <span class="history-score">
-                    <i class="fas fa-star"></i> {{ item.overall_score }}/100
-                  </span>
-                </td>
-                <td>
-                  <span class="history-score" style="background: rgba(0, 194, 255, 0.15); color: var(--accent);">
-                    <i class="fas fa-robot"></i> {{ item.ats_score if item.ats_score else item.overall_score }}/100
-                  </span>
-                </td>
-                <td class="history-career">{{ item.predicted_career or 'N/A' }}</td>
-                <td class="history-actions">
-                  <form action="{{ url_for('delete_resume_history', history_id=item.id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this entry?');">
-                    <button type="submit" class="action-btn delete">
-                      <i class="fas fa-trash"></i> Delete
-                    </button>
-                  </form>
-                </td>
+                <th>Date</th>
+                <th>Filename</th>
+                <th>Resume Score</th>
+                <th>ATS Score</th>
+                <th>Career Match</th>
+                <th>Actions</th>
               </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {% for item in history %}
+                <tr class="history-row" data-page="{{ (loop.index0 // 10) + 1 }}" {% if loop.index0 >= 10 %}style="display: none;"{% endif %}>
+                  <td>{{ item.upload_date.strftime('%b %d, %Y') }}</td>
+                  <td>{{ item.filename }}</td>
+                  <td>
+                    <span class="history-score">
+                      <i class="fas fa-star"></i> {{ item.overall_score or 0 }}/100
+                    </span>
+                  </td>
+                  <td>
+                    <span class="history-score ats">
+                      <i class="fas fa-robot"></i> {{ item.ats_score or item.overall_score or 0 }}/100
+                    </span>
+                  </td>
+                  <td class="history-career">{{ item.predicted_career or 'N/A' }}</td>
+                  <td class="history-actions">
+                    <form action="{{ url_for('delete_resume_history', history_id=item.id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this entry?');">
+                      <button type="submit" class="action-btn delete">
+                        <i class="fas fa-trash"></i> Delete
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% if history|length > 10 %}
+        <div class="pagination" id="pagination">
+          <button class="pagination-btn" onclick="changePage(-1)" id="prevBtn" disabled>
+            <i class="fas fa-chevron-left"></i> Prev
+          </button>
+          <span id="pageInfo" style="padding: 0.5rem 1rem; color: var(--text-muted);">Page 1 of {{ ((history|length - 1) // 10) + 1 }}</span>
+          <button class="pagination-btn" onclick="changePage(1)" id="nextBtn">
+            Next <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
+        {% endif %}
       </div>
 
-      <!-- Skills & Recommendations -->
-      <div class="skills-grid">
+      <!-- Two Column Section: Roadmap & Skills -->
+      <div class="two-columns">
+        <!-- Career Roadmap Progress -->
+        <div class="section">
+          <div class="section-header">
+            <div class="section-icon"><i class="fas fa-road"></i></div>
+            <h2>🎯 Career Roadmap Progress</h2>
+          </div>
+          
+          {% if top_career and roadmap_progress %}
+            <div class="roadmap-header">
+              <i class="fas fa-graduation-cap"></i>
+              YOUR ROADMAP: {{ top_career }}
+            </div>
+            <div class="roadmap-section">
+              {% for phase in roadmap_progress %}
+                <div class="roadmap-phase">
+                  <div class="phase-header">
+                    <div class="phase-name">
+                      <span class="phase-status">
+                        {% if phase.progress == 100 %}✅{% elif phase.progress > 0 %}🔄{% else %}⬜{% endif %}
+                      </span>
+                      {{ phase.name }}
+                    </div>
+                    <span class="phase-percentage">{{ phase.progress }}%</span>
+                  </div>
+                  <div class="progress-bar">
+                    <div class="progress-fill {% if phase.progress == 100 %}complete{% elif phase.progress > 0 %}in-progress{% else %}not-started{% endif %}" style="width: {{ phase.progress }}%"></div>
+                  </div>
+                </div>
+              {% endfor %}
+              <a href="{{ url_for('show_roadmap', career=top_career) }}" class="view-roadmap-btn">
+                <i class="fas fa-map"></i> View Full Roadmap
+              </a>
+            </div>
+          {% else %}
+            <p style="color: var(--text-muted);">Upload a resume to see your personalized career roadmap!</p>
+          {% endif %}
+        </div>
+
+        <!-- Skills Analysis -->
         <div class="section">
           <div class="section-header">
             <div class="section-icon"><i class="fas fa-code"></i></div>
-            <h2>🛠️ Your Skills</h2>
+            <h2>💡 Skills Analysis</h2>
+          </div>
+          
+          <div class="sub-section-title">
+            <i class="fas fa-check-circle" style="color: var(--success);"></i>
+            Your Skills ({{ all_skills|length }})
           </div>
           {% if all_skills %}
-            <div class="skills-container">
+            <div class="skills-container" style="margin-bottom: 1.5rem;">
               {% for skill in all_skills %}
                 <span class="skill-badge">{{ skill }}</span>
               {% endfor %}
             </div>
           {% else %}
-            <p style="color: var(--text-muted);">No skills detected yet. Upload a resume to get started!</p>
+            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">No skills detected yet.</p>
+          {% endif %}
+          
+          <div class="sub-section-title">
+            <i class="fas fa-plus-circle" style="color: var(--warning);"></i>
+            Skills to Learn ({{ missing_skills|length }})
+          </div>
+          {% if missing_skills %}
+            <div class="skills-container">
+              {% for skill in missing_skills[:10] %}
+                <span class="skill-badge missing">{{ skill }}</span>
+              {% endfor %}
+            </div>
+          {% else %}
+            <p style="color: var(--text-muted);">Great job! You have most of the skills for {{ top_career or 'your target career' }}.</p>
           {% endif %}
         </div>
+      </div>
 
-        <div class="section">
-          <div class="section-header">
-            <div class="section-icon"><i class="fas fa-lightbulb"></i></div>
-            <h2>💡 Recommended Actions</h2>
-          </div>
-          <ul class="recommendation-list">
-            {% if top_career %}
-              <li class="recommendation-item">
-                <div class="recommendation-icon"><i class="fas fa-road"></i></div>
-                <span class="recommendation-text">View the learning roadmap for {{ top_career }}</span>
-              </li>
-            {% endif %}
-            {% if latest_score < 70 %}
-              <li class="recommendation-item">
-                <div class="recommendation-icon"><i class="fas fa-edit"></i></div>
-                <span class="recommendation-text">Improve your resume score by adding more relevant skills</span>
-              </li>
-            {% endif %}
-            <li class="recommendation-item">
-              <div class="recommendation-icon"><i class="fas fa-certificate"></i></div>
-              <span class="recommendation-text">Add relevant certifications to stand out</span>
-            </li>
-            <li class="recommendation-item">
-              <div class="recommendation-icon"><i class="fas fa-project-diagram"></i></div>
-              <span class="recommendation-text">Include more projects showcasing your expertise</span>
-            </li>
-            <li class="recommendation-item">
-              <div class="recommendation-icon"><i class="fas fa-link"></i></div>
-              <span class="recommendation-text">Update your LinkedIn profile with new skills</span>
-            </li>
-          </ul>
+      <!-- Recommendations -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-icon"><i class="fas fa-lightbulb"></i></div>
+          <h2>🚀 Recommended Actions</h2>
         </div>
+        <ul class="recommendation-list">
+          {% if top_career %}
+            <li class="recommendation-item">
+              <div class="recommendation-icon"><i class="fas fa-road"></i></div>
+              <span class="recommendation-text">
+                View the <a href="{{ url_for('show_roadmap', career=top_career) }}">learning roadmap for {{ top_career }}</a> to plan your career growth
+              </span>
+            </li>
+          {% endif %}
+          {% if latest_score < 70 %}
+            <li class="recommendation-item">
+              <div class="recommendation-icon"><i class="fas fa-edit"></i></div>
+              <span class="recommendation-text">
+                Your resume score is {{ latest_score }}/100. Add more relevant skills and projects to improve it.
+              </span>
+            </li>
+          {% endif %}
+          {% if missing_skills|length > 5 %}
+            <li class="recommendation-item">
+              <div class="recommendation-icon"><i class="fas fa-book"></i></div>
+              <span class="recommendation-text">
+                You're missing {{ missing_skills|length }} key skills for {{ top_career or 'your target career' }}. Start learning: {{ missing_skills[:3]|join(', ') }}
+              </span>
+            </li>
+          {% endif %}
+          <li class="recommendation-item">
+            <div class="recommendation-icon"><i class="fas fa-certificate"></i></div>
+            <span class="recommendation-text">
+              Add relevant certifications to stand out from other candidates
+            </span>
+          </li>
+          <li class="recommendation-item">
+            <div class="recommendation-icon"><i class="fas fa-project-diagram"></i></div>
+            <span class="recommendation-text">
+              Include more projects showcasing your expertise and practical experience
+            </span>
+          </li>
+          <li class="recommendation-item">
+            <div class="recommendation-icon"><i class="fas fa-link"></i></div>
+            <span class="recommendation-text">
+              Update your LinkedIn profile with your new skills and achievements
+            </span>
+          </li>
+        </ul>
       </div>
 
     {% else %}
@@ -716,35 +964,62 @@
     if (scoreHistory && scoreHistory.length > 0) {
       const ctx = document.getElementById('scoreChart').getContext('2d');
       
-      const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-      gradient.addColorStop(0, 'rgba(0, 194, 255, 0.3)');
-      gradient.addColorStop(1, 'rgba(0, 194, 255, 0.0)');
+      const gradientResume = ctx.createLinearGradient(0, 0, 0, 300);
+      gradientResume.addColorStop(0, 'rgba(0, 194, 255, 0.3)');
+      gradientResume.addColorStop(1, 'rgba(0, 194, 255, 0.0)');
+      
+      const gradientATS = ctx.createLinearGradient(0, 0, 0, 300);
+      gradientATS.addColorStop(0, 'rgba(0, 255, 136, 0.3)');
+      gradientATS.addColorStop(1, 'rgba(0, 255, 136, 0.0)');
       
       new Chart(ctx, {
         type: 'line',
         data: {
           labels: scoreHistory.map(item => item.date),
-          datasets: [{
-            label: 'Resume Score',
-            data: scoreHistory.map(item => item.score),
-            borderColor: '#00c2ff',
-            backgroundColor: gradient,
-            borderWidth: 3,
-            fill: true,
-            tension: 0.4,
-            pointBackgroundColor: '#00c2ff',
-            pointBorderColor: '#fff',
-            pointBorderWidth: 2,
-            pointRadius: 5,
-            pointHoverRadius: 7
-          }]
+          datasets: [
+            {
+              label: 'Resume Score',
+              data: scoreHistory.map(item => item.score),
+              borderColor: '#00c2ff',
+              backgroundColor: gradientResume,
+              borderWidth: 3,
+              fill: true,
+              tension: 0.4,
+              pointBackgroundColor: '#00c2ff',
+              pointBorderColor: '#fff',
+              pointBorderWidth: 2,
+              pointRadius: 5,
+              pointHoverRadius: 7
+            },
+            {
+              label: 'ATS Score',
+              data: scoreHistory.map(item => item.ats_score),
+              borderColor: '#00ff88',
+              backgroundColor: 'transparent',
+              borderWidth: 2,
+              borderDash: [5, 5],
+              fill: false,
+              tension: 0.4,
+              pointBackgroundColor: '#00ff88',
+              pointBorderColor: '#fff',
+              pointBorderWidth: 2,
+              pointRadius: 4,
+              pointHoverRadius: 6
+            }
+          ]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
           plugins: {
             legend: {
-              display: false
+              display: true,
+              position: 'top',
+              labels: {
+                color: '#888',
+                usePointStyle: true,
+                padding: 20
+              }
             },
             tooltip: {
               backgroundColor: '#1a1b22',
@@ -753,10 +1028,10 @@
               borderColor: 'rgba(0, 194, 255, 0.3)',
               borderWidth: 1,
               padding: 12,
-              displayColors: false,
+              displayColors: true,
               callbacks: {
                 label: function(context) {
-                  return 'Score: ' + context.raw + '/100';
+                  return context.dataset.label + ': ' + context.raw + '/100';
                 }
               }
             }
@@ -771,7 +1046,7 @@
               ticks: {
                 color: '#888',
                 callback: function(value) {
-                  return value + '/100';
+                  return value;
                 }
               }
             },
@@ -790,6 +1065,28 @@
           }
         }
       });
+    }
+
+    // Pagination functionality
+    let currentPage = 1;
+    const totalPages = {{ ((history|length - 1) // 10) + 1 }};
+
+    function changePage(delta) {
+      const newPage = currentPage + delta;
+      if (newPage < 1 || newPage > totalPages) return;
+      
+      currentPage = newPage;
+      
+      // Update visibility
+      document.querySelectorAll('.history-row').forEach(row => {
+        const rowPage = parseInt(row.dataset.page);
+        row.style.display = rowPage === currentPage ? '' : 'none';
+      });
+      
+      // Update pagination controls
+      document.getElementById('pageInfo').textContent = `Page ${currentPage} of ${totalPages}`;
+      document.getElementById('prevBtn').disabled = currentPage === 1;
+      document.getElementById('nextBtn').disabled = currentPage === totalPages;
     }
   </script>
   {% endif %}

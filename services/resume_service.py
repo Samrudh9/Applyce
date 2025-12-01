@@ -12,6 +12,42 @@ from models.resume import Resume, ResumeVersion
 from models.resume_history import ResumeHistory
 
 
+def convert_numpy_types(value):
+    """
+    Convert numpy types to Python native types for database compatibility.
+    This prevents PostgreSQL errors like 'schema "np" does not exist'.
+    
+    Args:
+        value: The value to convert (could be numpy type or Python native type)
+        
+    Returns:
+        Python native type equivalent of the value
+    """
+    if value is None:
+        return value
+    
+    # Check if value has .item() method (numpy scalars)
+    if hasattr(value, 'item'):
+        return value.item()
+    
+    # Check if value is a numpy ndarray
+    if hasattr(value, 'tolist'):
+        return value.tolist()
+    
+    # Handle specific numpy type names
+    type_name = type(value).__name__
+    if type_name.startswith(('float', 'int', 'uint', 'bool')):
+        # Try to convert to Python native type
+        if 'float' in type_name:
+            return float(value)
+        elif 'int' in type_name or 'uint' in type_name:
+            return int(value)
+        elif 'bool' in type_name:
+            return bool(value)
+    
+    return value
+
+
 class ResumeService:
     """Service for managing resume database operations."""
     
@@ -317,6 +353,38 @@ class ResumeService:
             format_score = ats_data.get('format_analysis', {}).get('score', 0) if ats_data else 0
             section_score = ats_data.get('section_analysis', {}).get('score', 0) if ats_data else 0
             
+            # Convert numpy types to Python native types for PostgreSQL compatibility
+            ats_score = convert_numpy_types(ats_score)
+            keyword_score = convert_numpy_types(keyword_score)
+            format_score = convert_numpy_types(format_score)
+            section_score = convert_numpy_types(section_score)
+            
+            # Convert career confidence from predictions
+            career_confidence = 0
+            if predictions and len(predictions) > 0:
+                career_confidence = convert_numpy_types(predictions[0][1])
+            
+            # Convert salary data
+            salary_min = convert_numpy_types(salary_data.get('min', 0)) if salary_data else 0
+            salary_max = convert_numpy_types(salary_data.get('max', 0)) if salary_data else 0
+            
+            # Ensure all scores are integers
+            ats_score = int(ats_score) if ats_score else 0
+            keyword_score = int(keyword_score) if keyword_score else 0
+            format_score = int(format_score) if format_score else 0
+            section_score = int(section_score) if section_score else 0
+            salary_min = int(salary_min) if salary_min else 0
+            salary_max = int(salary_max) if salary_max else 0
+            
+            # Ensure career_confidence is a float
+            career_confidence = float(career_confidence) if career_confidence else 0.0
+            
+            # Convert predictions for JSON serialization
+            serializable_predictions = []
+            if predictions:
+                for career, conf in predictions[:3]:
+                    serializable_predictions.append((career, float(convert_numpy_types(conf))))
+            
             history_entry = ResumeHistory(
                 user_id=user_id,
                 filename=filename,
@@ -328,15 +396,15 @@ class ResumeService:
                 format_score=format_score,
                 section_score=section_score,
                 predicted_career=predictions[0][0] if predictions else None,
-                career_confidence=predictions[0][1] if predictions else 0,
-                top_careers=json.dumps([(c, conf) for c, conf in predictions[:3]]) if predictions else '[]',
+                career_confidence=career_confidence,
+                top_careers=json.dumps(serializable_predictions) if serializable_predictions else '[]',
                 skills_detected=json.dumps(skills_found) if skills_found else '[]',
                 skills_missing=json.dumps(
                     skill_gap_data.get("skills_analysis", {}).get("missing_required", [])
                 ) if skill_gap_data else '[]',
                 skill_count=len(skills_found) if skills_found else 0,
-                predicted_salary_min=salary_data.get('min', 0) if salary_data else 0,
-                predicted_salary_max=salary_data.get('max', 0) if salary_data else 0
+                predicted_salary_min=salary_min,
+                predicted_salary_max=salary_max
             )
             
             db.session.add(history_entry)
