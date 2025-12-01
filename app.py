@@ -7,6 +7,7 @@ import uuid
 import re
 import functools
 from typing import List
+from flask_migrate import Migrate
 from flask import Flask, request, render_template, jsonify, redirect, url_for, flash, session
 from werkzeug.utils import secure_filename
 import logging
@@ -1356,6 +1357,33 @@ def api_get_roadmap(career):
         })
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+
+@app. route('/run-migrations')
+def run_migrations():
+    """Temporary - DELETE AFTER USE"""
+    try:
+        sql_statements = [
+            "ALTER TABLE resume_history ADD COLUMN IF NOT EXISTS experience_level VARCHAR(50)",
+            "ALTER TABLE resume_history ADD COLUMN IF NOT EXISTS target_role VARCHAR(100)",
+            "ALTER TABLE resume_history ADD COLUMN IF NOT EXISTS keyword_score INTEGER",
+            "ALTER TABLE resume_history ADD COLUMN IF NOT EXISTS format_score INTEGER",
+            "ALTER TABLE resume_history ADD COLUMN IF NOT EXISTS section_score INTEGER",
+            "ALTER TABLE resume_history ADD COLUMN IF NOT EXISTS career_confidence FLOAT",
+            "ALTER TABLE resume_history ADD COLUMN IF NOT EXISTS top_careers TEXT",
+            "ALTER TABLE resume_history ADD COLUMN IF NOT EXISTS skills_missing TEXT",
+            "ALTER TABLE resume_history ADD COLUMN IF NOT EXISTS skill_count INTEGER DEFAULT 0",
+            "ALTER TABLE resume_history ADD COLUMN IF NOT EXISTS predicted_salary_min INTEGER",
+            "ALTER TABLE resume_history ADD COLUMN IF NOT EXISTS predicted_salary_max INTEGER",
+        ]
+        
+        for sql in sql_statements:
+            db.session.execute(db.text(sql))
+        db.session.commit()
+        
+        return "✅ All columns added successfully!"
+    except Exception as e:
+        db.session.rollback()
+        return f"❌ Error: {str(e)}"
 
 
 @app.route('/api/skill-gap', methods=['POST'])
