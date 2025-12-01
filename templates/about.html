@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>About - AI Career Guidance</title>
-  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+  <title>About - SkillFit</title>
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon. svg') }}">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <style>
@@ -18,7 +18,7 @@
       --success: #00ff88;
       --warning: #ffaa00;
       --error: #ff4444;
-      --border-color: rgba(255, 255, 255, 0.1);
+      --border-color: rgba(255, 255, 255, 0. 1);
     }
 
     * {
@@ -73,51 +73,185 @@
     }
 
     .title {
-      font-size: 2.5rem;
+      font-size: 2. 5rem;
       text-align: center;
-      margin-bottom: 2rem;
+      margin-bottom: 0.5rem;
       background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
-    .nested-glass-card {
+    .tagline {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+    }
+
+    /* Stats Bar */
+    .stats-bar {
+      display: flex;
+      justify-content: center;
+      gap: 3rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    . nested-glass-card {
       background: rgba(255, 255, 255, 0.03);
       border-radius: 16px;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
       padding: 2rem;
       border: 1px solid var(--border-color);
-      transition: all 0.3s ease;
-      text-align: center;
-      margin-bottom: 2rem;
+      transition: all 0. 3s ease;
+      margin-bottom: 1.5rem;
     }
 
-    .nested-glass-card:hover {
+    . nested-glass-card:hover {
       transform: translateY(-5px);
       box-shadow: 0 15px 40px rgba(0, 194, 255, 0.15);
+      border-color: rgba(0, 194, 255, 0.3);
     }
 
-    .nested-glass-card h1 {
-      font-size: 1.5rem;
+    . nested-glass-card h2 {
+      font-size: 1.3rem;
       color: var(--accent);
       margin-bottom: 1rem;
-      border-bottom: none;
-      padding-bottom: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
-    .nested-glass-card .subtitle {
+    .nested-glass-card . subtitle {
       font-size: 1rem;
       line-height: 1.7;
       color: var(--text-muted);
-      text-align: left;
     }
 
-    .nested-glass-card .subtitle strong {
+    .nested-glass-card . subtitle strong {
       color: var(--accent-secondary);
     }
 
-    .fade-in {
+    /* Features Grid */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    . feature-card {
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 12px;
+      padding: 1.5rem;
+      border: 1px solid var(--border-color);
+      transition: all 0. 3s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(0, 194, 255, 0.3);
+    }
+
+    . feature-icon {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .feature-card h3 {
+      color: var(--text-color);
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .feature-card p {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    /* How It Works */
+    .how-it-works {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin: 1.5rem 0;
+    }
+
+    .step {
+      flex: 1;
+      min-width: 150px;
+      text-align: center;
+      padding: 1rem;
+    }
+
+    .step-number {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #000;
+      margin: 0 auto 1rem;
+    }
+
+    .step h4 {
+      color: var(--text-color);
+      margin-bottom: 0.5rem;
+    }
+
+    . step p {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    . step-arrow {
+      color: var(--accent);
+      font-size: 1. 5rem;
+    }
+
+    /* Tech Stack */
+    . tech-stack {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .tech-badge {
+      padding: 0.5rem 1rem;
+      background: rgba(0, 194, 255, 0.1);
+      border: 1px solid rgba(0, 194, 255, 0.3);
+      border-radius: 20px;
+      font-size: 0.85rem;
+      color: var(--accent);
+    }
+
+    . fade-in {
       opacity: 0;
       animation: fadeInText 1s ease-in forwards;
     }
@@ -128,7 +262,7 @@
       }
     }
 
-    .action-buttons {
+    . action-buttons {
       display: flex;
       gap: 1rem;
       justify-content: center;
@@ -140,19 +274,25 @@
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      padding: 0.75rem 1.5rem;
+      padding: 0.75rem 1. 5rem;
       border-radius: 30px;
       font-weight: 600;
       text-decoration: none;
       transition: all 0.3s ease;
     }
 
-    .action-btn.primary {
+    .action-btn. primary {
       background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
       color: #000;
     }
 
-    .action-btn:hover {
+    .action-btn.secondary {
+      background: transparent;
+      border: 2px solid var(--accent);
+      color: var(--accent);
+    }
+
+    . action-btn:hover {
       transform: scale(1.05);
       box-shadow: 0 5px 20px rgba(0, 194, 255, 0.4);
     }
@@ -170,13 +310,17 @@
         padding: 1.5rem;
       }
       
-      .nested-glass-card h1 {
-        font-size: 1.25rem;
+      .stats-bar {
+        gap: 1. 5rem;
+      }
+
+      .step-arrow {
+        display: none;
       }
     }
 
     /* Team Section Styles */
-    .team-section {
+    . team-section {
         margin-top: 60px;
         text-align: center;
     }
@@ -210,7 +354,7 @@
         background: var(--card-bg);
         border-radius: 16px;
         padding: 30px 20px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0. 1);
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
         text-align: center;
@@ -231,7 +375,7 @@
         box-shadow: 0 4px 15px rgba(0, 194, 255, 0.3);
     }
 
-    .member-avatar img {
+    . member-avatar img {
         width: 100%;
         height: 100%;
         object-fit: cover;
@@ -260,7 +404,7 @@
         border-radius: 20px;
         font-size: 0.85rem;
         font-weight: 500;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        transition: transform 0.3s ease, box-shadow 0. 3s ease;
     }
 
     .linkedin-btn:hover {
@@ -288,58 +432,177 @@
 {% include 'components/navbar.html' %}
 
 <main class="page-content">
-    <a href="/" class="back-link">← Back to Home</a>
+    <a href="/" class="back-link"><i class="fas fa-arrow-left"></i> Back to Home</a>
     
     <section class="glass-card2">
-      <h1 class="title">About the Project</h1>
-      
+      <h1 class="title">🎯 SkillFit</h1>
+      <p class="tagline">AI-Powered Career Intelligence Platform</p>
+
+      <!-- Stats Bar -->
+      <div class="stats-bar fade-in">
+        <div class="stat-item">
+          <div class="stat-number">500+</div>
+          <div class="stat-label">Careers</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">100+</div>
+          <div class="stat-label">Skills Detected</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">6</div>
+          <div class="stat-label">Industries</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">🧠</div>
+          <div class="stat-label">Self-Learning AI</div>
+        </div>
+      </div>
+
+      <!-- What is SkillFit -->
       <div class="nested-glass-card fade-in">
-        <h1>Career Recommendation System</h1>
+        <h2><i class="fas fa-rocket"></i> What is SkillFit?</h2>
         <p class="subtitle">
-          In an era defined by <strong>rapidly evolving industries</strong> and <strong>diverse career landscapes</strong>, navigating one's professional path is more complex—and more <strong>crucial</strong>—than ever. The <strong>Career Recommendation System</strong> project aims to <strong>bridge this gap</strong> using the power of <strong>machine learning</strong> and <strong>intelligent web design</strong> to help individuals <strong>discover career paths</strong> that truly align with their unique skills and personal interests.
+          SkillFit is an <strong>intelligent, self-learning career recommendation platform</strong> that analyzes your resume, 
+          predicts optimal career paths, evaluates ATS compatibility, and <strong>continuously improves</strong> through user feedback.
+          <br><br>
+          Unlike traditional career tools, SkillFit uses a <strong>Bayesian learning algorithm</strong> that gets smarter with every 
+          user interaction. The more feedback we receive, the more accurate our predictions become. 
         </p>
       </div>
 
-      <div class="nested-glass-card fade-in">
-        <h1>Project Overview</h1>
-        <p class="subtitle">
-          This application harnesses <strong>Python</strong>, <strong>Flask</strong>, and a trained <strong>machine learning model</strong> to analyze user inputs—such as personal interests and skill sets—and generate tailored career recommendations. It offers a seamless user experience through a responsive <strong>HTML/CSS</strong> interface, paired with a <strong>Flask</strong>-powered backend and a predictive ML engine built using <strong>Pandas</strong> and <strong>Scikit-learn</strong>.
+      <!-- Key Features Grid -->
+      <h2 style="text-align: center; margin: 2rem 0 1rem; color: var(--accent);"><i class="fas fa-star"></i> Key Features</h2>
+      <div class="features-grid fade-in">
+        <div class="feature-card">
+          <div class="feature-icon">🧠</div>
+          <h3>Self-Learning AI</h3>
+          <p>Our model improves with every feedback.  Pattern recognition + Bayesian confidence adjustment. </p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3>ATS Scoring</h3>
+          <p>Get a detailed 0-100 ATS compatibility score with actionable improvement tips.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🎯</div>
+          <h3>Career Prediction</h3>
+          <p>ML-powered predictions with confidence scores.  Top 3 career matches ranked. </p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📈</div>
+          <h3>Progress Tracking</h3>
+          <p>Dashboard with charts showing your score improvement over time.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🗺️</div>
+          <h3>Career Roadmaps</h3>
+          <p>Personalized learning paths with curated resources for 500+ careers.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">💰</div>
+          <h3>Salary Estimation</h3>
+          <p>Get predicted salary ranges based on your skills and experience level.</p>
+        </div>
+      </div>
 
-          At its core, the system not only delivers recommendations but also aims to simulate real-world software development practices—right from data collection and preprocessing, to model training, frontend design, backend integration, and version control using GitHub.
+      <!-- How It Works -->
+      <div class="nested-glass-card fade-in">
+        <h2><i class="fas fa-cogs"></i> How It Works</h2>
+        <div class="how-it-works">
+          <div class="step">
+            <div class="step-number">1</div>
+            <h4>Upload Resume</h4>
+            <p>PDF or DOCX format</p>
+          </div>
+          <div class="step-arrow"><i class="fas fa-arrow-right"></i></div>
+          <div class="step">
+            <div class="step-number">2</div>
+            <h4>AI Analysis</h4>
+            <p>Skills, ATS, Career Match</p>
+          </div>
+          <div class="step-arrow"><i class="fas fa-arrow-right"></i></div>
+          <div class="step">
+            <div class="step-number">3</div>
+            <h4>Get Results</h4>
+            <p>Scores & Recommendations</p>
+          </div>
+          <div class="step-arrow"><i class="fas fa-arrow-right"></i></div>
+          <div class="step">
+            <div class="step-number">4</div>
+            <h4>Give Feedback</h4>
+            <p>Help AI learn & improve</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Self-Learning Engine -->
+      <div class="nested-glass-card fade-in">
+        <h2><i class="fas fa-brain"></i> Self-Learning Engine</h2>
+        <p class="subtitle">
+          Our <strong>self-learning engine</strong> is what makes SkillFit unique. Here's how it works:
+          <br><br>
+          <strong>1.  Pattern Recognition:</strong> We track skill-to-career associations from every resume analyzed.
+          <br>
+          <strong>2. Feedback Loop:</strong> When you give thumbs up 👍 or thumbs down 👎, we adjust our confidence scores.
+          <br>
+          <strong>3.  Bayesian Update:</strong> More feedback = higher certainty.  The formula: <code>confidence = (positive + 1) / (positive + negative + 2)</code>
+          <br>
+          <strong>4. Continuous Improvement:</strong> Every interaction makes SkillFit smarter for the next user.
         </p>
       </div>
 
+      <!-- Tech Stack -->
       <div class="nested-glass-card fade-in">
-        <h1>Learning Objectives</h1>
-        <p class="subtitle">
-          This project has been meticulously structured to demonstrate the seamless <strong>integration</strong> of <strong>machine learning</strong> algorithms within modern <strong>web applications</strong>. It aims to cultivate <strong>real-world</strong> development workflows by leveraging <strong>industry-relevant tools</strong> such as <strong>Git</strong> for version control and <strong>Flask</strong> for backend development. In doing so, it emphasizes the importance of effective <strong>team collaboration</strong> through clearly defined roles and responsibilities. Ultimately, the project is designed to serve as a <strong>resume-worthy</strong> endeavor, highlighting both <strong>technical expertise</strong> and <strong>creative problem-solving</strong> abilities in a practical and impactful context.
-        </p>      
+        <h2><i class="fas fa-code"></i> Technology Stack</h2>
+        <p class="subtitle">Built with modern, production-ready technologies:</p>
+        <div class="tech-stack">
+          <span class="tech-badge">Python</span>
+          <span class="tech-badge">Flask</span>
+          <span class="tech-badge">PostgreSQL</span>
+          <span class="tech-badge">Scikit-learn</span>
+          <span class="tech-badge">Pandas</span>
+          <span class="tech-badge">Chart.js</span>
+          <span class="tech-badge">Flask-Login</span>
+          <span class="tech-badge">PyPDF2</span>
+          <span class="tech-badge">Gunicorn</span>
+          <span class="tech-badge">Render</span>
+        </div>
       </div>
 
+      <!-- Future Roadmap -->
       <div class="nested-glass-card fade-in">
-        <h1>Future Scope</h1>
+        <h2><i class="fas fa-road"></i> Future Roadmap</h2>
         <p class="subtitle">
-          With further enhancement, this system holds the potential to evolve into a more <strong>intelligent</strong> and <strong>personalized</strong> career guidance platform. Future iterations could incorporate <strong>real-time market data</strong> to dynamically reflect current <strong>career demand</strong> and trends. <strong>Natural Language Processing (NLP)</strong> can be applied for advanced <strong>resume analysis</strong>, offering deeper insights into <strong>user profiles</strong>. Integration with <strong>job board APIs</strong> would streamline access to live <strong>opportunities</strong>, while a <strong>user-specific dashboard</strong> and <strong>history log</strong> would enable <strong>progress tracking</strong>, personalized recommendations, and improved <strong>user engagement</strong> over time.
+          <strong>✅ Phase 1 (Complete):</strong> Database, Authentication, Self-Learning Engine
+          <br>
+          <strong>✅ Phase 2 (Complete):</strong> 500+ Careers, ATS Analyzer, Career Roadmaps
+          <br>
+          <strong>🔄 Phase 3 (In Progress):</strong> User Dashboard with Progress Charts
+          <br>
+          <strong>⬜ Phase 4 (Planned):</strong> Job Market Integration (LinkedIn/Indeed APIs)
+          <br>
+          <strong>⬜ Phase 5 (Planned):</strong> Email Reports & External API Access
         </p>      
       </div>
 
       <div class="action-buttons">
-        <a href="/upload" class="action-btn primary">🚀 Get Started</a>
+        <a href="/upload" class="action-btn primary"><i class="fas fa-rocket"></i> Get Started</a>
+        <a href="https://github.com/Samrudh9/Career-Recommendation-demo" target="_blank" class="action-btn secondary"><i class="fab fa-github"></i> View on GitHub</a>
       </div>
 
       <!-- Team Section -->
       <section class="team-section">
           <h2 class="section-title gradient-text">👥 Meet Our Team</h2>
-          <p class="section-subtitle">The talented people behind this project</p>
+          <p class="section-subtitle">The talented people behind SkillFit</p>
           
           <div class="team-grid">
               <!-- Team Member 1 -->
               <div class="team-card">
                   <div class="member-avatar">
-                      <img src="https://media.licdn.com/dms/image/v2/D5603AQHNlEFrJ27f4g/profile-displayphoto-shrink_400_400/B56ZZMTxDsGcAg-/0/1745036973891?e=1765411200&v=beta&t=wHGAf6o-OR7uvGYp8cRLnzrdpW4E3iJd6ieukQJ1wnI" alt="Team Member 1">
+                      <img src="https://media.licdn.com/dms/image/v2/D5603AQHNlEFrJ27f4g/profile-displayphoto-shrink_400_400/B56ZZMTxDsGcAg-/0/1745036973891?e=1765411200&v=beta&t=wHGAf6o-OR7uvGYpO8TxxDZ7J3ZN4oNGh6P5CyqWxsI" alt="Dishita Kotian">
                   </div>
-                  <h3 class="member-name">Dishita kotian</h3>
-                  <p class="member-role">BackEnd/Lead Developer</p>
+                  <h3 class="member-name">Dishita Kotian</h3>
+                  <p class="member-role">Backend/Lead Developer</p>
                   <a href="https://www.linkedin.com/in/dishita-kotian-15357129b/" target="_blank" class="linkedin-btn">
                       <i class="fab fa-linkedin"></i> LinkedIn
                   </a>
@@ -348,7 +611,7 @@
               <!-- Team Member 2 -->
               <div class="team-card">
                   <div class="member-avatar">
-                      <img src="https://media.licdn.com/dms/image/v2/D5603AQG1aqSuC_JTsA/profile-displayphoto-scale_400_400/B56ZkKv5bOHAAo-/0/1756821974906?e=1765411200&v=beta&t=eydZqHRE3GVg5eRTOQ4HOlDDVPOURahL7HxglKrrED4" alt="Team Member 2">
+                      <img src="https://media.licdn. com/dms/image/v2/D5603AQG1aqSuC_JTsA/profile-displayphoto-scale_400_400/B56ZkKv5bOHAAo-/0/1756821974906?e=1765411200&v=beta&t=eydZqHRE3GVg5eRTOy09oHzJq98fEpOG2vTOspyA6qg" alt="Khyathi Jain">
                   </div>
                   <h3 class="member-name">Khyathi Jain</h3>
                   <p class="member-role">Data Specialist</p>
@@ -360,10 +623,10 @@
               <!-- Team Member 3 -->
               <div class="team-card">
                   <div class="member-avatar">
-                      <img src="https://media.licdn.com/dms/image/v2/D5603AQHzOWKLbo6XDw/profile-displayphoto-shrink_400_400/B56ZaVOuOPGUAg-/0/1746260388063?e=1765411200&v=beta&t=2L_gBqyl1--PeE7_kkVcsPyoqvc9WcnpwGztfkR6cTs" alt="Team Member 3">
+                      <img src="https://media. licdn.com/dms/image/v2/D5603AQHzOWKLbo6XDw/profile-displayphoto-shrink_400_400/B56ZaVOuOPGUAg-/0/1746260388063?e=1765411200&v=beta&t=2L_gBqyl1--PeE7_sXpmv3u8KZcXqvMn1yKVODuHPPs" alt="Shaabdhik M Jain">
                   </div>
                   <h3 class="member-name">Shaabdhik M Jain</h3>
-                  <p class="member-role">FrontEnd Developer</p>
+                  <p class="member-role">Frontend Developer</p>
                   <a href="https://www.linkedin.com/in/shaabdhik-jain-19181528b/" target="_blank" class="linkedin-btn">
                       <i class="fab fa-linkedin"></i> LinkedIn
                   </a>
@@ -372,11 +635,11 @@
               <!-- Team Member 4 -->
               <div class="team-card">
                   <div class="member-avatar">
-                      <img src="https://media.licdn.com/dms/image/v2/D5603AQH2_gj4ZWTrwg/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1729395828694?e=1765411200&v=beta&t=2hW_hN-IjYzr0DrHgMSyECOTyObDblkdjwsxv1FCizo" alt="Team Member 4">
+                      <img src="https://media.licdn.com/dms/image/v2/D5603AQH2_gj4ZWTrwg/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1729395828694?e=1765411200&v=beta&t=NQbfZ-wKCW6NlVg6KfQfaS6qN9NN6_FMRmz_5q5LCpg" alt="Sathwik R Shetty">
                   </div>
                   <h3 class="member-name">Sathwik R Shetty</h3>
                   <p class="member-role">UI/UX Designer</p>
-                  <a href="https://www.linkedin.com/in/sathwik-shetty-6847172b2/" target="_blank" class="linkedin-btn">
+                  <a href="https://www.linkedin. com/in/sathwik-shetty-6847172b2/" target="_blank" class="linkedin-btn">
                       <i class="fab fa-linkedin"></i> LinkedIn
                   </a>
               </div>
@@ -384,7 +647,7 @@
               <!-- Team Member 5 -->
               <div class="team-card">
                   <div class="member-avatar">
-                      <img src="https://media.licdn.com/dms/image/v2/D5603AQHVz8pXdb6tbg/profile-displayphoto-shrink_400_400/B56ZWZL2fGGsBs-/0/1742031778589?e=1765411200&v=beta&t=aSAxdGazizk6ADhFtoG6unhh23WNSgPiNegVmazkNbM" alt="Team Member 5">
+                      <img src="https://media. licdn.com/dms/image/v2/D5603AQHVz8pXdb6tbg/profile-displayphoto-shrink_400_400/B56ZWZL2fGGsBs-/0/1742031778589?e=1765411200&v=beta&t=aSAxdGazizk6ADhF3Y_1kAJSJFCWLwz2GCpP8-VVZwE" alt="Samrudh S Shetty">
                   </div>
                   <h3 class="member-name">Samrudh S Shetty</h3>
                   <p class="member-role">Developer</p>
