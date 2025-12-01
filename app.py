@@ -58,6 +58,14 @@ from services.resume_evaluator import (
 )
 resume_evaluator = get_evaluator()
 
+# Unified Resume Scorer
+from services.unified_scorer import (
+    UnifiedResumeScorer,
+    get_experience_levels,
+    get_target_roles
+)
+unified_scorer = UnifiedResumeScorer()
+
 print("✅ All imports loaded successfully")
 
 app = Flask(__name__)
@@ -587,6 +595,24 @@ def handle_resume_upload():
         return redirect(url_for('upload'))
     
     resume = request.files['resume']
+    
+    # Get experience level and target role from form
+    experience_level = request.form.get('experience_level', 'beginner').strip()
+    target_role = request.form.get('target_role', 'other').strip()
+    custom_role = request.form.get('custom_role', '').strip()
+    
+    # If "other" is selected, use custom role input
+    if target_role == 'other' and custom_role:
+        target_role = custom_role.lower()
+    
+    # Validate required fields
+    if not experience_level:
+        flash('Please select your experience level')
+        return redirect(url_for('upload'))
+    
+    if not target_role:
+        flash('Please select your target role')
+        return redirect(url_for('upload'))
     
     # Use the FileValidator for comprehensive validation
     is_valid, error_message = FileValidator.validate_file_upload(resume)
