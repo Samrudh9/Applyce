@@ -550,7 +550,7 @@
           <div class="stat-icon blue">
             <i class="fas fa-chart-line"></i>
           </div>
-          <div class="stat-label">Latest Score</div>
+          <div class="stat-label">Latest Score (ATS)</div>
           <div class="stat-value">{{ latest_score }}/100</div>
         </div>
 
@@ -566,7 +566,7 @@
           <div class="stat-icon green">
             <i class="fas fa-trophy"></i>
           </div>
-          <div class="stat-label">Best Score</div>
+          <div class="stat-label">Best Score (ATS)</div>
           <div class="stat-value">{{ best_score }}/100</div>
         </div>
 
@@ -603,7 +603,8 @@
             <tr>
               <th>Date</th>
               <th>Filename</th>
-              <th>Score</th>
+              <th>Resume Score</th>
+              <th>ATS Score</th>
               <th>Career Match</th>
               <th>Actions</th>
             </tr>
@@ -616,6 +617,11 @@
                 <td>
                   <span class="history-score">
                     <i class="fas fa-star"></i> {{ item.overall_score }}/100
+                  </span>
+                </td>
+                <td>
+                  <span class="history-score" style="background: rgba(0, 194, 255, 0.15); color: var(--accent);">
+                    <i class="fas fa-robot"></i> {{ item.ats_score if item.ats_score else item.overall_score }}/100
                   </span>
                 </td>
                 <td class="history-career">{{ item.predicted_career or 'N/A' }}</td>
