@@ -190,12 +190,8 @@ class AuthService:
         
         if not sender_email or not sender_password:
             logger.warning("Email credentials not configured. Skipping email send.")
-            # In development, log the reset link instead
-            try:
-                reset_url = url_for('reset_password', token=token, _external=True)
-            except RuntimeError:
-                reset_url = f"/reset-password/{token}"
-            logger.info(f"Development mode - Reset URL: {reset_url}")
+            # In development, log that a reset was requested (without exposing the token)
+            logger.info(f"Development mode - Password reset requested for user")
             return
         
         # Build reset URL

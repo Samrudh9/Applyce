@@ -27,6 +27,10 @@ TIER_LIMITS = {
     }
 }
 
+# Password reset token configuration
+RESET_TOKEN_BYTES = 32  # Length of secure token in bytes
+RESET_TOKEN_EXPIRY_HOURS = 1  # Token expires after 1 hour
+
 
 class User(UserMixin, db.Model):
     """User model for authentication and tracking."""
@@ -77,13 +81,13 @@ class User(UserMixin, db.Model):
     def generate_reset_token(self) -> str:
         """
         Generate a secure password reset token.
-        Token expires in 1 hour.
+        Token expires based on RESET_TOKEN_EXPIRY_HOURS constant.
         
         Returns:
             str: The generated reset token
         """
-        self.reset_token = secrets.token_urlsafe(32)
-        self.reset_token_expiry = datetime.utcnow() + timedelta(hours=1)
+        self.reset_token = secrets.token_urlsafe(RESET_TOKEN_BYTES)
+        self.reset_token_expiry = datetime.utcnow() + timedelta(hours=RESET_TOKEN_EXPIRY_HOURS)
         db.session.commit()
         return self.reset_token
     
