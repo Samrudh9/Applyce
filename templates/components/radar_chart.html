@@ -1,0 +1,132 @@
+<!-- Radar Chart Component for Explainable Scoring System -->
+<!-- Include Chart.js before using this component -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
+
+<div class="radar-chart-container">
+  <canvas id="scoreRadarChart"></canvas>
+</div>
+
+<style>
+  .radar-chart-container {
+    background: var(--card-bg, #1a1b22);
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+    max-width: 400px;
+    margin: 0 auto;
+  }
+</style>
+
+<script>
+  function initRadarChart(radarData) {
+    const ctx = document.getElementById('scoreRadarChart').getContext('2d');
+    
+    // Default data if not provided
+    const defaultData = {
+      labels: [
+        'Keywords & Skills',
+        'ATS Formatting',
+        'Content & Impact',
+        'Parseability',
+        'Readability',
+        'Section Completeness'
+      ],
+      scores: [70, 65, 80, 75, 85, 90],
+      target: [80, 80, 80, 80, 80, 80]
+    };
+    
+    const data = radarData || defaultData;
+    
+    new Chart(ctx, {
+      type: 'radar',
+      data: {
+        labels: data.labels,
+        datasets: [
+          {
+            label: 'Your Score',
+            data: data.scores,
+            backgroundColor: 'rgba(0, 194, 255, 0.2)',
+            borderColor: 'rgba(0, 194, 255, 1)',
+            borderWidth: 2,
+            pointBackgroundColor: 'rgba(0, 194, 255, 1)',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: 'rgba(0, 194, 255, 1)'
+          },
+          {
+            label: 'Target (80+)',
+            data: data.target,
+            backgroundColor: 'rgba(0, 255, 136, 0.1)',
+            borderColor: 'rgba(0, 255, 136, 0.5)',
+            borderWidth: 1,
+            borderDash: [5, 5],
+            pointRadius: 0
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        scales: {
+          r: {
+            beginAtZero: true,
+            max: 100,
+            min: 0,
+            ticks: {
+              stepSize: 20,
+              color: '#888',
+              backdropColor: 'transparent'
+            },
+            grid: {
+              color: 'rgba(255, 255, 255, 0.1)'
+            },
+            angleLines: {
+              color: 'rgba(255, 255, 255, 0.1)'
+            },
+            pointLabels: {
+              color: '#e0e0e0',
+              font: {
+                size: 11,
+                family: 'Inter, sans-serif'
+              }
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              color: '#e0e0e0',
+              font: {
+                family: 'Inter, sans-serif'
+              },
+              padding: 15
+            }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(26, 27, 34, 0.95)',
+            titleColor: '#fff',
+            bodyColor: '#e0e0e0',
+            borderColor: 'rgba(0, 194, 255, 0.3)',
+            borderWidth: 1,
+            padding: 12,
+            cornerRadius: 8,
+            displayColors: true,
+            callbacks: {
+              label: function(context) {
+                return context.dataset.label + ': ' + context.raw + '/100';
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // Initialize with data if available
+  {% if radar_chart_data %}
+    document.addEventListener('DOMContentLoaded', function() {
+      initRadarChart({{ radar_chart_data | tojson | safe }});
+    });
+  {% endif %}
+</script>
