@@ -349,18 +349,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ---
 
-## 👥 Team
-
-| Name | Role | LinkedIn |
-|------|------|----------|
-| Dishita Kotian | Backend/Lead Developer | [LinkedIn](https://www.linkedin.com/in/dishita-kotian-15357129b/) |
-| Khyathi Jain | Data Specialist | [LinkedIn](https://www.linkedin.com/in/khyathi-j-975201290/) |
-| Shaabdhik M Jain | Frontend Developer | [LinkedIn](https://www.linkedin.com/in/shaabdhik-jain-19181528b/) |
-| Sathwik R Shetty | UI/UX Designer | [LinkedIn](https://www.linkedin.com/in/sathwik-shetty-6847172b2/) |
-| Samrudh S Shetty | Developer | [LinkedIn](https://www.linkedin.com/in/samrudhsshetty/) |
-
----
-
 ## 📄 License
 
 This project is licensed under the MIT License. 
