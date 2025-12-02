@@ -1697,110 +1697,114 @@ def api_skill_gap():
 
 @app.route('/jobs')
 def jobs_page():
-    """Job search page with real job listings"""
-    career = request.args. get('career', '').strip()
-    location = request.args.get('location', 'India').strip()
-    remote_only = request. args.get('remote', 'false').lower() == 'true'
+    """Job search page - TEMPORARILY LOCKED"""
+    flash('🔒 Job matching feature coming soon!  Stay tuned.', 'info')
+    return redirect(url_for('home'))
+# def jobs_page():
+#     """Job search page with real job listings"""
+#     career = request.args. get('career', '').strip()
+#     location = request.args.get('location', 'India').strip()
+#     remote_only = request. args.get('remote', 'false').lower() == 'true'
     
-    # Get user skills from session if logged in
-    user_skills = []
-    if current_user.is_authenticated:
-        from models.resume_history import ResumeHistory
-        last_resume = ResumeHistory.query.filter_by(
-            user_id=current_user.id
-        ).order_by(ResumeHistory.upload_date.desc()). first()
+#     # Get user skills from session if logged in
+#     user_skills = []
+#     if current_user.is_authenticated:
+#         from models.resume_history import ResumeHistory
+#         last_resume = ResumeHistory.query.filter_by(
+#             user_id=current_user.id
+#         ).order_by(ResumeHistory.upload_date.desc()). first()
         
-        if last_resume and last_resume.skills_detected:
-            try:
-                user_skills = json.loads(last_resume.skills_detected)
-            except:
-                user_skills = []
+#         if last_resume and last_resume.skills_detected:
+#             try:
+#                 user_skills = json.loads(last_resume.skills_detected)
+#             except:
+#                 user_skills = []
     
-    jobs = []
-    insights = {}
-    error_message = None
+#     jobs = []
+#     insights = {}
+#     error_message = None
     
-    if career:
-        try:
-            jobs = job_service. search_jobs(
-                career=career,
-                location=location,
-                user_skills=user_skills,
-                limit=20,
-                remote_only=remote_only
-            )
-            insights = job_service.get_market_insights(career, location)
-        except Exception as e:
-            logger.error(f"Job search error: {e}")
-            error_message = "Unable to fetch jobs. Please try again later."
+#     if career:
+#         try:
+#             jobs = job_service. search_jobs(
+#                 career=career,
+#                 location=location,
+#                 user_skills=user_skills,
+#                 limit=20,
+#                 remote_only=remote_only
+#             )
+#             insights = job_service.get_market_insights(career, location)
+#         except Exception as e:
+#             logger.error(f"Job search error: {e}")
+#             error_message = "Unable to fetch jobs. Please try again later."
     
-    return render_template('jobs.html',
-                          jobs=jobs,
-                          career=career,
-                          location=location,
-                          remote_only=remote_only,
-                          insights=insights,
-                          user_skills=user_skills,
-                          error_message=error_message)
+#     return render_template('jobs.html',
+#                           jobs=jobs,
+#                           career=career,
+#                           location=location,
+#                           remote_only=remote_only,
+#                           insights=insights,
+#                           user_skills=user_skills,
+#                           error_message=error_message)
 
 
-@app.route('/api/jobs/search')
-def api_jobs_search():
-    """API endpoint for job search"""
-    career = request.args. get('career', '').strip()
-    location = request.args.get('location', 'India').strip()
-    skills = request.args. get('skills', '')
-    limit = request.args.get('limit', 20, type=int)
-    remote_only = request.args.get('remote', 'false').lower() == 'true'
+# @app.route('/api/jobs/search')
+# def api_jobs_search():
+#     """API endpoint for job search"""
+#     career = request.args. get('career', '').strip()
+#     location = request.args.get('location', 'India').strip()
+#     skills = request.args. get('skills', '')
+#     limit = request.args.get('limit', 20, type=int)
+#     remote_only = request.args.get('remote', 'false').lower() == 'true'
     
-    if not career:
-        return jsonify({'success': False, 'error': 'Career parameter required'}), 400
+#     if not career:
+#         return jsonify({'success': False, 'error': 'Career parameter required'}), 400
     
-    user_skills = [s.strip() for s in skills.split(',') if s.strip()] if skills else []
+#     user_skills = [s.strip() for s in skills.split(',') if s.strip()] if skills else []
     
-    try:
-        jobs = job_service.search_jobs(
-            career=career,
-            location=location,
-            user_skills=user_skills,
-            limit=min(limit, 50),
-            remote_only=remote_only
-        )
+#     try:
+#         jobs = job_service.search_jobs(
+#             career=career,
+#             location=location,
+#             user_skills=user_skills,
+#             limit=min(limit, 50),
+#             remote_only=remote_only
+#         )
         
-        return jsonify({
-            'success': True,
-            'count': len(jobs),
-            'career': career,
-            'location': location,
-            'jobs': [asdict(job) for job in jobs]
-        })
-    except Exception as e:
-        logger.error(f"Job API error: {e}")
-        return jsonify({'success': False, 'error': str(e)}), 500
+#         return jsonify({
+#             'success': True,
+#             'count': len(jobs),
+#             'career': career,
+#             'location': location,
+#             'jobs': [asdict(job) for job in jobs]
+#         })
+#     except Exception as e:
+#         logger.error(f"Job API error: {e}")
+#         return jsonify({'success': False, 'error': str(e)}), 500
 
 
-@app. route('/api/jobs/insights')
-def api_job_insights():
-    """API endpoint for market insights"""
-    career = request.args. get('career', '').strip()
-    location = request.args.get('location', 'India').strip()
+# @app. route('/api/jobs/insights')
+# def api_job_insights():
+#     """API endpoint for market insights"""
+#     career = request.args. get('career', '').strip()
+#     location = request.args.get('location', 'India').strip()
     
-    if not career:
-        return jsonify({'success': False, 'error': 'Career parameter required'}), 400
+#     if not career:
+#         return jsonify({'success': False, 'error': 'Career parameter required'}), 400
     
-    try:
-        # First fetch jobs to populate cache
-        job_service.search_jobs(career=career, location=location, limit=20)
-        insights = job_service. get_market_insights(career, location)
+#     try:
+#         # First fetch jobs to populate cache
+#         job_service.search_jobs(career=career, location=location, limit=20)
+#         insights = job_service. get_market_insights(career, location)
         
-        return jsonify({
-            'success': True,
-            'career': career,
-            'location': location,
-            'insights': insights
-        })
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
+#         return jsonify({
+#             'success': True,
+#             'career': career,
+#             'location': location,
+#             'insights': insights
+#         })
+#     except Exception as e:
+#         return jsonify({'success': False, 'error': str(e)}), 500
 
 # ===== Admin Backup Routes =====
 from services.backup_service import BackupService
