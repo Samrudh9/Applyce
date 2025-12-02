@@ -1642,7 +1642,7 @@ def api_explainable_score():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
-@app. route('/run-migrations')
+@app.route('/run-migrations')
 def run_migrations():
     """Temporary - DELETE AFTER USE"""
     try:

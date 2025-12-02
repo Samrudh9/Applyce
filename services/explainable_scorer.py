@@ -242,9 +242,6 @@ class ExplainableScorer:
             else:
                 missing_keywords.append(keyword)
         
-        # Calculate match rate
-        match_rate = len(found_keywords) / max(len(all_keywords), 1)
-        
         # Technical keywords (40 points of this category)
         tech_found = [k for k in role_keywords.get('technical', []) if k in resume_lower]
         tech_total = len(role_keywords.get('technical', []))
