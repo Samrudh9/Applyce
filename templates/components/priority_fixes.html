@@ -1,0 +1,232 @@
+<!-- Priority Fixes Component for Explainable Scoring System -->
+<!-- Shows ranked list of issues to fix sorted by impact -->
+
+<style>
+  .priority-fixes-container {
+    background: var(--card-bg, #1a1b22);
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+  }
+
+  .priority-fixes-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+
+  .priority-fixes-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .priority-fixes-title i {
+    color: var(--accent, #00c2ff);
+  }
+
+  .fix-count-badge {
+    background: rgba(255, 68, 68, 0.2);
+    color: #ff4444;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+
+  .priority-fix-item {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    border-left: 4px solid;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .priority-fix-item:hover {
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .priority-fix-item:last-child {
+    margin-bottom: 0;
+  }
+
+  /* Priority colors */
+  .priority-fix-item.priority-1 {
+    border-left-color: #ff4444;
+  }
+
+  .priority-fix-item.priority-2 {
+    border-left-color: #ff6b35;
+  }
+
+  .priority-fix-item.priority-3 {
+    border-left-color: #ffaa00;
+  }
+
+  .priority-fix-item.priority-4 {
+    border-left-color: #ffd700;
+  }
+
+  .priority-fix-item.priority-5,
+  .priority-fix-item.priority-low {
+    border-left-color: #88cc00;
+  }
+
+  .fix-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .priority-badge {
+    min-width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #000;
+  }
+
+  .priority-1 .priority-badge { background: #ff4444; }
+  .priority-2 .priority-badge { background: #ff6b35; }
+  .priority-3 .priority-badge { background: #ffaa00; }
+  .priority-4 .priority-badge { background: #ffd700; }
+  .priority-5 .priority-badge,
+  .priority-low .priority-badge { background: #88cc00; }
+
+  .fix-content {
+    flex: 1;
+  }
+
+  .fix-category {
+    font-size: 0.75rem;
+    color: var(--text-muted, #888);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.25rem;
+  }
+
+  .fix-issue {
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: var(--text-color, #e0e0e0);
+  }
+
+  .fix-solution {
+    font-size: 0.85rem;
+    color: var(--text-muted, #888);
+    padding-left: 1rem;
+    border-left: 2px solid rgba(0, 194, 255, 0.3);
+  }
+
+  .fix-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.75rem;
+    font-size: 0.8rem;
+  }
+
+  .severity-badge {
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .severity-critical {
+    background: rgba(255, 68, 68, 0.2);
+    color: #ff4444;
+  }
+
+  .severity-high {
+    background: rgba(255, 107, 53, 0.2);
+    color: #ff6b35;
+  }
+
+  .severity-medium {
+    background: rgba(255, 170, 0, 0.2);
+    color: #ffaa00;
+  }
+
+  .severity-low {
+    background: rgba(136, 204, 0, 0.2);
+    color: #88cc00;
+  }
+
+  .potential-gain {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--success, #00ff88);
+  }
+
+  .potential-gain i {
+    font-size: 0.7rem;
+  }
+
+  .no-fixes-message {
+    text-align: center;
+    padding: 2rem;
+    color: var(--success, #00ff88);
+  }
+
+  .no-fixes-message i {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .no-fixes-message p {
+    font-size: 0.95rem;
+  }
+</style>
+
+<div class="priority-fixes-container">
+  <div class="priority-fixes-header">
+    <h3 class="priority-fixes-title">
+      <i class="fas fa-wrench"></i>
+      Priority Fixes
+    </h3>
+    {% if priority_fixes %}
+      <span class="fix-count-badge">{{ priority_fixes|length }} issues</span>
+    {% endif %}
+  </div>
+
+  {% if priority_fixes and priority_fixes|length > 0 %}
+    {% for fix in priority_fixes %}
+      <div class="priority-fix-item priority-{{ fix.priority if fix.priority <= 5 else 'low' }}">
+        <div class="fix-header">
+          <div class="priority-badge">#{{ fix.priority }}</div>
+          <div class="fix-content">
+            <div class="fix-category">{{ fix.category }}</div>
+            <div class="fix-issue">{{ fix.issue }}</div>
+            <div class="fix-solution">💡 {{ fix.solution }}</div>
+            <div class="fix-meta">
+              <span class="severity-badge severity-{{ fix.severity }}">{{ fix.severity }}</span>
+              <span class="potential-gain">
+                <i class="fas fa-arrow-up"></i>
+                +{{ fix.potential_gain|round(1) }} points
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="no-fixes-message">
+      <i class="fas fa-check-circle"></i>
+      <p>Great job! No critical issues found.</p>
+    </div>
+  {% endif %}
+</div>

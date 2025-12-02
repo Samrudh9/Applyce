@@ -454,6 +454,82 @@ def logout():
     return redirect(url_for('home'))
 
 
+# ===== Forgot Password Routes =====
+@app.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    """Handle forgot password request"""
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip()
+        
+        if not email:
+            flash('Please enter your email address.', 'error')
+            return render_template('forgot_password.html')
+        
+        success, message = AuthService.initiate_password_reset(email)
+        
+        if success:
+            flash(message, 'success')
+        else:
+            flash(message, 'error')
+        
+        return render_template('forgot_password.html')
+    
+    return render_template('forgot_password.html')
+
+
+@app.route('/reset-password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    """Handle password reset with token"""
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    
+    # Verify token is valid
+    user = AuthService.get_user_by_reset_token(token)
+    valid_token = user is not None and user.verify_reset_token(token)
+    
+    if request.method == 'POST' and valid_token:
+        password = request.form.get('password', '')
+        confirm_password = request.form.get('confirm_password', '')
+        
+        if password != confirm_password:
+            flash('Passwords do not match.', 'error')
+            return render_template('reset_password.html', valid_token=True, token=token)
+        
+        success, message = AuthService.reset_password(token, password)
+        
+        if success:
+            flash(message, 'success')
+            return redirect(url_for('login'))
+        else:
+            flash(message, 'error')
+            return render_template('reset_password.html', valid_token=valid_token, token=token)
+    
+    return render_template('reset_password.html', valid_token=valid_token, token=token)
+
+
+# ===== Pricing Route =====
+@app.route('/pricing')
+def pricing():
+    """Display pricing page with plan comparison"""
+    return render_template('pricing.html')
+
+
+# ===== Freemium Decorator =====
+def check_scan_limit(f):
+    """Decorator to check if user has remaining scans"""
+    @functools.wraps(f)
+    def decorated_function(*args, **kwargs):
+        if current_user.is_authenticated:
+            if not current_user.can_scan_resume():
+                flash('You have reached your daily scan limit. Upgrade to Premium for more scans!', 'warning')
+                return redirect(url_for('pricing'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+
 @app.route('/dashboard')
 @login_required
 def dashboard():
@@ -888,6 +964,9 @@ def handle_resume_upload():
     if current_user.is_authenticated:
         try:
             from services.resume_service import ResumeService
+            
+            # Record the scan for freemium tracking
+            current_user.record_scan()
             
             # Use ResumeService to save to history with consistent ATS score
             ResumeService.save_to_history(
@@ -1462,7 +1541,108 @@ def api_get_roadmap(career):
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
-@app. route('/run-migrations')
+
+# ===== Score Trends API (UNIQUE - No competitor has this) =====
+@app.route('/api/score-trends')
+@login_required
+def api_score_trends():
+    """
+    API endpoint for score trends over time.
+    Returns historical data for tracking resume improvement progress.
+    """
+    from models.resume_history import ResumeHistory
+    import json
+    
+    try:
+        # Get user's resume history ordered by date
+        history = ResumeHistory.query.filter_by(user_id=current_user.id)\
+            .order_by(ResumeHistory.upload_date.asc()).all()
+        
+        if not history:
+            return jsonify({
+                'success': True,
+                'has_data': False,
+                'message': 'No resume history found. Upload your first resume to start tracking progress.'
+            })
+        
+        # Build trend data
+        dates = []
+        overall_scores = []
+        ats_scores = []
+        skill_counts = []
+        
+        for h in history:
+            dates.append(h.upload_date.strftime('%Y-%m-%d'))
+            overall_scores.append(h.overall_score or 0)
+            ats_scores.append(h.ats_score or h.overall_score or 0)
+            skill_counts.append(h.skill_count or 0)
+        
+        # Calculate summary statistics
+        total_scans = len(history)
+        first_score = overall_scores[0] if overall_scores else 0
+        latest_score = overall_scores[-1] if overall_scores else 0
+        best_score = max(overall_scores) if overall_scores else 0
+        total_improvement = latest_score - first_score
+        
+        return jsonify({
+            'success': True,
+            'has_data': True,
+            'trends': {
+                'dates': dates,
+                'overall_scores': overall_scores,
+                'ats_scores': ats_scores,
+                'skill_counts': skill_counts
+            },
+            'summary': {
+                'total_scans': total_scans,
+                'first_score': first_score,
+                'latest_score': latest_score,
+                'best_score': best_score,
+                'total_improvement': total_improvement,
+                'average_score': round(sum(overall_scores) / len(overall_scores), 1) if overall_scores else 0
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"Score trends API error: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+# ===== Explainable Scoring API =====
+@app.route('/api/explainable-score', methods=['POST'])
+def api_explainable_score():
+    """
+    API endpoint for explainable resume scoring.
+    Returns full 6-category breakdown with transparency.
+    """
+    from services.explainable_scorer import get_explainable_scorer
+    
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'error': 'No data provided'}), 400
+        
+        resume_text = data.get('resume_text', '')
+        target_role = data.get('target_role', 'default')
+        detected_skills = data.get('detected_skills', [])
+        
+        if not resume_text:
+            return jsonify({'success': False, 'error': 'Resume text is required'}), 400
+        
+        scorer = get_explainable_scorer()
+        result = scorer.analyze(resume_text, target_role, detected_skills)
+        
+        return jsonify({
+            'success': True,
+            **result
+        })
+        
+    except Exception as e:
+        logger.error(f"Explainable score API error: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/run-migrations')
 def run_migrations():
     """Temporary - DELETE AFTER USE"""
     try:
@@ -1811,6 +1991,15 @@ def auto_migrate_db():
             'created_at': ('DATETIME', 'TIMESTAMP'),
             'last_login': ('DATETIME', 'TIMESTAMP'),
             'is_active': ('BOOLEAN', 'BOOLEAN'),
+            # Password reset fields
+            'reset_token': ('VARCHAR(100)', 'VARCHAR(100)'),
+            'reset_token_expiry': ('DATETIME', 'TIMESTAMP'),
+            # Freemium fields
+            'account_type': ('VARCHAR(20)', 'VARCHAR(20)'),
+            'resume_scans_today': ('INTEGER', 'INTEGER'),
+            'resume_scans_total': ('INTEGER', 'INTEGER'),
+            'last_scan_date': ('DATE', 'DATE'),
+            'premium_expires_at': ('DATETIME', 'TIMESTAMP'),
         },
         'feedbacks': {
             'id': ('INTEGER', 'INTEGER'),
