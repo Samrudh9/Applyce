@@ -38,8 +38,9 @@ class JobMatchService:
     
     def _compile_patterns(self):
         """Compile regex patterns for skill extraction."""
-        # Create pattern for skill matching
-        escaped_skills = [re.escape(skill) for skill in self.SKILL_KEYWORDS]
+        # Create pattern for skill matching - sort by length (longest first) to match multi-word skills first
+        sorted_skills = sorted(self.SKILL_KEYWORDS, key=len, reverse=True)
+        escaped_skills = [re.escape(skill) for skill in sorted_skills]
         pattern = r'\b(' + '|'.join(escaped_skills) + r')\b'
         self._skill_pattern = re.compile(pattern, re.IGNORECASE)
     
@@ -76,6 +77,7 @@ class JobMatchService:
             Similarity score between 0 and 1
         """
         if not text1 or not text2:
+            logger.warning("Empty text provided for semantic similarity calculation")
             return 0.0
         
         try:
@@ -91,7 +93,7 @@ class JobMatchService:
             
             return float(similarity)
         except Exception as e:
-            logger.error(f"Semantic similarity calculation error: {e}")
+            logger.error(f"Semantic similarity calculation error: {e}. Text1 length: {len(text1)}, Text2 length: {len(text2)}")
             return 0.0
     
     def parse_skills_input(self, skills_input: str) -> List[str]:
