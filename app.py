@@ -1847,6 +1847,16 @@ def api_job_match():
         resume_text = data.get('resume_text', '')
         resume_id = data.get('resume_id')
         
+        # If no resume_id or resume_text provided, but user is authenticated, use latest resume
+        if not resume_id and not resume_text and current_user.is_authenticated:
+            from models.resume_history import ResumeHistory
+            latest_resume = ResumeHistory.query.filter_by(
+                user_id=current_user.id
+            ).order_by(ResumeHistory.upload_date.desc()).first()
+            
+            if latest_resume:
+                resume_id = latest_resume.id
+        
         if resume_id:
             # Fetch resume from database
             from models.resume_history import ResumeHistory
@@ -1884,7 +1894,7 @@ def api_job_match():
         else:
             return jsonify({
                 'success': False,
-                'error': 'Either resume_text or resume_id must be provided'
+                'error': 'Either resume_text or resume_id must be provided, or user must be authenticated with a resume uploaded'
             }), 400
         
         # Get job description and skills
