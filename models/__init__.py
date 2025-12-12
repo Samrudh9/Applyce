@@ -14,6 +14,7 @@ from models.career import Career
 from models.skill_pattern import SkillPattern
 from models.resume_history import ResumeHistory
 from models.user_preferences import UserPreferences
+from models.job_pattern import JobPattern
 
 __all__ = [
     'db', 
@@ -24,5 +25,6 @@ __all__ = [
     'Career', 
     'SkillPattern', 
     'ResumeHistory',
-    'UserPreferences'
+    'UserPreferences',
+    'JobPattern'
 ]
