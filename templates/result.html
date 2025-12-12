@@ -901,13 +901,13 @@
             <div class="career-card primary">
               <div class="career-header">
                 <div class="career-title">{{ predicted_career.predicted_career }}</div>
-                <div class="career-score">{{ "%. 0f"|format(predicted_career.confidence) }}% Match</div>
+                <div class="career-score">{{ "%.0f"|format(predicted_career.confidence) }}% Match</div>
               </div>
               <div class="career-progress">
-                <div class="career-progress-fill" style="width: {{ predicted_career. confidence }}%"></div>
+                <div class="career-progress-fill" style="width: {{ predicted_career.confidence }}%"></div>
               </div>
               <div class="career-actions" style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1rem;">
-                <a href="/roadmap/{{ predicted_career. predicted_career | urlencode }}" class="roadmap-btn">
+                <a href="/roadmap/{{ predicted_career.predicted_career | urlencode }}" class="roadmap-btn">
                   <i class="fas fa-road"></i> View Learning Roadmap
                 </a>
                 <a href="/jobs? career={{ predicted_career.predicted_career | urlencode }}" class="roadmap-btn" style="background: linear-gradient(90deg, #00ff88, #00c2ff);">
@@ -917,7 +917,7 @@
             </div>
             
             {% if predicted_career.top_careers %}
-              {% for career, confidence in predicted_career. top_careers %}
+              {% for career, confidence in predicted_career.top_careers %}
                 {% if loop.index > 1 %}
                   <div class="career-card">
                     <div class="career-header">

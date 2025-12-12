@@ -16,6 +16,7 @@ class ResumeHistory(db.Model):
     # Resume metadata
     filename = db.Column(db.String(255), nullable=False)
     upload_date = db.Column(db.DateTime, default=lambda: datetime.utcnow())
+    extracted_text = db.Column(db.Text, nullable=True)  # Raw text extracted from resume
     
     # User context
     experience_level = db.Column(db.String(50))  # beginner, mid-level, senior-level

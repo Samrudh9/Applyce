@@ -164,7 +164,7 @@ class User(UserMixin, db.Model):
         if self.daily_scan_limit == -1:  # Unlimited
             return -1
         
-        return max(0, self.daily_scan_limit - self.resume_scans_today)
+        return max(0, self.daily_scan_limit - (self.resume_scans_today or 0))
     
     def can_scan_resume(self) -> bool:
         """
@@ -193,8 +193,9 @@ class User(UserMixin, db.Model):
             self.resume_scans_today = 0
             self.last_scan_date = today
         
-        self.resume_scans_today += 1
-        self.resume_scans_total += 1
+        # Use safe arithmetic in case of None values
+        self.resume_scans_today = (self.resume_scans_today or 0) + 1
+        self.resume_scans_total = (self.resume_scans_total or 0) + 1
         db.session.commit()
     
     def upgrade_to_premium(self, months: int = 1):
