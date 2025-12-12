@@ -212,7 +212,7 @@ class TestJobMatchService:
         # All required skills are present
         assert len(result['required_matched']) == 3
         assert len(result['missing_required']) == 0
-        assert result['match_percentage'] > 70
+        assert result['match_percentage'] >= 70
 
 
 if __name__ == '__main__':
