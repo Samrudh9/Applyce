@@ -317,7 +317,8 @@ class ResumeService:
         skill_gap_data: Dict[str, Any],
         salary_data: Dict[str, Any],
         experience_level: str = None,
-        target_role: str = None
+        target_role: str = None,
+        extracted_text: str = None
     ) -> ResumeHistory:
         """
         Save resume analysis to history table.
@@ -333,6 +334,7 @@ class ResumeService:
             salary_data: Salary prediction data
             experience_level: User's experience level
             target_role: User's target role
+            extracted_text: Raw text extracted from resume
             
         Returns:
             ResumeHistory object
@@ -383,6 +385,7 @@ class ResumeService:
                 filename=filename,
                 experience_level=experience_level,
                 target_role=target_role,
+                extracted_text=extracted_text,
                 overall_score=ats_score,
                 ats_score=ats_score,
                 keyword_score=keyword_score,
