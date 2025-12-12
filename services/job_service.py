@@ -283,7 +283,10 @@ class JobService:
     def _fetch_remoteok_jobs(self, career: str, limit: int = 10) -> List[Job]:
         """Fetch from RemoteOK (free, no auth)"""
         url = "https://remoteok.com/api"
-        headers = {'User-Agent': 'SkillFit/1.0'}
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+            'Accept': 'application/json'
+        }
         
         response = requests.get(url, headers=headers, timeout=15)
         response.raise_for_status()
@@ -293,7 +296,7 @@ class JobService:
             data = data[1:]
         
         jobs = []
-        career_terms = self._get_search_terms(career. lower())
+        career_terms = self._get_search_terms(career.lower())
         
         for item in data:
             title = (item.get('position', '') or '').lower()
@@ -320,7 +323,7 @@ class JobService:
                 source='RemoteOK',
                 is_remote=True
             )
-            jobs. append(job)
+            jobs.append(job)
             
             if len(jobs) >= limit:
                 break
@@ -436,8 +439,8 @@ class JobService:
 
     def _get_cache_key(self, career: str, location: str, remote_only: bool) -> str:
         """Generate cache key"""
-        raw = f"{career. lower()}_{location. lower()}_{remote_only}"
-        return hashlib.md5(raw.encode()). hexdigest()
+        raw = f"{career.lower()}_{location.lower()}_{remote_only}"
+        return hashlib.md5(raw.encode()).hexdigest()
 
     def _parse_experience_level(self, exp_data: dict) -> str:
         """Parse experience level"""
@@ -493,8 +496,8 @@ class JobService:
             'avg_salary_max': avg_max,
             'top_companies': list(companies)[:6] or ['Google', 'Microsoft', 'Amazon'],
             'hot_skills': [s for s, _ in top_skills] or ['Python', 'SQL', 'AWS'],
-            'growth_rate': growth_rates. get(career. lower(), '+15%'),
-            'demand_level': 'Very High' if 'data' in career.lower() or 'devops' in career. lower() else 'High',
+            'growth_rate': growth_rates.get(career.lower(), '+15%'),
+            'demand_level': 'Very High' if 'data' in career.lower() or 'devops' in career.lower() else 'High',
             'remote_percentage': 45 if any(t in career.lower() for t in ['data', 'frontend', 'full stack']) else 25
         }
 
