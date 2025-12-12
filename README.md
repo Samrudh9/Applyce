@@ -22,6 +22,8 @@ An intelligent, self-learning career recommendation platform that analyzes resum
 | 📈 **Progress Tracking** | Dashboard with charts showing score improvement over time |
 | 💰 **Salary Estimation** | Predicted salary ranges based on skills and experience |
 | 🗺️ **Career Roadmaps** | Personalized learning paths with curated resources |
+| 💼 **Job Fit Analysis** | Calculate match percentage between resume and job descriptions |
+| 🔍 **Real Job Search** | Find jobs from LinkedIn, Indeed, Glassdoor & more |
 
 ---
 
@@ -44,6 +46,13 @@ An intelligent, self-learning career recommendation platform that analyzes resum
 - **Confidence Scores**: Shows prediction accuracy percentage
 - **Top 3 Matches**: Multiple career recommendations ranked
 - **Skill Gap Analysis**: Identifies missing skills for target careers
+
+### 💼 Job Fit & Search
+- **Job Match API**: Calculate compatibility between resume and job descriptions
+- **Real-Time Job Search**: Find opportunities from LinkedIn, Indeed, Glassdoor & more
+- **Interactive Analysis**: Click "Check Job Fit" on any job to see detailed match score
+- **Skill Comparison**: See which required/preferred skills you have or need to learn
+- **Smart Recommendations**: Get personalized advice based on match percentage (0-100)
 
 ### 👤 User Dashboard
 - **Resume History**: Track all uploaded resumes
