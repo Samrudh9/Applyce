@@ -1879,7 +1879,8 @@ def api_job_match():
             if resume_history.skills_detected:
                 try:
                     resume_skills = json.loads(resume_history.skills_detected)
-                except:
+                except (json.JSONDecodeError, TypeError) as e:
+                    logger.warning(f"Failed to parse skills_detected JSON: {e}")
                     resume_skills = []
             
             # If no skills stored, extract from text
