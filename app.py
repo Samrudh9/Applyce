@@ -979,7 +979,8 @@ def handle_resume_upload():
                 skill_gap_data=skill_gap_data,
                 salary_data=salary_data,
                 experience_level=experience_level,
-                target_role=target_role
+                target_role=target_role,
+                extracted_text=extracted_text
             )
             
             # Store resume_id in session for potential future use
