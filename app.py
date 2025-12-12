@@ -1802,6 +1802,135 @@ def api_job_insights():
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
+
+@app.route('/api/job-match', methods=['POST'])
+def api_job_match():
+    """
+    Job Fit MVP API - Calculate match percentage between resume skills and job requirements.
+    
+    Request Body (JSON):
+        {
+            "resume_text": "text content of resume" (optional if resume_id provided),
+            "resume_id": 123 (optional if resume_text provided),
+            "job_description": "full job description text" (optional),
+            "required_skills": ["Python", "SQL", "AWS"] (optional),
+            "preferred_skills": ["Docker", "Kubernetes"] (optional)
+        }
+    
+    Response:
+        {
+            "success": true,
+            "match_percentage": 84,
+            "semantic_similarity": 76.5,
+            "required_matched": ["python", "sql"],
+            "preferred_matched": ["docker"],
+            "missing_required": ["aws"],
+            "missing_preferred": ["kubernetes"],
+            "total_resume_skills": 15,
+            "total_required_skills": 3,
+            "total_preferred_skills": 2,
+            "recommendation": "Good match. Consider applying..."
+        }
+    """
+    from services.job_match_service import job_match_service
+    
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({
+                'success': False,
+                'error': 'Request body must be JSON'
+            }), 400
+        
+        # Extract resume skills
+        resume_skills = []
+        resume_text = data.get('resume_text', '')
+        resume_id = data.get('resume_id')
+        
+        # If no resume_id or resume_text provided, but user is authenticated, use latest resume
+        if not resume_id and not resume_text and current_user.is_authenticated:
+            from models.resume_history import ResumeHistory
+            latest_resume = ResumeHistory.query.filter_by(
+                user_id=current_user.id
+            ).order_by(ResumeHistory.upload_date.desc()).first()
+            
+            if latest_resume:
+                resume_id = latest_resume.id
+        
+        if resume_id:
+            # Fetch resume from database
+            from models.resume_history import ResumeHistory
+            resume_history = ResumeHistory.query.filter_by(id=resume_id).first()
+            
+            if not resume_history:
+                return jsonify({
+                    'success': False,
+                    'error': f'Resume with ID {resume_id} not found'
+                }), 404
+            
+            # Check if user owns this resume (if authenticated)
+            if current_user.is_authenticated and resume_history.user_id != current_user.id:
+                return jsonify({
+                    'success': False,
+                    'error': 'Unauthorized access to resume'
+                }), 403
+            
+            # Get skills from resume
+            if resume_history.skills_detected:
+                try:
+                    resume_skills = json.loads(resume_history.skills_detected)
+                except (json.JSONDecodeError, TypeError) as e:
+                    logger.warning(f"Failed to parse skills_detected JSON: {e}")
+                    resume_skills = []
+            
+            # If no skills stored, extract from text
+            if not resume_skills and resume_history.extracted_text:
+                resume_skills = basic_skill_detection(resume_history.extracted_text)
+            
+            resume_text = resume_history.extracted_text or ''
+        
+        elif resume_text:
+            # Extract skills from provided text
+            resume_skills = basic_skill_detection(resume_text)
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Either resume_text or resume_id must be provided, or user must be authenticated with a resume uploaded'
+            }), 400
+        
+        # Get job description and skills
+        job_description = data.get('job_description', '')
+        required_skills = data.get('required_skills', [])
+        preferred_skills = data.get('preferred_skills', [])
+        
+        # Validate input
+        if not job_description and not required_skills:
+            return jsonify({
+                'success': False,
+                'error': 'Either job_description or required_skills must be provided'
+            }), 400
+        
+        # Calculate match
+        match_result = job_match_service.calculate_job_match(
+            resume_skills=resume_skills,
+            job_description=job_description,
+            required_skills=required_skills,
+            preferred_skills=preferred_skills
+        )
+        
+        return jsonify({
+            'success': True,
+            **match_result
+        })
+    
+    except Exception as e:
+        logger.error(f"Job match API error: {e}", exc_info=True)
+        return jsonify({
+            'success': False,
+            'error': 'Internal server error',
+            'details': str(e) if app.debug else None
+        }), 500
+
 # ===== Admin Backup Routes =====
 from services.backup_service import BackupService
 
