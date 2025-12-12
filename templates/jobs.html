@@ -590,6 +590,14 @@
                             <a href="{{ job.url }}" target="_blank" rel="noopener" class="btn btn-primary">
                                 <i class="fas fa-external-link-alt"></i> Apply Now
                             </a>
+                            {% if current_user.is_authenticated %}
+                            <button class="btn btn-secondary check-fit-btn" 
+                                    data-job-title="{{ job.title }}"
+                                    data-job-description="{{ job.description }}"
+                                    data-job-skills="{{ job.skills_required | join(',') }}">
+                                <i class="fas fa-chart-line"></i> Check Job Fit
+                            </button>
+                            {% endif %}
                             {% if job.missing_skills %}
                             <a href="/roadmap/{{ career | urlencode }}" class="btn btn-secondary">
                                 <i class="fas fa-road"></i> Learn Missing Skills
@@ -626,6 +634,298 @@
             </div>
         {% endif %}
     </div>
+
+    <!-- Job Fit Modal -->
+    <div id="jobFitModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2><i class="fas fa-chart-line"></i> Job Fit Analysis</h2>
+            <div id="jobFitContent">
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .modal {
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            overflow: auto;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            margin: 5% auto;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 700px;
+            position: relative;
+        }
+
+        .modal-content h2 {
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .close {
+            color: var(--text-muted);
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 20px;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: var(--accent);
+        }
+
+        .fit-score {
+            text-align: center;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            background: rgba(0, 194, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .fit-score .percentage {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .fit-score .label {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        .fit-score .recommendation {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .fit-details {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .fit-section h3 {
+            font-size: 1rem;
+            color: var(--text-color);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .fit-section .skills-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .check-fit-btn {
+            cursor: pointer;
+        }
+
+        .check-fit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
+
+    <script>
+        // Job Fit Modal functionality
+        const modal = document.getElementById('jobFitModal');
+        const span = document.getElementsByClassName('close')[0];
+        const checkFitButtons = document.querySelectorAll('.check-fit-btn');
+
+        // Close modal when clicking X
+        if (span) {
+            span.onclick = function() {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Handle Check Fit button clicks
+        checkFitButtons.forEach(button => {
+            button.addEventListener('click', async function() {
+                const jobTitle = this.getAttribute('data-job-title');
+                const jobDescription = this.getAttribute('data-job-description');
+                const jobSkills = this.getAttribute('data-job-skills');
+
+                // Show modal with loading state
+                modal.style.display = 'block';
+                document.getElementById('jobFitContent').innerHTML = `
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p style="margin-top: 1rem; color: var(--text-muted);">Analyzing job fit...</p>
+                    </div>
+                `;
+
+                try {
+                    // Call the Job Match API
+                    const response = await fetch('/api/job-match', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            resume_id: null, // Will use latest resume from session
+                            job_description: jobDescription,
+                            required_skills: jobSkills ? jobSkills.split(',').map(s => s.trim()) : []
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        displayJobFit(data, jobTitle);
+                    } else {
+                        displayError(data.error || 'Failed to analyze job fit');
+                    }
+                } catch (error) {
+                    console.error('Job fit analysis error:', error);
+                    displayError('An error occurred while analyzing job fit. Please try again.');
+                }
+            });
+        });
+
+        function displayJobFit(data, jobTitle) {
+            const matchClass = data.match_percentage >= 70 ? 'match-high' : 
+                              data.match_percentage >= 40 ? 'match-medium' : 'match-low';
+
+            let html = `
+                <div class="fit-score">
+                    <div class="percentage ${matchClass}">${data.match_percentage}%</div>
+                    <div class="label">Job Match Score</div>
+                    <div class="recommendation">${data.recommendation}</div>
+                </div>
+
+                <div class="fit-details">
+            `;
+
+            // Required skills matched
+            if (data.required_matched && data.required_matched.length > 0) {
+                html += `
+                    <div class="fit-section">
+                        <h3><i class="fas fa-check-circle" style="color: var(--success);"></i> Required Skills You Have</h3>
+                        <div class="skills-list">
+                            ${data.required_matched.map(skill => `
+                                <span class="skill-tag skill-match">${skill}</span>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Preferred skills matched
+            if (data.preferred_matched && data.preferred_matched.length > 0) {
+                html += `
+                    <div class="fit-section">
+                        <h3><i class="fas fa-star" style="color: var(--warning);"></i> Preferred Skills You Have</h3>
+                        <div class="skills-list">
+                            ${data.preferred_matched.map(skill => `
+                                <span class="skill-tag skill-match">${skill}</span>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Missing required skills
+            if (data.missing_required && data.missing_required.length > 0) {
+                html += `
+                    <div class="fit-section">
+                        <h3><i class="fas fa-exclamation-triangle" style="color: var(--error);"></i> Required Skills to Learn</h3>
+                        <div class="skills-list">
+                            ${data.missing_required.map(skill => `
+                                <span class="skill-tag skill-missing">${skill}</span>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Missing preferred skills
+            if (data.missing_preferred && data.missing_preferred.length > 0) {
+                html += `
+                    <div class="fit-section">
+                        <h3><i class="fas fa-info-circle" style="color: var(--warning);"></i> Preferred Skills to Learn</h3>
+                        <div class="skills-list">
+                            ${data.missing_preferred.map(skill => `
+                                <span class="skill-tag skill-missing">${skill}</span>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Additional stats
+            html += `
+                <div class="fit-section">
+                    <h3><i class="fas fa-chart-bar"></i> Statistics</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-top: 0.5rem;">
+                        <div style="text-align: center; padding: 0.75rem; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                            <div style="font-size: 1.5rem; font-weight: 600; color: var(--accent);">${data.total_resume_skills}</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">Your Skills</div>
+                        </div>
+                        <div style="text-align: center; padding: 0.75rem; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                            <div style="font-size: 1.5rem; font-weight: 600; color: var(--accent);">${data.total_required_skills}</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">Required</div>
+                        </div>
+                        <div style="text-align: center; padding: 0.75rem; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                            <div style="font-size: 1.5rem; font-weight: 600; color: var(--accent);">${data.semantic_similarity}%</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">Text Similarity</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            html += '</div>';
+
+            document.getElementById('jobFitContent').innerHTML = html;
+        }
+
+        function displayError(message) {
+            document.getElementById('jobFitContent').innerHTML = `
+                <div class="error-message" style="margin: 2rem 0;">
+                    <i class="fas fa-exclamation-triangle"></i> ${message}
+                </div>
+                <p style="color: var(--text-muted); text-align: center;">
+                    Make sure you have uploaded a resume first.
+                </p>
+            `;
+        }
+    </script>
 
     {% include 'components/footer.html' %}
 </body>
