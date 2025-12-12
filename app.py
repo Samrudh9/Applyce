@@ -1697,10 +1697,6 @@ def api_skill_gap():
 
 @app.route('/jobs')
 def jobs_page():
-    """Job search page - TEMPORARILY LOCKED"""
-    flash('🔒 Job matching feature coming soon!  Stay tuned.', 'info')
-    return redirect(url_for('home'))
-def jobs_page():
     """Job search page with real job listings"""
     career = request.args. get('career', '').strip()
     location = request.args.get('location', 'India').strip()
