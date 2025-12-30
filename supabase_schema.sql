@@ -150,8 +150,8 @@ CREATE TABLE IF NOT EXISTS resume_versions (
     id SERIAL PRIMARY KEY,
     resume_id INT REFERENCES resumes(id) ON DELETE CASCADE,
     version INTEGER NOT NULL,
-    overall_score INTEGER,
-    ats_score INTEGER,
+    overall_score FLOAT,
+    ats_score FLOAT,
     score_breakdown TEXT,
     changes_made TEXT,
     created_at TIMESTAMP DEFAULT NOW()
