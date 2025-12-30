@@ -104,8 +104,9 @@ if not os.path.exists(instance_path):
 database_url = os.environ.get('DATABASE_URL')
 
 if database_url:
-    # SQLAlchemy requires 'postgresql://' prefix (some services provide 'postgres://')
-    # This fix ensures compatibility with both Render and Supabase connection strings
+    # SQLAlchemy 1.4+ deprecated 'postgres://' scheme in favor of 'postgresql://'
+    # Some services (like Heroku/Render) may provide 'postgres://' URLs
+    # This conversion ensures forward compatibility with SQLAlchemy
     if database_url.startswith('postgres://'):
         database_url = database_url.replace('postgres://', 'postgresql://', 1)
     print("📦 Using PostgreSQL (Supabase/Render)")
