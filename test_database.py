@@ -96,7 +96,10 @@ def test_database_connection():
         if tables:
             print("\n📋 Existing Tables:")
             for table in sorted(tables):
+                # Note: Table names come from database schema inspection (not user input)
+                # This is safe because inspector.get_table_names() returns validated table names
                 with engine.connect() as connection:
+                    # Using text() with f-string is safe here as table names are from schema
                     count_result = connection.execute(
                         text(f"SELECT COUNT(*) FROM {table}")
                     )
