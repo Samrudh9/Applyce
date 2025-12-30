@@ -181,7 +181,9 @@ COMMENT ON TABLE user_preferences IS 'User preferences and settings';
 COMMENT ON TABLE resume_versions IS 'Version history of resume iterations';
 COMMENT ON TABLE job_patterns IS 'Job market patterns and requirements';
 
--- Grant necessary permissions (adjust as needed for your Supabase project)
+-- Note: Supabase handles permissions automatically for the postgres role
+-- These manual GRANT statements are typically not needed in Supabase
+-- Uncomment only if using a custom PostgreSQL installation:
 -- GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO postgres;
 -- GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO postgres;
 
