@@ -152,7 +152,7 @@ CREATE TABLE resume_history (
 | `SECRET_KEY` | Flask secret key for sessions | Yes (prod) | Random (dev) |
 | `FLASK_ENV` | Environment mode | No | `development` |
 | `ADMIN_ID` | Admin login ID for backups | No | `admin@skillfit.onrender.com` |
-| `ADMIN_PASSWORD` | Admin password | No | `skillfit@admin` |
+| `ADMIN_PASSWORD` | Admin password (change in production!) | No | ⚠️ Must be set securely |
 | `ROADMAP_SUPPORT` | Enable roadmap features | No | `true` |
 | `ML_CLASSIFIER_ENABLED` | Enable ML classifier | No | `false` |
 
