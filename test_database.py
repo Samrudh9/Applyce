@@ -39,11 +39,15 @@ def mask_password_in_url(url):
     if '@' not in url:
         return url
     
-    parts = url.split('@')
-    credentials = parts[0].split('://')
-    if len(credentials) > 1 and ':' in credentials[1]:
-        user_pass = credentials[1].split(':')
-        return f"{credentials[0]}://{user_pass[0]}:****@{parts[1]}"
+    try:
+        parts = url.split('@')
+        credentials = parts[0].split('://')
+        if len(credentials) > 1 and ':' in credentials[1]:
+            user_pass = credentials[1].split(':', 1)  # Split only on first ':'
+            return f"{credentials[0]}://{user_pass[0]}:****@{parts[1]}"
+    except (IndexError, ValueError):
+        # If URL structure is unexpected, return as-is
+        pass
     
     return url
 
