@@ -138,7 +138,7 @@ If deploying to Render or another platform:
    ```
 3. Check the console output for:
    ```
-   📦 Using PostgreSQL (Render)
+   📦 Using PostgreSQL (Supabase/Render)
    ✅ Database tables created/verified!
    ✅ Database ready!
    ```
