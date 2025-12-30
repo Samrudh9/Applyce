@@ -103,7 +103,7 @@ An intelligent, self-learning career recommendation platform that analyzes resum
 | Category | Technologies |
 |----------|-------------|
 | **Backend** | Python, Flask, Gunicorn |
-| **Database** | PostgreSQL (Production), SQLite (Development) |
+| **Database** | PostgreSQL (Supabase/Render), SQLite (Development) |
 | **ML/AI** | Scikit-learn, Pandas, NumPy |
 | **Authentication** | Flask-Login, Werkzeug |
 | **Document Processing** | PyPDF2, pdfplumber, python-docx |
@@ -192,6 +192,31 @@ python app.py
 ```
 http://localhost:5000
 ```
+
+### Database Setup (PostgreSQL/Supabase)
+
+For production deployment with Supabase PostgreSQL:
+
+1. **Create a Supabase project** at https://supabase.com
+
+2. **Set up the database schema**
+   - Go to SQL Editor in Supabase
+   - Run the SQL script from `supabase_schema.sql`
+
+3. **Configure environment variables**
+   ```bash
+   cp .env.example .env
+   # Edit .env and add your Supabase connection string
+   DATABASE_URL=postgresql://postgres:[PASSWORD]@db.xxxxx.supabase.co:5432/postgres
+   ```
+
+4. **Test database connection**
+   ```bash
+   python test_database.py
+   ```
+
+📚 **Detailed Guide**: See [DATABASE_SETUP.md](DATABASE_SETUP.md) for complete instructions  
+🔄 **Migration Guide**: See [MIGRATION.md](MIGRATION.md) for migrating from Render to Supabase
 
 ---
 
