@@ -12,6 +12,41 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
+def get_database_url():
+    """
+    Get database URL from environment or fallback to SQLite.
+    Returns tuple of (database_url, is_postgresql).
+    """
+    database_url = os.environ.get('DATABASE_URL')
+    
+    if not database_url:
+        # Use SQLite for local testing
+        basedir = os.path.abspath(os.path.dirname(__file__))
+        instance_path = os.path.join(basedir, 'instance')
+        if not os.path.exists(instance_path):
+            os.makedirs(instance_path)
+        database_url = f'sqlite:///{os.path.join(instance_path, "skillfit.db")}'
+        return database_url, False
+    
+    # Handle postgres:// vs postgresql:// prefix
+    if database_url.startswith('postgres://'):
+        database_url = database_url.replace('postgres://', 'postgresql://', 1)
+    
+    return database_url, True
+
+def mask_password_in_url(url):
+    """Mask password in database URL for safe display."""
+    if '@' not in url:
+        return url
+    
+    parts = url.split('@')
+    credentials = parts[0].split('://')
+    if len(credentials) > 1 and ':' in credentials[1]:
+        user_pass = credentials[1].split(':')
+        return f"{credentials[0]}://{user_pass[0]}:****@{parts[1]}"
+    
+    return url
+
 def test_database_connection():
     """Test database connection and display information."""
     print("=" * 60)
@@ -19,37 +54,16 @@ def test_database_connection():
     print("=" * 60)
     
     # Get database URL
-    database_url = os.environ.get('DATABASE_URL')
+    database_url, is_postgresql = get_database_url()
     
-    if not database_url:
+    if not is_postgresql:
         print("\n❌ DATABASE_URL not found in environment variables")
         print("\nFor local development, this is OK - SQLite will be used.")
-        
-        # Use SQLite for local testing
-        basedir = os.path.abspath(os.path.dirname(__file__))
-        instance_path = os.path.join(basedir, 'instance')
-        if not os.path.exists(instance_path):
-            os.makedirs(instance_path)
-        database_url = f'sqlite:///{os.path.join(instance_path, "skillfit.db")}'
         print(f"\n📦 Testing SQLite connection")
         print(f"   Location: {database_url}")
     else:
-        # Handle postgres:// vs postgresql:// prefix
-        if database_url.startswith('postgres://'):
-            database_url = database_url.replace('postgres://', 'postgresql://', 1)
-        
         print(f"\n📦 Testing PostgreSQL connection")
-        
-        # Mask password in output
-        masked_url = database_url
-        if '@' in masked_url:
-            parts = masked_url.split('@')
-            credentials = parts[0].split('://')
-            if len(credentials) > 1 and ':' in credentials[1]:
-                user_pass = credentials[1].split(':')
-                masked_url = f"{credentials[0]}://{user_pass[0]}:****@{parts[1]}"
-        
-        print(f"   URL: {masked_url}")
+        print(f"   URL: {mask_password_in_url(database_url)}")
     
     try:
         # Create engine
@@ -124,17 +138,8 @@ def test_write_operation():
     print("DATABASE WRITE TEST")
     print("=" * 60)
     
-    database_url = os.environ.get('DATABASE_URL')
-    
-    if not database_url:
-        basedir = os.path.abspath(os.path.dirname(__file__))
-        instance_path = os.path.join(basedir, 'instance')
-        if not os.path.exists(instance_path):
-            os.makedirs(instance_path)
-        database_url = f'sqlite:///{os.path.join(instance_path, "skillfit.db")}'
-    else:
-        if database_url.startswith('postgres://'):
-            database_url = database_url.replace('postgres://', 'postgresql://', 1)
+    # Get database URL using helper function
+    database_url, is_postgresql = get_database_url()
     
     try:
         engine = create_engine(database_url)
