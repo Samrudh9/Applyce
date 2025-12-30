@@ -132,7 +132,7 @@ CREATE TABLE IF NOT EXISTS skill_patterns (
 -- Create User Preferences Table
 CREATE TABLE IF NOT EXISTS user_preferences (
     id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(id) ON DELETE CASCADE UNIQUE,
+    user_id INT UNIQUE REFERENCES users(id) ON DELETE CASCADE,
     default_experience_level VARCHAR(50),
     default_target_role VARCHAR(100),
     preferred_industries TEXT,
