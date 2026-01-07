@@ -92,33 +92,26 @@ app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
 
 # ===== Database Configuration =====
-# ===== Database Configuration =====
 
 basedir = os.path.abspath(os.path.dirname(__file__))
-instance_path = os. path.join(basedir, 'instance')
+instance_path = os.path.join(basedir, 'instance')
 
 # Create instance folder if it doesn't exist
-if not os.path. exists(instance_path):
-    os. makedirs(instance_path)
+if not os.path.exists(instance_path):
+    os.makedirs(instance_path)
 
-# ===== Database Configuration =====
-
-# Get database URL from environment (Render) or use SQLite (local)
-# ===== Database Configuration =====
-
-database_url = os. environ.get('DATABASE_URL')
+# Get database URL from environment or use SQLite (local)
+database_url = os.environ.get('DATABASE_URL')
 
 if database_url:
-    # Fix for Render: postgres:// → postgresql://
+    # SQLAlchemy 1.4+ deprecated 'postgres://' scheme in favor of 'postgresql://'
+    # Some services (like Heroku/Render) may provide 'postgres://' URLs
+    # This conversion ensures forward compatibility with SQLAlchemy
     if database_url.startswith('postgres://'):
-        database_url = database_url. replace('postgres://', 'postgresql://', 1)
-    print("📦 Using PostgreSQL (Render)")
+        database_url = database_url.replace('postgres://', 'postgresql://', 1)
+    print("📦 Using PostgreSQL (Supabase/Render)")
 else:
     # Local: Use SQLite
-    basedir = os.path.abspath(os.path.dirname(__file__))
-    instance_path = os.path.join(basedir, 'instance')
-    if not os.path. exists(instance_path):
-        os. makedirs(instance_path)
     database_url = f'sqlite:///{os.path.join(instance_path, "skillfit.db")}'
     print("📦 Using SQLite (Local)")
 
