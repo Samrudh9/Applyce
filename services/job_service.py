@@ -8,7 +8,7 @@ import re
 import logging
 import requests
 import hashlib
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Self, Tuple
 from datetime import datetime, timedelta
 from dataclasses import dataclass, field, asdict
 
@@ -56,15 +56,15 @@ class JobService:
     """
     
     def __init__(self):
-        # Load API keys from environment (NEVER hardcode!)
-        self. ADZUNA_APP_ID = os. environ.get('0f396d0c', '')
-        self. ADZUNA_API_KEY = os.environ.get('2493382c75cb1211cece11304eba0997', '')
-        self.RAPIDAPI_KEY = os. environ.get('89b90bf114msh0e973f8198f5bdfp1a7024jsne784128c9363', '')
-        
-        # Log API status
-        logger.info(f"Adzuna API: {'✅ Configured' if self. ADZUNA_APP_ID else '❌ Not configured'}")
-        logger. info(f"RapidAPI: {'✅ Configured' if self. RAPIDAPI_KEY else '❌ Not configured'}")
-        
+    # Load API keys from environment (NEVER hardcode!)
+        self.ADZUNA_APP_ID = os.environ. get('ADZUNA_APP_ID', '')       
+        self. ADZUNA_API_KEY = os.environ.get('ADZUNA_API_KEY', '')     
+        self.RAPIDAPI_KEY = os. environ.get('RAPIDAPI_KEY', '')         
+    
+    # Log API status
+        logger.info(f"Adzuna API:  {'✅ Configured' if self. ADZUNA_APP_ID else '❌ Not configured'}")
+        logger.info(f"RapidAPI:  {'✅ Configured' if self. RAPIDAPI_KEY else '❌ Not configured'}")
+    
         self._compile_skill_patterns()
     
     # Country codes for Adzuna
