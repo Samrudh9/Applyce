@@ -101,7 +101,7 @@ if not os.path.exists(instance_path):
     os.makedirs(instance_path)
 
 # Get database URL from environment or use SQLite (local)
-database_url = os.environ.get('DATABASE_URL')
+database_url = os.environ.get('postgresql://postgres:Zxcvbnm@(2005)..@db.etlpqbraqfxhstpnomms.supabase.co:5432/postgres')
 
 if database_url:
     # SQLAlchemy 1.4+ deprecated 'postgres://' scheme in favor of 'postgresql://'
