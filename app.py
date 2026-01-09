@@ -114,6 +114,9 @@ else:
     print("📦 Using SQLite (Local)")
 
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+    "connect_args": {"sslmode": "require"}
+}
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # Initialize database
 from models import db
