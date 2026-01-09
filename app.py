@@ -2264,7 +2264,15 @@ def init_db():
 # Call init_db
 init_db()
 
+<<<<<<< Updated upstream
 if __name__ == '__main__':
     import os
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
+=======
+if __name__ == "__main__":
+    from os import environ
+
+    port = int(environ.get("PORT", 5000))  # Default to 5000 if PORT is not set
+    app.run(host="0.0.0.0", port=port)  # Bind to all available IPs
+>>>>>>> Stashed changes
