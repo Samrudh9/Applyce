@@ -101,12 +101,10 @@ if not os.path.exists(instance_path):
     os.makedirs(instance_path)
 
 # Get database URL from environment or use SQLite (local)
-database_url = os.environ.get('postgresql://postgres:Zxcvbnm@(2005)..@db.etlpqbraqfxhstpnomms.supabase.co:5432/postgres')
+database_url = os.environ.get('DATABASE_URL')
 
 if database_url:
-    # SQLAlchemy 1.4+ deprecated 'postgres://' scheme in favor of 'postgresql://'
-    # Some services (like Heroku/Render) may provide 'postgres://' URLs
-    # This conversion ensures forward compatibility with SQLAlchemy
+    
     if database_url.startswith('postgres://'):
         database_url = database_url.replace('postgres://', 'postgresql://', 1)
     print("📦 Using PostgreSQL (Supabase/Render)")
@@ -2267,6 +2265,7 @@ if __name__ == '__main__':
     import os
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
+
 if __name__ == "__main__":
     from os import environ
 
