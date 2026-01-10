@@ -1,0 +1,171 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Resume Analytics{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>📄 Resume Analytics</h1>
+  <p>Analyze resume data and trends</p>
+</div>
+
+<!-- Analytics Stats -->
+<div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+  <div class="stat-card">
+    <div class="stat-icon" style="background: rgba(0, 194, 255, 0.15); color: var(--accent);">
+      <i class="fas fa-file-alt"></i>
+    </div>
+    <div class="stat-label">Total Resumes</div>
+    <div class="stat-value">{{ total_resumes }}</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon" style="background: rgba(0, 255, 136, 0.15); color: var(--success);">
+      <i class="fas fa-star"></i>
+    </div>
+    <div class="stat-label">Average Score</div>
+    <div class="stat-value">{{ avg_score }}</div>
+  </div>
+</div>
+
+<!-- Top Predicted Careers -->
+<div class="card">
+  <div class="card-header">
+    <h2><i class="fas fa-chart-pie"></i> Top Predicted Careers</h2>
+  </div>
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Career</th>
+          <th>Count</th>
+          <th>Percentage</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for career, count in top_careers %}
+          <tr>
+            <td style="font-weight: 500;">{{ career }}</td>
+            <td><span class="badge badge-info">{{ count }}</span></td>
+            <td>
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <div style="flex: 1; height: 8px; background: rgba(255, 255, 255, 0.1); border-radius: 4px; overflow: hidden;">
+                  <div style="height: 100%; width: {{ (count / total_resumes * 100) }}%; background: linear-gradient(90deg, var(--accent), var(--accent-secondary));"></div>
+                </div>
+                <span style="color: var(--text-muted); font-size: 0.85rem; min-width: 50px;">{{ (count / total_resumes * 100) | round(1) }}%</span>
+              </div>
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="3" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+              No career predictions yet
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Resume List -->
+<div class="card">
+  <div class="card-header">
+    <h2><i class="fas fa-list"></i> All Resumes</h2>
+  </div>
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Filename</th>
+          <th>Upload Date</th>
+          <th>Overall Score</th>
+          <th>ATS Score</th>
+          <th>Predicted Career</th>
+          <th>Skills</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for resume in resumes.items %}
+          <tr>
+            <td>
+              {% if resume.user %}
+                <a href="{{ url_for('admin_user_detail', user_id=resume.user_id) }}" style="color: var(--accent); text-decoration: none;">
+                  {{ resume.user.username }}
+                </a>
+              {% else %}
+                <span style="color: var(--text-muted);">Unknown</span>
+              {% endif %}
+            </td>
+            <td style="font-size: 0.85rem; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+              {{ resume.filename }}
+            </td>
+            <td style="color: var(--text-muted); font-size: 0.85rem;">
+              {{ resume.upload_date.strftime('%Y-%m-%d') if resume.upload_date else 'N/A' }}
+            </td>
+            <td>
+              {% if resume.overall_score >= 80 %}
+                <span class="badge badge-success">{{ resume.overall_score }}</span>
+              {% elif resume.overall_score >= 60 %}
+                <span class="badge badge-warning">{{ resume.overall_score }}</span>
+              {% else %}
+                <span class="badge badge-error">{{ resume.overall_score }}</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if resume.ats_score >= 80 %}
+                <span class="badge badge-success">{{ resume.ats_score }}</span>
+              {% elif resume.ats_score >= 60 %}
+                <span class="badge badge-warning">{{ resume.ats_score }}</span>
+              {% else %}
+                <span class="badge badge-error">{{ resume.ats_score }}</span>
+              {% endif %}
+            </td>
+            <td style="color: var(--text-muted); font-size: 0.85rem;">
+              {{ resume.predicted_career or 'N/A' }}
+            </td>
+            <td style="text-align: center;">
+              <span class="badge badge-info">{{ resume.skill_count or 0 }}</span>
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+              No resumes analyzed yet
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  {% if resumes.pages > 1 %}
+    <div class="pagination">
+      {% if resumes.has_prev %}
+        <a href="{{ url_for('admin_resumes', page=resumes.prev_num) }}">
+          <i class="fas fa-chevron-left"></i>
+        </a>
+      {% endif %}
+
+      {% for page_num in resumes.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+        {% if page_num %}
+          {% if page_num == resumes.page %}
+            <span class="active">{{ page_num }}</span>
+          {% else %}
+            <a href="{{ url_for('admin_resumes', page=page_num) }}">{{ page_num }}</a>
+          {% endif %}
+        {% else %}
+          <span>...</span>
+        {% endif %}
+      {% endfor %}
+
+      {% if resumes.has_next %}
+        <a href="{{ url_for('admin_resumes', page=resumes.next_num) }}">
+          <i class="fas fa-chevron-right"></i>
+        </a>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,248 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>📊 Dashboard</h1>
+  <p>Real-time overview of your application</p>
+</div>
+
+<!-- Stats Grid -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon" style="background: rgba(0, 194, 255, 0.15); color: var(--accent);">
+      <i class="fas fa-users"></i>
+    </div>
+    <div class="stat-label">Total Users</div>
+    <div class="stat-value">{{ total_users }}</div>
+    {% if new_users_today > 0 %}
+      <div style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--success);">
+        <i class="fas fa-arrow-up"></i> +{{ new_users_today }} today
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon" style="background: rgba(255, 170, 0, 0.15); color: var(--warning);">
+      <i class="fas fa-file-alt"></i>
+    </div>
+    <div class="stat-label">Total Resumes</div>
+    <div class="stat-value">{{ total_resumes }}</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon" style="background: rgba(168, 85, 247, 0.15); color: var(--accent-purple);">
+      <i class="fas fa-star"></i>
+    </div>
+    <div class="stat-label">Average Score</div>
+    <div class="stat-value">{{ avg_score }}</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon" style="background: rgba(0, 255, 136, 0.15); color: var(--success);">
+      <i class="fas fa-comments"></i>
+    </div>
+    <div class="stat-label">Total Feedback</div>
+    <div class="stat-value">{{ total_feedback }}</div>
+    {% if total_feedback > 0 %}
+      <div style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-muted);">
+        {{ positive_feedback }} positive ({{ ((positive_feedback / total_feedback) * 100) | round | int }}%)
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon" style="background: rgba(0, 255, 224, 0.15); color: var(--accent-secondary);">
+      <i class="fas fa-user-check"></i>
+    </div>
+    <div class="stat-label">Active Users</div>
+    <div class="stat-value">{{ active_users }}</div>
+    <div style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-muted);">
+      Last 7 days
+    </div>
+  </div>
+</div>
+
+<!-- Charts Section -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+  <div class="card">
+    <div class="card-header">
+      <h2><i class="fas fa-chart-line"></i> User Registrations (Last 30 Days)</h2>
+    </div>
+    <canvas id="userChart" style="max-height: 250px;"></canvas>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2><i class="fas fa-chart-bar"></i> Resume Score Distribution</h2>
+    </div>
+    <canvas id="scoreChart" style="max-height: 250px;"></canvas>
+  </div>
+</div>
+
+<!-- Recent Activity -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem;">
+  <!-- Recent Users -->
+  <div class="card">
+    <div class="card-header">
+      <h2><i class="fas fa-user-plus"></i> Latest Users</h2>
+      <a href="{{ url_for('admin_users') }}" class="btn btn-secondary">View All</a>
+    </div>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Joined</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in recent_users %}
+            <tr>
+              <td><a href="{{ url_for('admin_user_detail', user_id=user.id) }}" style="color: var(--accent); text-decoration: none;">{{ user.username }}</a></td>
+              <td style="color: var(--text-muted); font-size: 0.85rem;">{{ user.email }}</td>
+              <td style="color: var(--text-muted); font-size: 0.85rem;">{{ user.created_at.strftime('%Y-%m-%d') if user.created_at else 'N/A' }}</td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="3" style="text-align: center; color: var(--text-muted);">No users yet</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Recent Resumes -->
+  <div class="card">
+    <div class="card-header">
+      <h2><i class="fas fa-file-upload"></i> Latest Resumes</h2>
+      <a href="{{ url_for('admin_resumes') }}" class="btn btn-secondary">View All</a>
+    </div>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Filename</th>
+            <th>Score</th>
+            <th>Career</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for resume in recent_resumes %}
+            <tr>
+              <td style="font-size: 0.85rem;">{{ resume.filename[:30] }}...</td>
+              <td><span class="badge badge-info">{{ resume.overall_score }}</span></td>
+              <td style="color: var(--text-muted); font-size: 0.85rem;">{{ resume.predicted_career or 'N/A' }}</td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="3" style="text-align: center; color: var(--text-muted);">No resumes yet</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+  // User Registrations Chart
+  fetch('{{ url_for("api_admin_chart_users") }}')
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        const ctx = document.getElementById('userChart').getContext('2d');
+        new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: data.data.map(d => d.date),
+            datasets: [{
+              label: 'New Users',
+              data: data.data.map(d => d.count),
+              borderColor: '#00c2ff',
+              backgroundColor: 'rgba(0, 194, 255, 0.1)',
+              tension: 0.4,
+              fill: true
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: false
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: { color: '#888' },
+                grid: { color: 'rgba(255, 255, 255, 0.08)' }
+              },
+              x: {
+                ticks: { 
+                  color: '#888',
+                  maxRotation: 45,
+                  minRotation: 45
+                },
+                grid: { color: 'rgba(255, 255, 255, 0.08)' }
+              }
+            }
+          }
+        });
+      }
+    });
+
+  // Score Distribution Chart
+  fetch('{{ url_for("api_admin_chart_scores") }}')
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        const ctx = document.getElementById('scoreChart').getContext('2d');
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: data.data.map(d => d.range),
+            datasets: [{
+              label: 'Resumes',
+              data: data.data.map(d => d.count),
+              backgroundColor: [
+                'rgba(255, 68, 68, 0.6)',
+                'rgba(255, 170, 0, 0.6)',
+                'rgba(255, 200, 0, 0.6)',
+                'rgba(0, 255, 136, 0.6)',
+                'rgba(0, 194, 255, 0.6)'
+              ]
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: false
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: { color: '#888' },
+                grid: { color: 'rgba(255, 255, 255, 0.08)' }
+              },
+              x: {
+                ticks: { color: '#888' },
+                grid: { color: 'rgba(255, 255, 255, 0.08)' }
+              }
+            }
+          }
+        });
+      }
+    });
+</script>
+{% endblock %}

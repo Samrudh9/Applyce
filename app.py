@@ -116,7 +116,7 @@ else:
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # Initialize database
-from models import db
+from models import db, User, Feedback, SkillPattern, ResumeHistory
 db.init_app(app)
 migrate = Migrate(app, db)
 # Create tables on startup (needed for Render)
@@ -1958,7 +1958,7 @@ def admin_required(f):
 def admin_login():
     """Admin login page for backup access"""
     if session.get('admin_authenticated'):
-        return redirect(url_for('admin_backup_page'))
+        return redirect(url_for('admin_dashboard'))
     
     error = None
     if request.method == 'POST':
@@ -1968,7 +1968,7 @@ def admin_login():
         # Check credentials against config
         if admin_id == config.ADMIN_ID and admin_password == config.ADMIN_PASSWORD:
             session['admin_authenticated'] = True
-            return redirect(url_for('admin_backup_page'))
+            return redirect(url_for('admin_dashboard'))
         else:
             error = 'Invalid admin credentials'
     
@@ -1981,6 +1981,239 @@ def admin_logout():
     session.pop('admin_authenticated', None)
     flash('Logged out from admin panel.', 'info')
     return redirect(url_for('home'))
+
+
+# ===== Admin Panel Routes =====
+
+@app.route('/admin/dashboard')
+@admin_required
+def admin_dashboard():
+    """Main admin dashboard with statistics"""
+    from datetime import datetime, timedelta
+    from sqlalchemy import func
+    
+    try:
+        # Get statistics
+        total_users = User.query.count()
+        
+        # Get new users today (SQLite compatible)
+        today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+        today_end = datetime.utcnow().replace(hour=23, minute=59, second=59, microsecond=999999)
+        new_users_today = User.query.filter(
+            User.created_at >= today_start,
+            User.created_at <= today_end
+        ).count()
+        
+        total_resumes = ResumeHistory.query.count()
+        avg_score = db.session.query(func.avg(ResumeHistory.overall_score)).scalar() or 0
+        
+        total_feedback = Feedback.query.count()
+        positive_feedback = Feedback.query.filter_by(feedback_type='positive').count()
+        
+        # Active users in last 7 days
+        seven_days_ago = datetime.utcnow() - timedelta(days=7)
+        active_users = User.query.filter(
+            User.last_login.isnot(None),
+            User.last_login >= seven_days_ago
+        ).count()
+        
+        # Recent activity
+        recent_users = User.query.order_by(User.created_at.desc()).limit(5).all()
+        recent_resumes = ResumeHistory.query.order_by(ResumeHistory.upload_date.desc()).limit(5).all()
+        
+        return render_template('admin/dashboard.html',
+            total_users=total_users,
+            new_users_today=new_users_today,
+            total_resumes=total_resumes,
+            avg_score=round(avg_score, 1),
+            total_feedback=total_feedback,
+            positive_feedback=positive_feedback,
+            active_users=active_users,
+            recent_users=recent_users,
+            recent_resumes=recent_resumes
+        )
+    except Exception as e:
+        logger.error(f"Error in admin dashboard: {str(e)}")
+        flash(f'Error loading dashboard: {str(e)}', 'error')
+        return redirect(url_for('admin_backup_page'))
+
+
+@app.route('/admin/users')
+@admin_required
+def admin_users():
+    """User management page"""
+    page = request.args.get('page', 1, type=int)
+    search = request.args.get('search', '')
+    
+    query = User.query
+    if search:
+        query = query.filter(
+            (User.username.ilike(f'%{search}%')) |
+            (User.email.ilike(f'%{search}%'))
+        )
+    
+    users = query.order_by(User.created_at.desc()).paginate(page=page, per_page=20, error_out=False)
+    return render_template('admin/users.html', users=users, search=search)
+
+
+@app.route('/admin/users/<int:user_id>')
+@admin_required
+def admin_user_detail(user_id):
+    """User detail view"""
+    user = User.query.get_or_404(user_id)
+    resumes = ResumeHistory.query.filter_by(user_id=user_id).order_by(ResumeHistory.upload_date.desc()).all()
+    feedback = Feedback.query.filter_by(user_id=user_id).all()
+    return render_template('admin/user_detail.html', user=user, resumes=resumes, feedback=feedback)
+
+
+@app.route('/admin/users/<int:user_id>/delete', methods=['POST'])
+@admin_required
+def admin_delete_user(user_id):
+    """Delete a user"""
+    user = User.query.get_or_404(user_id)
+    username = user.username
+    
+    # Delete related data
+    ResumeHistory.query.filter_by(user_id=user_id).delete()
+    Feedback.query.filter_by(user_id=user_id).delete()
+    db.session.delete(user)
+    db.session.commit()
+    
+    flash(f'User {username} deleted successfully.', 'success')
+    return redirect(url_for('admin_users'))
+
+
+@app.route('/admin/resumes')
+@admin_required  
+def admin_resumes():
+    """Resume analytics page"""
+    page = request.args.get('page', 1, type=int)
+    resumes = ResumeHistory.query.order_by(ResumeHistory.upload_date.desc()).paginate(page=page, per_page=20, error_out=False)
+    
+    # Analytics
+    from sqlalchemy import func
+    avg_score = db.session.query(func.avg(ResumeHistory.overall_score)).scalar() or 0
+    total_resumes = ResumeHistory.query.count()
+    
+    # Top careers
+    top_careers = db.session.query(
+        ResumeHistory.predicted_career,
+        func.count(ResumeHistory.id).label('count')
+    ).filter(ResumeHistory.predicted_career.isnot(None)).group_by(
+        ResumeHistory.predicted_career
+    ).order_by(func.count(ResumeHistory.id).desc()).limit(10).all()
+    
+    return render_template('admin/resumes.html', 
+        resumes=resumes, 
+        avg_score=round(avg_score, 1),
+        total_resumes=total_resumes,
+        top_careers=top_careers
+    )
+
+
+@app.route('/admin/feedback')
+@admin_required
+def admin_feedback():
+    """Feedback management page"""
+    page = request.args.get('page', 1, type=int)
+    feedback_type = request.args.get('type', '')
+    
+    query = Feedback.query
+    if feedback_type:
+        query = query.filter_by(feedback_type=feedback_type)
+    
+    feedbacks = query.order_by(Feedback.created_at.desc()).paginate(page=page, per_page=20, error_out=False)
+    
+    # Stats
+    total = Feedback.query.count()
+    positive = Feedback.query.filter_by(feedback_type='positive').count()
+    negative = Feedback.query.filter_by(feedback_type='negative').count()
+    
+    return render_template('admin/feedback.html',
+        feedbacks=feedbacks,
+        total=total,
+        positive=positive,
+        negative=negative,
+        filter_type=feedback_type
+    )
+
+
+@app.route('/admin/system')
+@admin_required
+def admin_system():
+    """System health page"""
+    # Database stats
+    db_stats = {
+        'users': User.query.count(),
+        'resumes': ResumeHistory.query.count(),
+        'feedback': Feedback.query.count(),
+        'patterns': SkillPattern.query.count()
+    }
+    
+    # System info (if psutil available)
+    system_stats = {}
+    try:
+        import psutil
+        system_stats = {
+            'cpu_percent': psutil.cpu_percent(interval=1),
+            'memory_percent': psutil.virtual_memory().percent,
+            'disk_percent': psutil.disk_usage('/').percent
+        }
+    except ImportError:
+        pass
+    
+    return render_template('admin/system.html',
+        db_stats=db_stats,
+        system_stats=system_stats
+    )
+
+
+# API endpoints for admin charts
+@app.route('/api/admin/chart/users')
+@admin_required
+def api_admin_chart_users():
+    """User registration chart data"""
+    from datetime import datetime, timedelta
+    
+    try:
+        # Last 30 days
+        data = []
+        for i in range(30, -1, -1):
+            date = datetime.utcnow().date() - timedelta(days=i)
+            # SQLite compatible date filtering
+            start = datetime.combine(date, datetime.min.time())
+            end = datetime.combine(date, datetime.max.time())
+            count = User.query.filter(
+                User.created_at >= start,
+                User.created_at <= end
+            ).count()
+            data.append({'date': date.isoformat(), 'count': count})
+        
+        return jsonify({'success': True, 'data': data})
+    except Exception as e:
+        logger.error(f"Error in user chart: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/admin/chart/scores')
+@admin_required
+def api_admin_chart_scores():
+    """Score distribution chart data"""
+    try:
+        # Group scores into ranges
+        ranges = [(0, 20), (21, 40), (41, 60), (61, 80), (81, 100)]
+        data = []
+        for low, high in ranges:
+            count = ResumeHistory.query.filter(
+                ResumeHistory.overall_score >= low,
+                ResumeHistory.overall_score <= high
+            ).count()
+            data.append({'range': f'{low}-{high}', 'count': count})
+        
+        return jsonify({'success': True, 'data': data})
+    except Exception as e:
+        logger.error(f"Error in score chart: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 
 @app.route('/admin/backup')
