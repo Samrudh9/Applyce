@@ -18,6 +18,167 @@ logger = logging.getLogger(__name__)
 _job_cache: Dict[str, Tuple[datetime, List]] = {}
 CACHE_DURATION = timedelta(minutes=30)
 
+# ===== Sample Jobs Fallback Data =====
+SAMPLE_JOBS = [
+    # Software Development Jobs
+    {
+        'id': 'sample_swe_1',
+        'title': 'Software Developer',
+        'company': 'Tech Solutions India',
+        'location': 'Bangalore, India',
+        'description': 'Looking for a skilled software developer with experience in Python, JavaScript, and modern web frameworks. Work on exciting projects in a collaborative environment.',
+        'url': 'https://example.com/jobs/software-developer',
+        'salary_min': 800000,
+        'salary_max': 1500000,
+        'skills_required': ['python', 'javascript', 'sql', 'git', 'react'],
+        'job_type': 'Full-time',
+        'source': 'Sample',
+        'is_remote': False,
+        'match_score': 75.0
+    },
+    {
+        'id': 'sample_swe_2',
+        'title': 'Full Stack Developer',
+        'company': 'Digital Innovations Ltd',
+        'location': 'Hyderabad, India',
+        'description': 'Join our team as a Full Stack Developer. Build scalable web applications using modern technologies and frameworks.',
+        'url': 'https://example.com/jobs/fullstack-developer',
+        'salary_min': 900000,
+        'salary_max': 1800000,
+        'skills_required': ['javascript', 'node.js', 'react', 'mongodb', 'aws'],
+        'job_type': 'Full-time',
+        'source': 'Sample',
+        'is_remote': True,
+        'match_score': 80.0
+    },
+    # Data Science Jobs
+    {
+        'id': 'sample_ds_1',
+        'title': 'Data Scientist',
+        'company': 'Analytics Pro',
+        'location': 'Mumbai, India',
+        'description': 'Seeking a Data Scientist to analyze complex datasets and build predictive models. Experience with Python, machine learning, and statistical analysis required.',
+        'url': 'https://example.com/jobs/data-scientist',
+        'salary_min': 1000000,
+        'salary_max': 2000000,
+        'skills_required': ['python', 'machine learning', 'sql', 'pandas', 'tensorflow'],
+        'job_type': 'Full-time',
+        'source': 'Sample',
+        'is_remote': False,
+        'match_score': 85.0
+    },
+    {
+        'id': 'sample_ds_2',
+        'title': 'Machine Learning Engineer',
+        'company': 'AI Innovations',
+        'location': 'Pune, India',
+        'description': 'Build and deploy machine learning models at scale. Work with cutting-edge AI technologies and large datasets.',
+        'url': 'https://example.com/jobs/ml-engineer',
+        'salary_min': 1200000,
+        'salary_max': 2500000,
+        'skills_required': ['python', 'machine learning', 'deep learning', 'pytorch', 'aws'],
+        'job_type': 'Full-time',
+        'source': 'Sample',
+        'is_remote': True,
+        'match_score': 90.0
+    },
+    # Frontend Jobs
+    {
+        'id': 'sample_fe_1',
+        'title': 'Frontend Developer',
+        'company': 'Creative Tech',
+        'location': 'Delhi, India',
+        'description': 'Create beautiful and responsive user interfaces. Work with React, TypeScript, and modern CSS frameworks.',
+        'url': 'https://example.com/jobs/frontend-developer',
+        'salary_min': 700000,
+        'salary_max': 1400000,
+        'skills_required': ['javascript', 'react', 'html', 'css', 'typescript'],
+        'job_type': 'Full-time',
+        'source': 'Sample',
+        'is_remote': False,
+        'match_score': 70.0
+    },
+    {
+        'id': 'sample_fe_2',
+        'title': 'UI/UX Developer',
+        'company': 'Design Studios',
+        'location': 'Bangalore, India',
+        'description': 'Bridge the gap between design and development. Create pixel-perfect interfaces with great user experience.',
+        'url': 'https://example.com/jobs/ui-ux-developer',
+        'salary_min': 800000,
+        'salary_max': 1600000,
+        'skills_required': ['react', 'javascript', 'figma', 'html', 'css'],
+        'job_type': 'Full-time',
+        'source': 'Sample',
+        'is_remote': True,
+        'match_score': 75.0
+    },
+    # Backend Jobs
+    {
+        'id': 'sample_be_1',
+        'title': 'Backend Developer',
+        'company': 'Cloud Systems',
+        'location': 'Chennai, India',
+        'description': 'Build robust and scalable backend systems. Work with Node.js, databases, and cloud infrastructure.',
+        'url': 'https://example.com/jobs/backend-developer',
+        'salary_min': 900000,
+        'salary_max': 1700000,
+        'skills_required': ['node.js', 'javascript', 'mongodb', 'postgresql', 'aws'],
+        'job_type': 'Full-time',
+        'source': 'Sample',
+        'is_remote': False,
+        'match_score': 78.0
+    },
+    # DevOps Jobs
+    {
+        'id': 'sample_devops_1',
+        'title': 'DevOps Engineer',
+        'company': 'Infrastructure Solutions',
+        'location': 'Bangalore, India',
+        'description': 'Manage CI/CD pipelines and cloud infrastructure. Experience with Docker, Kubernetes, and AWS required.',
+        'url': 'https://example.com/jobs/devops-engineer',
+        'salary_min': 1100000,
+        'salary_max': 2200000,
+        'skills_required': ['docker', 'kubernetes', 'aws', 'linux', 'python'],
+        'job_type': 'Full-time',
+        'source': 'Sample',
+        'is_remote': True,
+        'match_score': 82.0
+    },
+    # Data Analyst Jobs
+    {
+        'id': 'sample_da_1',
+        'title': 'Data Analyst',
+        'company': 'Business Intelligence Corp',
+        'location': 'Hyderabad, India',
+        'description': 'Analyze business data and create insightful reports. Strong SQL and visualization skills required.',
+        'url': 'https://example.com/jobs/data-analyst',
+        'salary_min': 600000,
+        'salary_max': 1200000,
+        'skills_required': ['sql', 'excel', 'tableau', 'python', 'power bi'],
+        'job_type': 'Full-time',
+        'source': 'Sample',
+        'is_remote': False,
+        'match_score': 72.0
+    },
+    # QA Jobs
+    {
+        'id': 'sample_qa_1',
+        'title': 'QA Engineer',
+        'company': 'Quality Assurance Ltd',
+        'location': 'Pune, India',
+        'description': 'Ensure software quality through automated and manual testing. Experience with testing frameworks required.',
+        'url': 'https://example.com/jobs/qa-engineer',
+        'salary_min': 600000,
+        'salary_max': 1300000,
+        'skills_required': ['selenium', 'python', 'javascript', 'sql', 'git'],
+        'job_type': 'Full-time',
+        'source': 'Sample',
+        'is_remote': False,
+        'match_score': 68.0
+    },
+]
+
 
 @dataclass
 class Job:
@@ -100,6 +261,55 @@ class JobService:
         pattern = r'\b(' + '|'.join(self.TECH_SKILLS) + r')\b'
         self._skill_pattern = re.compile(pattern, re.IGNORECASE)
 
+    def get_sample_jobs(self, career: str = "", limit: int = 20) -> List[Job]:
+        """
+        Get sample jobs as fallback when APIs fail.
+        Filters sample jobs by career if provided.
+        """
+        career_lower = career.lower() if career else ""
+        
+        # Career keyword mappings to filter relevant sample jobs
+        career_keywords = {
+            'data scientist': ['data scientist', 'machine learning', 'data analyst'],
+            'data analyst': ['data analyst', 'data scientist'],
+            'software developer': ['software developer', 'full stack', 'backend', 'frontend'],
+            'full stack developer': ['full stack', 'software developer', 'backend', 'frontend'],
+            'frontend developer': ['frontend', 'ui/ux', 'full stack'],
+            'backend developer': ['backend', 'full stack', 'software developer'],
+            'devops engineer': ['devops'],
+            'machine learning': ['machine learning', 'data scientist'],
+            'qa': ['qa'],
+        }
+        
+        # Find matching keywords
+        relevant_keywords = []
+        for key, keywords in career_keywords.items():
+            if key in career_lower:
+                relevant_keywords = keywords
+                break
+        
+        # Filter sample jobs
+        filtered_jobs = []
+        for sample_data in SAMPLE_JOBS:
+            job_title_lower = sample_data['title'].lower()
+            
+            # If career specified, filter by relevance
+            if career_lower and relevant_keywords:
+                if any(keyword in job_title_lower for keyword in relevant_keywords):
+                    job = Job(**sample_data)
+                    filtered_jobs.append(job)
+            else:
+                # No career filter, add all
+                job = Job(**sample_data)
+                filtered_jobs.append(job)
+        
+        # If no jobs match the specific career, return all sample jobs
+        if not filtered_jobs and career_lower:
+            logger.info(f"No specific sample jobs for '{career}', returning all sample jobs")
+            filtered_jobs = [Job(**sample_data) for sample_data in SAMPLE_JOBS]
+        
+        return filtered_jobs[:limit]
+
     def search_jobs(
         self, 
         career: str, 
@@ -164,6 +374,11 @@ class JobService:
         # Deduplicate
         unique_jobs = self._deduplicate_jobs(all_jobs)
         logger.info(f"Total unique jobs: {len(unique_jobs)}")
+        
+        # Fallback to sample jobs if no jobs found from APIs
+        if len(unique_jobs) == 0:
+            logger.warning(f"All APIs failed or returned no jobs for '{career}'. Using sample jobs as fallback.")
+            unique_jobs = self.get_sample_jobs(career, limit)
         
         # Cache results
         _job_cache[cache_key] = (datetime.now(), unique_jobs)
