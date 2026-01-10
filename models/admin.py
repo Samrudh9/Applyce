@@ -37,8 +37,8 @@ def create_default_admins():
         {'username': 'sathwik', 'password': 'sathwik@053', 'role': 'UI Designer', 'email': 'sathwik@applyce.com'},
     ]
     
-        for admin_data in default_admins: 
-        existing = Admin.query. filter_by(username=admin_data['username']).first()
+    for admin_data in default_admins: 
+        existing = Admin.query.filter_by(username=admin_data['username']).first()
         if not existing:
             admin = Admin(
                 username=admin_data['username'],
