@@ -222,53 +222,6 @@ class ResumeQualityChecker:
             'keyword_density': round(keyword_density, 2)
         }
     
-    def check_resume_quality(self, text: str, extracted_data: Dict) -> Dict:
-        """
-        Comprehensive quality analysis based on recruiter framework.
-        Returns detailed scoring and actionable feedback.
-        """
-        scores = {}
-        feedback = []
-        
-        # 1. Personal Details & Contact Info (10 points)
-        personal_score, personal_feedback = self._score_personal_details(text, extracted_data)
-        scores['personal_contact'] = personal_score
-        feedback.extend(personal_feedback)
-        
-        # 2. Education (20 points)
-        education_score, education_feedback = self._score_education(text, extracted_data)
-        scores['education'] = education_score
-        feedback.extend(education_feedback)
-        
-        # 3. Skills Section (25 points)
-        skills_score, skills_feedback = self._score_skills(text, extracted_data)
-        scores['skills'] = skills_score
-        feedback.extend(skills_feedback)
-        
-        # 4. Projects & Practical Experience (30 points)
-        projects_score, projects_feedback = self._score_projects_experience(text, extracted_data)
-        scores['projects_experience'] = projects_score
-        feedback.extend(projects_feedback)
-        
-        # 5. Extracurriculars & Achievements (10 points)
-        extra_score, extra_feedback = self._score_extracurriculars(text, extracted_data)
-        scores['extracurriculars'] = extra_score
-        feedback.extend(extra_feedback)
-        
-        # 6. Presentation & Hygiene (5 points)
-        presentation_score, presentation_feedback = self._score_presentation(text)
-        scores['presentation'] = presentation_score
-        feedback.extend(presentation_feedback)
-        
-        total_score = sum(scores.values())
-        
-        return {
-            'score': total_score,
-            'breakdown': scores,
-            'feedback': feedback,
-            'grade': self._get_grade(total_score),
-            'priority_improvements': self._get_priority_improvements(scores, feedback)
-        }
     
     def _score_personal_details(self, text: str, data: Dict) -> Tuple[int, List[str]]:
         """Score personal details and contact information (10 points)"""
