@@ -635,6 +635,136 @@
       align-items: center;
       gap: 0.5rem;
     }
+
+    /* Jobs Section Styles */
+    .jobs-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .job-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+      transition: all 0.3s ease;
+    }
+
+    .job-item:hover {
+      background: rgba(0, 194, 255, 0.05);
+      border-color: rgba(0, 194, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .job-info {
+      flex: 1;
+    }
+
+    .job-title {
+      font-weight: 600;
+      color: #fff;
+      font-size: 1rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .job-company {
+      color: var(--accent);
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .job-location {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .remote-badge {
+      background: rgba(138, 43, 226, 0.2);
+      color: #a855f7;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      margin-left: 0.5rem;
+      font-weight: 500;
+    }
+
+    .job-match {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .match-score {
+      background: rgba(0, 255, 136, 0.15);
+      color: var(--success);
+      padding: 0.4rem 0.8rem;
+      border-radius: 15px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      white-space: nowrap;
+    }
+
+    .apply-btn {
+      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
+      color: #000;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+    }
+
+    .apply-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 194, 255, 0.3);
+    }
+
+    .view-all-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .view-all-btn:hover {
+      color: var(--accent-secondary);
+      gap: 0.75rem;
+    }
+
+    .no-jobs {
+      color: var(--text-muted);
+      text-align: center;
+      padding: 2rem;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 10px;
+      border: 1px dashed var(--border-color);
+    }
+
+    @media (max-width: 768px) {
+      .job-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+      
+      .job-match {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
   </style>
 </head>
 <body>
@@ -748,6 +878,40 @@
         <div class="chart-container">
           <canvas id="scoreChart"></canvas>
         </div>
+      </div>
+
+      <!-- Top Matching Jobs Section -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-icon"><i class="fas fa-briefcase"></i></div>
+          <h2>💼 Top Matching Jobs</h2>
+        </div>
+        
+        {% if matching_jobs %}
+          <div class="jobs-list">
+            {% for job in matching_jobs[:5] %}
+              <div class="job-item">
+                <div class="job-info">
+                  <div class="job-title">{{ job.title }}</div>
+                  <div class="job-company">{{ job.company }}</div>
+                  <div class="job-location">
+                    <i class="fas fa-map-marker-alt"></i> {{ job.location }}
+                    {% if job.is_remote %}<span class="remote-badge">Remote</span>{% endif %}
+                  </div>
+                </div>
+                <div class="job-match">
+                  <span class="match-score">{{ job.match_score|round(0)|int }}% Match</span>
+                  <a href="{{ job.url }}" class="apply-btn" target="_blank">Apply</a>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+          <a href="{{ url_for('jobs_page', career=top_career) }}" class="view-all-btn">
+            <i class="fas fa-arrow-right"></i> View All {{ top_career }} Jobs
+          </a>
+        {% else %}
+          <p class="no-jobs">Upload a resume to see matching job opportunities!</p>
+        {% endif %}
       </div>
 
       <!-- Resume History -->
