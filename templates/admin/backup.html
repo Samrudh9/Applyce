@@ -1,889 +1,199 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Data Backup & Protection - SkillFit Admin</title>
-  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    :root {
-      --bg-color: #0a0b0f;
-      --bg-secondary: #12131a;
-      --card-bg: #1a1b22;
-      --card-bg-hover: #22232d;
-      --text-color: #e0e0e0;
-      --text-muted: #888;
-      --accent: #00c2ff;
-      --accent-secondary: #00ffe0;
-      --accent-purple: #a855f7;
-      --success: #00ff88;
-      --warning: #ffaa00;
-      --error: #ff4444;
-      --border-color: rgba(255, 255, 255, 0.08);
-      --glow: 0 0 40px rgba(0, 194, 255, 0.15);
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      min-height: 100vh;
-      line-height: 1.6;
-      padding: 2rem;
-    }
-
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: 
-        radial-gradient(ellipse at 20% 20%, rgba(0, 194, 255, 0.08) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 80%, rgba(0, 255, 224, 0.08) 0%, transparent 50%),
-        radial-gradient(ellipse at 50% 50%, rgba(168, 85, 247, 0.05) 0%, transparent 50%);
-      pointer-events: none;
-      z-index: -1;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    /* Header */
-    .page-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 2rem;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .header-icon {
-      width: 60px;
-      height: 60px;
-      background: linear-gradient(135deg, rgba(0, 194, 255, 0.2), rgba(0, 255, 224, 0.2));
-      border-radius: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.75rem;
-    }
-
-    .header-text h1 {
-      font-size: 1.75rem;
-      font-weight: 700;
-      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .header-text p {
-      color: var(--text-muted);
-      font-size: 0.9rem;
-    }
-
-    .logout-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.75rem 1.25rem;
-      background: rgba(255, 68, 68, 0.15);
-      color: var(--error);
-      border: 1px solid rgba(255, 68, 68, 0.3);
-      border-radius: 10px;
-      text-decoration: none;
-      font-weight: 500;
-      transition: all 0.3s ease;
-    }
-
-    .logout-btn:hover {
-      background: rgba(255, 68, 68, 0.25);
-    }
-
-    /* Warning Banner */
-    .warning-banner {
-      background: rgba(255, 170, 0, 0.15);
-      border: 1px solid rgba(255, 170, 0, 0.3);
-      border-radius: 12px;
-      padding: 1.25rem;
-      margin-bottom: 2rem;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .warning-banner i {
-      font-size: 1.5rem;
-      color: var(--warning);
-    }
-
-    .warning-banner .warning-content h3 {
-      color: var(--warning);
-      font-size: 1rem;
-      margin-bottom: 0.25rem;
-    }
-
-    .warning-banner .warning-content p {
-      color: var(--text-muted);
-      font-size: 0.9rem;
-    }
-
-    /* Stats Grid */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1.5rem;
-      margin-bottom: 2rem;
-    }
-
-    @media (max-width: 1024px) {
-      .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    @media (max-width: 600px) {
-      .stats-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .stat-card {
-      background: var(--card-bg);
-      border-radius: 16px;
-      padding: 1.5rem;
-      border: 1px solid var(--border-color);
-      transition: all 0.3s ease;
-      text-align: center;
-    }
-
-    .stat-card:hover {
-      border-color: rgba(0, 194, 255, 0.3);
-      box-shadow: var(--glow);
-      transform: translateY(-3px);
-    }
-
-    .stat-icon {
-      width: 56px;
-      height: 56px;
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-      margin: 0 auto 1rem;
-    }
-
-    .stat-icon.patterns { background: rgba(168, 85, 247, 0.15); color: var(--accent-purple); }
-    .stat-icon.feedback { background: rgba(0, 255, 136, 0.15); color: var(--success); }
-    .stat-icon.users { background: rgba(0, 194, 255, 0.15); color: var(--accent); }
-    .stat-icon.resumes { background: rgba(255, 170, 0, 0.15); color: var(--warning); }
-
-    .stat-label {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 0.5rem;
-    }
-
-    .stat-value {
-      font-size: 2.25rem;
-      font-weight: 700;
-      color: #fff;
-    }
-
-    /* Section Card */
-    .section {
-      background: var(--card-bg);
-      border-radius: 16px;
-      padding: 1.75rem;
-      border: 1px solid var(--border-color);
-      margin-bottom: 1.5rem;
-    }
-
-    .section-header {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      margin-bottom: 1.25rem;
-    }
-
-    .section-icon {
-      width: 40px;
-      height: 40px;
-      background: linear-gradient(135deg, rgba(0, 194, 255, 0.2), rgba(0, 255, 224, 0.2));
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--accent);
-      font-size: 1.1rem;
-    }
-
-    .section-header h2 {
-      font-size: 1.15rem;
-      font-weight: 600;
-      color: #fff;
-    }
-
-    /* Data Value Explanation */
-    .value-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1rem;
-    }
-
-    .value-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 0.75rem;
-      padding: 1rem;
-      background: rgba(255, 255, 255, 0.02);
-      border-radius: 10px;
-      border: 1px solid var(--border-color);
-    }
-
-    .value-item i {
-      font-size: 1.25rem;
-      margin-top: 0.1rem;
-    }
-
-    .value-item.patterns i { color: var(--accent-purple); }
-    .value-item.feedback i { color: var(--success); }
-    .value-item.history i { color: var(--warning); }
-
-    .value-item h4 {
-      font-size: 0.95rem;
-      color: #fff;
-      margin-bottom: 0.25rem;
-    }
-
-    .value-item p {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-    }
-
-    .value-badge {
-      display: inline-block;
-      padding: 0.2rem 0.5rem;
-      background: rgba(168, 85, 247, 0.2);
-      color: var(--accent-purple);
-      border-radius: 4px;
-      font-size: 0.7rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      margin-left: 0.5rem;
-    }
-
-    /* Action Buttons */
-    .action-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      margin-top: 1rem;
-    }
-
-    .action-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.875rem 1.5rem;
-      border-radius: 10px;
-      font-weight: 600;
-      font-size: 0.95rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-decoration: none;
-      border: none;
-    }
-
-    .action-btn.primary {
-      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
-      color: #000;
-    }
-
-    .action-btn.primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 20px rgba(0, 194, 255, 0.4);
-    }
-
-    .action-btn.secondary {
-      background: rgba(0, 194, 255, 0.15);
-      color: var(--accent);
-      border: 1px solid rgba(0, 194, 255, 0.3);
-    }
-
-    .action-btn.secondary:hover {
-      background: rgba(0, 194, 255, 0.25);
-    }
-
-    .action-btn.success {
-      background: rgba(0, 255, 136, 0.15);
-      color: var(--success);
-      border: 1px solid rgba(0, 255, 136, 0.3);
-    }
-
-    .action-btn.success:hover {
-      background: rgba(0, 255, 136, 0.25);
-    }
-
-    .action-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none !important;
-    }
-
-    /* Backup List */
-    .backup-list {
-      margin-top: 1rem;
-    }
-
-    .backup-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1rem 1.25rem;
-      background: rgba(255, 255, 255, 0.02);
-      border-radius: 10px;
-      border: 1px solid var(--border-color);
-      margin-bottom: 0.75rem;
-      transition: all 0.3s ease;
-    }
-
-    .backup-item:hover {
-      border-color: rgba(0, 194, 255, 0.3);
-      background: rgba(0, 194, 255, 0.05);
-    }
-
-    .backup-info {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .backup-icon {
-      width: 44px;
-      height: 44px;
-      background: rgba(0, 194, 255, 0.15);
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--accent);
-      font-size: 1.1rem;
-    }
-
-    .backup-details h4 {
-      font-size: 0.95rem;
-      color: #fff;
-      margin-bottom: 0.25rem;
-    }
-
-    .backup-meta {
-      display: flex;
-      gap: 1rem;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-    }
-
-    .backup-meta span {
-      display: flex;
-      align-items: center;
-      gap: 0.35rem;
-    }
-
-    .backup-actions {
-      display: flex;
-      gap: 0.5rem;
-    }
-
-    .backup-actions .btn {
-      padding: 0.5rem 1rem;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-      border: none;
-    }
-
-    .backup-actions .btn.download {
-      background: rgba(0, 194, 255, 0.15);
-      color: var(--accent);
-    }
-
-    .backup-actions .btn.download:hover {
-      background: rgba(0, 194, 255, 0.25);
-    }
-
-    .backup-actions .btn.restore {
-      background: rgba(0, 255, 136, 0.15);
-      color: var(--success);
-    }
-
-    .backup-actions .btn.restore:hover {
-      background: rgba(0, 255, 136, 0.25);
-    }
-
-    .no-backups {
-      text-align: center;
-      padding: 2rem;
-      color: var(--text-muted);
-    }
-
-    .no-backups i {
-      font-size: 3rem;
-      margin-bottom: 1rem;
-      opacity: 0.5;
-    }
-
-    /* Recommendations */
-    .recommendations {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1rem;
-      margin-top: 1rem;
-    }
-
-    .recommendation {
-      display: flex;
-      align-items: flex-start;
-      gap: 0.75rem;
-      padding: 1rem;
-      background: rgba(255, 255, 255, 0.02);
-      border-radius: 10px;
-      border: 1px solid var(--border-color);
-    }
-
-    .recommendation-number {
-      width: 28px;
-      height: 28px;
-      background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #000;
-      font-weight: 700;
-      font-size: 0.85rem;
-      flex-shrink: 0;
-    }
-
-    .recommendation h4 {
-      font-size: 0.95rem;
-      color: #fff;
-      margin-bottom: 0.25rem;
-    }
-
-    .recommendation p {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-    }
-
-    /* Flash Messages */
-    .flash-messages {
-      margin-bottom: 1.5rem;
-    }
-
-    .flash-message {
-      padding: 1rem 1.25rem;
-      border-radius: 10px;
-      margin-bottom: 0.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    .flash-message.success {
-      background: rgba(0, 255, 136, 0.15);
-      border: 1px solid rgba(0, 255, 136, 0.3);
-      color: var(--success);
-    }
-
-    .flash-message.error {
-      background: rgba(255, 68, 68, 0.15);
-      border: 1px solid rgba(255, 68, 68, 0.3);
-      color: var(--error);
-    }
-
-    .flash-message.info {
-      background: rgba(0, 194, 255, 0.15);
-      border: 1px solid rgba(0, 194, 255, 0.3);
-      color: var(--accent);
-    }
-
-    /* Loading Spinner */
-    .loading {
-      display: none;
-      align-items: center;
-      gap: 0.5rem;
-      color: var(--text-muted);
-    }
-
-    .loading.active {
-      display: inline-flex;
-    }
-
-    .spinner {
-      width: 20px;
-      height: 20px;
-      border: 2px solid var(--border-color);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    /* Toast Notification */
-    .toast {
-      position: fixed;
-      bottom: 2rem;
-      right: 2rem;
-      padding: 1rem 1.5rem;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      transform: translateX(150%);
-      transition: transform 0.3s ease;
-      z-index: 1000;
-    }
-
-    .toast.show {
-      transform: translateX(0);
-    }
-
-    .toast.success {
-      background: rgba(0, 255, 136, 0.95);
-      color: #000;
-    }
-
-    .toast.error {
-      background: rgba(255, 68, 68, 0.95);
-      color: #fff;
-    }
-
-    /* Back to home */
-    .back-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: var(--text-muted);
-      text-decoration: none;
-      margin-bottom: 1.5rem;
-      font-size: 0.9rem;
-      transition: color 0.3s ease;
-    }
-
-    .back-link:hover {
-      color: var(--accent);
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <!-- Back Link -->
-    <a href="{{ url_for('home') }}" class="back-link">
-      <i class="fas fa-arrow-left"></i> Back to Home
-    </a>
-
-    <!-- Flash Messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <div class="flash-messages">
-          {% for category, message in messages %}
-            <div class="flash-message {{ category }}">
-              {% if category == 'success' %}
-                <i class="fas fa-check-circle"></i>
-              {% elif category == 'error' %}
-                <i class="fas fa-exclamation-circle"></i>
-              {% else %}
-                <i class="fas fa-info-circle"></i>
-              {% endif %}
-              {{ message }}
+{% extends "admin/base.html" %}
+
+{% block title %}Data Backup{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>🛡️ Data Backup & Protection</h1>
+  <p>Protect your AI's learning data from loss</p>
+</div>
+
+<!-- Warning Banner -->
+<div style="background: rgba(255, 170, 0, 0.15); border: 1px solid rgba(255, 170, 0, 0.3); border-radius: 12px; padding: 1.25rem; margin-bottom: 2rem; display: flex; align-items: center; gap: 1rem;">
+  <i class="fas fa-exclamation-triangle" style="font-size: 1.5rem; color: var(--warning);"></i>
+  <div>
+    <h3 style="color: var(--warning); font-size: 1rem; margin-bottom: 0.25rem;">⚠️ Render Free Tier Warning</h3>
+    <p style="color: var(--text-muted); font-size: 0.9rem;">Free PostgreSQL databases are deleted after 90 days of inactivity. Regular backups are essential!</p>
+  </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon" style="background: rgba(168, 85, 247, 0.15); color: var(--accent-purple);">
+      <i class="fas fa-brain"></i>
+    </div>
+    <div class="stat-label">Skill Patterns</div>
+    <div class="stat-value">{{ stats.total_patterns }}</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon" style="background: rgba(0, 255, 136, 0.15); color: var(--success);">
+      <i class="fas fa-comments"></i>
+    </div>
+    <div class="stat-label">User Feedback</div>
+    <div class="stat-value">{{ stats.total_feedback }}</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon" style="background: rgba(0, 194, 255, 0.15); color: var(--accent);">
+      <i class="fas fa-users"></i>
+    </div>
+    <div class="stat-label">Users</div>
+    <div class="stat-value">{{ stats.total_users }}</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon" style="background: rgba(255, 170, 0, 0.15); color: var(--warning);">
+      <i class="fas fa-file-alt"></i>
+    </div>
+    <div class="stat-label">Resume History</div>
+    <div class="stat-value">{{ stats.total_resumes }}</div>
+  </div>
+</div>
+
+<!-- Create Backup Section -->
+<div class="card">
+  <div class="card-header">
+    <h2><i class="fas fa-download"></i> Create Backup</h2>
+  </div>
+  <p style="color: var(--text-muted); margin-bottom: 1rem;">
+    Download a complete backup of all your data. JSON includes everything, CSV exports only skill patterns.
+  </p>
+  <div style="display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;">
+    <form action="{{ url_for('create_backup') }}" method="POST" style="display: inline;">
+      <input type="hidden" name="format" value="json">
+      <button type="submit" class="btn btn-primary" id="downloadJsonBtn">
+        <i class="fas fa-file-code"></i> Download JSON
+      </button>
+    </form>
+    <form action="{{ url_for('create_backup') }}" method="POST" style="display: inline;">
+      <input type="hidden" name="format" value="csv">
+      <button type="submit" class="btn btn-secondary" id="downloadCsvBtn">
+        <i class="fas fa-file-csv"></i> Download CSV (Patterns)
+      </button>
+    </form>
+    <button class="btn btn-success" id="saveServerBtn" onclick="saveToServer()">
+      <i class="fas fa-server"></i> Save to Server
+    </button>
+    <span style="display: none; align-items: center; gap: 0.5rem; color: var(--text-muted);" id="loadingIndicator">
+      <div style="width: 20px; height: 20px; border: 2px solid var(--border-color); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+      Processing...
+    </span>
+  </div>
+</div>
+
+<!-- Available Backups Section -->
+<div class="card">
+  <div class="card-header">
+    <h2><i class="fas fa-folder-open"></i> Available Backups</h2>
+  </div>
+  
+  {% if backups %}
+    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+      {% for backup in backups %}
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem; background: rgba(255, 255, 255, 0.02); border-radius: 10px; border: 1px solid var(--border-color); transition: all 0.3s ease;">
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <div style="width: 44px; height: 44px; background: rgba(0, 194, 255, 0.15); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 1.1rem;">
+              <i class="fas fa-file-archive"></i>
             </div>
-          {% endfor %}
-        </div>
-      {% endif %}
-    {% endwith %}
-
-    <!-- Page Header -->
-    <div class="page-header">
-      <div class="header-left">
-        <div class="header-icon">🛡️</div>
-        <div class="header-text">
-          <h1>Data Backup & Protection</h1>
-          <p>Protect your AI's learning data from loss</p>
-        </div>
-      </div>
-      <a href="{{ url_for('admin_logout') }}" class="logout-btn">
-        <i class="fas fa-sign-out-alt"></i> Logout
-      </a>
-    </div>
-
-    <!-- Warning Banner -->
-    <div class="warning-banner">
-      <i class="fas fa-exclamation-triangle"></i>
-      <div class="warning-content">
-        <h3>⚠️ Render Free Tier Warning</h3>
-        <p>Free PostgreSQL databases are deleted after 90 days of inactivity. Regular backups are essential!</p>
-      </div>
-    </div>
-
-    <!-- Stats Cards -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-icon patterns">
-          <i class="fas fa-brain"></i>
-        </div>
-        <div class="stat-label">Skill Patterns</div>
-        <div class="stat-value">{{ stats.total_patterns }}</div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-icon feedback">
-          <i class="fas fa-comments"></i>
-        </div>
-        <div class="stat-label">User Feedback</div>
-        <div class="stat-value">{{ stats.total_feedback }}</div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-icon users">
-          <i class="fas fa-users"></i>
-        </div>
-        <div class="stat-label">Users</div>
-        <div class="stat-value">{{ stats.total_users }}</div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-icon resumes">
-          <i class="fas fa-file-alt"></i>
-        </div>
-        <div class="stat-label">Resume History</div>
-        <div class="stat-value">{{ stats.total_resumes }}</div>
-      </div>
-    </div>
-
-    <!-- Data Value Explanation -->
-    <div class="section">
-      <div class="section-header">
-        <div class="section-icon"><i class="fas fa-gem"></i></div>
-        <h2>💎 Data Value Explanation</h2>
-      </div>
-      <div class="value-grid">
-        <div class="value-item patterns">
-          <i class="fas fa-brain"></i>
-          <div>
-            <h4>Skill Patterns <span class="value-badge">Most Valuable</span></h4>
-            <p>AI's learned knowledge from analyzing resumes. Each pattern represents skill-to-career correlations.</p>
-          </div>
-        </div>
-        <div class="value-item feedback">
-          <i class="fas fa-thumbs-up"></i>
-          <div>
-            <h4>User Feedback</h4>
-            <p>Every 👍/👎 improves prediction accuracy. This feedback trains the model to be smarter.</p>
-          </div>
-        </div>
-        <div class="value-item history">
-          <i class="fas fa-history"></i>
-          <div>
-            <h4>Resume History</h4>
-            <p>Usage patterns and user progress tracking. Helps understand career trends over time.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Create Backup Section -->
-    <div class="section">
-      <div class="section-header">
-        <div class="section-icon"><i class="fas fa-download"></i></div>
-        <h2>📥 Create Backup</h2>
-      </div>
-      <p style="color: var(--text-muted); margin-bottom: 1rem;">
-        Download a complete backup of all your data. JSON includes everything, CSV exports only skill patterns.
-      </p>
-      <div class="action-buttons">
-        <form action="{{ url_for('create_backup') }}" method="POST" style="display: inline;">
-          <input type="hidden" name="format" value="json">
-          <button type="submit" class="action-btn primary" id="downloadJsonBtn">
-            <i class="fas fa-file-code"></i> Download JSON
-          </button>
-        </form>
-        <form action="{{ url_for('create_backup') }}" method="POST" style="display: inline;">
-          <input type="hidden" name="format" value="csv">
-          <button type="submit" class="action-btn secondary" id="downloadCsvBtn">
-            <i class="fas fa-file-csv"></i> Download CSV (Patterns)
-          </button>
-        </form>
-        <button class="action-btn success" id="saveServerBtn" onclick="saveToServer()">
-          <i class="fas fa-server"></i> Save to Server
-        </button>
-        <span class="loading" id="loadingIndicator">
-          <div class="spinner"></div>
-          Processing...
-        </span>
-      </div>
-    </div>
-
-    <!-- Available Backups Section -->
-    <div class="section">
-      <div class="section-header">
-        <div class="section-icon"><i class="fas fa-folder-open"></i></div>
-        <h2>📂 Available Backups</h2>
-      </div>
-      
-      {% if backups %}
-        <div class="backup-list">
-          {% for backup in backups %}
-            <div class="backup-item">
-              <div class="backup-info">
-                <div class="backup-icon">
-                  <i class="fas fa-file-archive"></i>
-                </div>
-                <div class="backup-details">
-                  <h4>{{ backup.filename }}</h4>
-                  <div class="backup-meta">
-                    <span><i class="fas fa-weight-hanging"></i> {{ backup.size_kb }} KB</span>
-                    <span><i class="fas fa-brain"></i> {{ backup.patterns_count }} patterns</span>
-                    <span><i class="fas fa-clock"></i> {{ backup.created_at[:10] }}</span>
-                  </div>
-                </div>
-              </div>
-              <div class="backup-actions">
-                <a href="{{ url_for('download_backup', filename=backup.filename) }}" class="btn download">
-                  <i class="fas fa-download"></i> Download
-                </a>
-                <form action="{{ url_for('restore_backup', filename=backup.filename) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to restore from this backup? Existing data will be merged.');">
-                  <button type="submit" class="btn restore">
-                    <i class="fas fa-undo"></i> Restore
-                  </button>
-                </form>
+            <div>
+              <h4 style="font-size: 0.95rem; color: #fff; margin-bottom: 0.25rem;">{{ backup.filename }}</h4>
+              <div style="display: flex; gap: 1rem; font-size: 0.8rem; color: var(--text-muted);">
+                <span><i class="fas fa-weight-hanging"></i> {{ backup.size_kb }} KB</span>
+                <span><i class="fas fa-brain"></i> {{ backup.patterns_count }} patterns</span>
+                <span><i class="fas fa-clock"></i> {{ backup.created_at[:10] }}</span>
               </div>
             </div>
-          {% endfor %}
+          </div>
+          <div style="display: flex; gap: 0.5rem;">
+            <a href="{{ url_for('download_backup', filename=backup.filename) }}" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
+              <i class="fas fa-download"></i> Download
+            </a>
+            <form action="{{ url_for('restore_backup', filename=backup.filename) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to restore from this backup? Existing data will be merged.');">
+              <button type="submit" class="btn btn-success" style="padding: 0.5rem 1rem;">
+                <i class="fas fa-undo"></i> Restore
+              </button>
+            </form>
+          </div>
         </div>
-      {% else %}
-        <div class="no-backups">
-          <i class="fas fa-inbox"></i>
-          <p>No backups saved on server yet. Use "Save to Server" to create your first backup.</p>
-        </div>
-      {% endif %}
+      {% endfor %}
     </div>
+  {% else %}
+    <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+      <i class="fas fa-inbox" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+      <p>No backups saved on server yet. Use "Save to Server" to create your first backup.</p>
+    </div>
+  {% endif %}
+</div>
 
-    <!-- Recommendations Section -->
-    <div class="section">
-      <div class="section-header">
-        <div class="section-icon"><i class="fas fa-lightbulb"></i></div>
-        <h2>💡 Recommendations</h2>
+<!-- Recommendations Section -->
+<div class="card">
+  <div class="card-header">
+    <h2><i class="fas fa-lightbulb"></i> Recommendations</h2>
+  </div>
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
+    <div style="display: flex; align-items: flex-start; gap: 0.75rem; padding: 1rem; background: rgba(255, 255, 255, 0.02); border-radius: 10px; border: 1px solid var(--border-color);">
+      <div style="width: 28px; height: 28px; background: linear-gradient(135deg, var(--accent), var(--accent-secondary)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #000; font-weight: 700; font-size: 0.85rem; flex-shrink: 0;">1</div>
+      <div>
+        <h4 style="font-size: 0.95rem; color: #fff; margin-bottom: 0.25rem;">Weekly Backups</h4>
+        <p style="font-size: 0.85rem; color: var(--text-muted);">Download a backup every Sunday to ensure you never lose more than a week of learning data.</p>
       </div>
-      <div class="recommendations">
-        <div class="recommendation">
-          <div class="recommendation-number">1</div>
-          <div>
-            <h4>Weekly Backups</h4>
-            <p>Download a backup every Sunday to ensure you never lose more than a week of learning data.</p>
-          </div>
-        </div>
-        <div class="recommendation">
-          <div class="recommendation-number">2</div>
-          <div>
-            <h4>Upgrade to Render Starter</h4>
-            <p>For $7/month, get a persistent database with no 90-day deletion policy.</p>
-          </div>
-        </div>
-        <div class="recommendation">
-          <div class="recommendation-number">3</div>
-          <div>
-            <h4>Store Backups Safely</h4>
-            <p>Keep downloaded backups in a private cloud storage (Google Drive, Dropbox) for extra safety.</p>
-          </div>
-        </div>
+    </div>
+    <div style="display: flex; align-items: flex-start; gap: 0.75rem; padding: 1rem; background: rgba(255, 255, 255, 0.02); border-radius: 10px; border: 1px solid var(--border-color);">
+      <div style="width: 28px; height: 28px; background: linear-gradient(135deg, var(--accent), var(--accent-secondary)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #000; font-weight: 700; font-size: 0.85rem; flex-shrink: 0;">2</div>
+      <div>
+        <h4 style="font-size: 0.95rem; color: #fff; margin-bottom: 0.25rem;">Upgrade to Render Starter</h4>
+        <p style="font-size: 0.85rem; color: var(--text-muted);">For $7/month, get a persistent database with no 90-day deletion policy.</p>
+      </div>
+    </div>
+    <div style="display: flex; align-items: flex-start; gap: 0.75rem; padding: 1rem; background: rgba(255, 255, 255, 0.02); border-radius: 10px; border: 1px solid var(--border-color);">
+      <div style="width: 28px; height: 28px; background: linear-gradient(135deg, var(--accent), var(--accent-secondary)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #000; font-weight: 700; font-size: 0.85rem; flex-shrink: 0;">3</div>
+      <div>
+        <h4 style="font-size: 0.95rem; color: #fff; margin-bottom: 0.25rem;">Store Backups Safely</h4>
+        <p style="font-size: 0.85rem; color: var(--text-muted);">Keep downloaded backups in a private cloud storage (Google Drive, Dropbox) for extra safety.</p>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Toast Notification -->
-  <div class="toast" id="toast">
-    <i class="fas fa-check-circle"></i>
-    <span id="toastMessage">Success!</span>
-  </div>
+<style>
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+</style>
 
-  <script>
-    // Save backup to server
-    function saveToServer() {
-      const btn = document.getElementById('saveServerBtn');
-      const loading = document.getElementById('loadingIndicator');
-      
-      btn.disabled = true;
-      loading.classList.add('active');
-      
-      fetch('{{ url_for("api_save_backup") }}', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          showToast('Backup saved successfully!', 'success');
-          setTimeout(() => location.reload(), 1500);
-        } else {
-          showToast(data.error || 'Failed to save backup', 'error');
-        }
-      })
-      .catch(error => {
-        showToast('Error: ' + error.message, 'error');
-      })
-      .finally(() => {
-        btn.disabled = false;
-        loading.classList.remove('active');
-      });
-    }
-
-    // Show toast notification
-    function showToast(message, type = 'success') {
-      const toast = document.getElementById('toast');
-      const toastMessage = document.getElementById('toastMessage');
-      
-      toast.className = 'toast ' + type;
-      toastMessage.textContent = message;
-      toast.classList.add('show');
-      
-      setTimeout(() => {
-        toast.classList.remove('show');
-      }, 3000);
-    }
-  </script>
-</body>
-</html>
+<script>
+  // Save backup to server
+  function saveToServer() {
+    const btn = document.getElementById('saveServerBtn');
+    const loading = document.getElementById('loadingIndicator');
+    
+    btn.disabled = true;
+    loading.style.display = 'inline-flex';
+    
+    fetch('{{ url_for("api_save_backup") }}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert('✅ Backup saved successfully!');
+        setTimeout(() => location.reload(), 1000);
+      } else {
+        alert('❌ Failed to save backup: ' + (data.error || 'Unknown error'));
+      }
+    })
+    .catch(error => {
+      alert('❌ Error: ' + error.message);
+    })
+    .finally(() => {
+      btn.disabled = false;
+      loading.style.display = 'none';
+    });
+  }
+</script>
+{% endblock %}

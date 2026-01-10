@@ -1,0 +1,174 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Feedback Management{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>💬 Feedback Management</h1>
+  <p>Review and analyze user feedback</p>
+</div>
+
+<!-- Feedback Stats -->
+<div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+  <div class="stat-card">
+    <div class="stat-icon" style="background: rgba(0, 194, 255, 0.15); color: var(--accent);">
+      <i class="fas fa-comments"></i>
+    </div>
+    <div class="stat-label">Total Feedback</div>
+    <div class="stat-value">{{ total }}</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon" style="background: rgba(0, 255, 136, 0.15); color: var(--success);">
+      <i class="fas fa-thumbs-up"></i>
+    </div>
+    <div class="stat-label">Positive</div>
+    <div class="stat-value">{{ positive }}</div>
+    {% if total > 0 %}
+      <div style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-muted);">
+        {{ (positive / total * 100) | round(1) }}%
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon" style="background: rgba(255, 68, 68, 0.15); color: var(--error);">
+      <i class="fas fa-thumbs-down"></i>
+    </div>
+    <div class="stat-label">Negative</div>
+    <div class="stat-value">{{ negative }}</div>
+    {% if total > 0 %}
+      <div style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-muted);">
+        {{ (negative / total * 100) | round(1) }}%
+      </div>
+    {% endif %}
+  </div>
+
+  {% if total > 0 %}
+  <div class="stat-card">
+    <div class="stat-icon" style="background: rgba(168, 85, 247, 0.15); color: var(--accent-purple);">
+      <i class="fas fa-percentage"></i>
+    </div>
+    <div class="stat-label">Accuracy Rate</div>
+    <div class="stat-value">{{ (positive / total * 100) | round(1) }}%</div>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Filter Options -->
+<div style="display: flex; gap: 0.75rem; margin-bottom: 1.5rem;">
+  <a href="{{ url_for('admin_feedback') }}" class="btn {% if not filter_type %}btn-primary{% else %}btn-secondary{% endif %}">
+    All
+  </a>
+  <a href="{{ url_for('admin_feedback', type='positive') }}" class="btn {% if filter_type == 'positive' %}btn-success{% else %}btn-secondary{% endif %}">
+    <i class="fas fa-thumbs-up"></i> Positive
+  </a>
+  <a href="{{ url_for('admin_feedback', type='negative') }}" class="btn {% if filter_type == 'negative' %}btn-danger{% else %}btn-secondary{% endif %}">
+    <i class="fas fa-thumbs-down"></i> Negative
+  </a>
+</div>
+
+<!-- Feedback List -->
+<div class="card">
+  <div class="card-header">
+    <h2><i class="fas fa-list"></i> Feedback Entries ({{ feedbacks.total }})</h2>
+  </div>
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>User</th>
+          <th>Predicted Career</th>
+          <th>Correct Career</th>
+          <th>Comments</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for feedback in feedbacks.items %}
+          <tr>
+            <td>
+              {% if feedback.feedback_type == 'positive' %}
+                <span class="badge badge-success"><i class="fas fa-thumbs-up"></i> Positive</span>
+              {% elif feedback.feedback_type == 'negative' %}
+                <span class="badge badge-error"><i class="fas fa-thumbs-down"></i> Negative</span>
+              {% else %}
+                <span class="badge badge-info">{{ feedback.feedback_type }}</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if feedback.user %}
+                <a href="{{ url_for('admin_user_detail', user_id=feedback.user_id) }}" style="color: var(--accent); text-decoration: none;">
+                  {{ feedback.user.username }}
+                </a>
+              {% else %}
+                <span style="color: var(--text-muted);">Unknown</span>
+              {% endif %}
+            </td>
+            <td style="color: var(--text-muted); font-size: 0.85rem;">
+              {{ feedback.predicted_career or 'N/A' }}
+            </td>
+            <td style="font-size: 0.85rem;">
+              {% if feedback.correct_career %}
+                <span style="color: var(--warning); font-weight: 500;">{{ feedback.correct_career }}</span>
+              {% else %}
+                <span style="color: var(--text-muted);">N/A</span>
+              {% endif %}
+            </td>
+            <td style="color: var(--text-muted); font-size: 0.85rem; max-width: 300px;">
+              {% if feedback.comments %}
+                {{ feedback.comments[:100] }}{% if feedback.comments|length > 100 %}...{% endif %}
+              {% else %}
+                <span style="color: var(--text-muted);">No comments</span>
+              {% endif %}
+            </td>
+            <td style="color: var(--text-muted); font-size: 0.85rem;">
+              {{ feedback.created_at.strftime('%Y-%m-%d %H:%M') if feedback.created_at else 'N/A' }}
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+              {% if filter_type %}
+                No {{ filter_type }} feedback found
+              {% else %}
+                No feedback received yet
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  {% if feedbacks.pages > 1 %}
+    <div class="pagination">
+      {% if feedbacks.has_prev %}
+        <a href="{{ url_for('admin_feedback', page=feedbacks.prev_num, type=filter_type) }}">
+          <i class="fas fa-chevron-left"></i>
+        </a>
+      {% endif %}
+
+      {% for page_num in feedbacks.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+        {% if page_num %}
+          {% if page_num == feedbacks.page %}
+            <span class="active">{{ page_num }}</span>
+          {% else %}
+            <a href="{{ url_for('admin_feedback', page=page_num, type=filter_type) }}">{{ page_num }}</a>
+          {% endif %}
+        {% else %}
+          <span>...</span>
+        {% endif %}
+      {% endfor %}
+
+      {% if feedbacks.has_next %}
+        <a href="{{ url_for('admin_feedback', page=feedbacks.next_num, type=filter_type) }}">
+          <i class="fas fa-chevron-right"></i>
+        </a>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
