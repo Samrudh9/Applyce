@@ -52,3 +52,118 @@ Skills,Interests,Career,Description
 "Market Research, Consumer Insights, Data Analysis, Competitive Analysis","Market Intelligence, Strategic Planning",Market Research Analyst,Conducts market research and analyzes consumer data to inform marketing strategies and business decisions.
 "Risk Management, Compliance, Regulatory Affairs, Internal Controls","Risk Assessment, Governance",Risk Manager,Identifies and mitigates organizational risks while ensuring compliance with regulatory requirements.
 "Treasury Management, Cash Flow, Banking Relationships, Investments","Corporate Finance, Liquidity Management",Treasury Analyst,"Manages corporate treasury functions including cash flow, banking relationships, and investment strategies."
+"AWS, EC2, S3, Lambda, CloudFormation","Cloud Architecture, Infrastructure Design",Cloud Architect,Designs and implements scalable cloud infrastructure solutions using AWS and other cloud platforms.
+"Kubernetes, Docker, Prometheus, Grafana, CI/CD","Site Reliability, System Performance",Site Reliability Engineer,Ensures system reliability and performance through automation and monitoring.
+"Spark, Kafka, Airflow, Python, SQL","Data Pipeline, ETL",Data Engineer,Builds and maintains data pipelines and infrastructure for analytics and machine learning.
+"Kubernetes, Docker, Terraform, Helm, ArgoCD","MLOps, Model Deployment",MLOps Engineer,Manages machine learning model deployment and infrastructure in production environments.
+"Kubernetes, Docker, Terraform, CI/CD, Monitoring","Platform Engineering, Infrastructure",Platform Engineer,Builds and maintains internal platforms and developer tooling for engineering teams.
+"Penetration Testing, SIEM, Vulnerability Assessment, Python","Security, Ethical Hacking",Security Engineer,Identifies and fixes security vulnerabilities in systems and applications.
+"Product Strategy, Roadmap, Agile, User Research","Product Development, Strategy",Product Manager,Defines product strategy and roadmap based on user needs and business goals.
+"Scrum, Agile, Jira, Facilitation, Coaching","Team Management, Agile Methodology",Scrum Master,Facilitates Scrum processes and removes impediments for development teams.
+"Technical Writing, Documentation, API, Markdown","Communication, Documentation",Technical Writer,Creates clear technical documentation for products and APIs.
+"SQL, Power BI, Tableau, Business Analysis","Analytics, Reporting",Business Intelligence Analyst,Analyzes business data and creates reports to support decision-making.
+"Prompt Engineering, GPT, ChatGPT, LangChain","AI, Natural Language",AI Prompt Engineer,Designs and optimizes prompts for large language models to achieve desired outputs.
+"Solidity, Ethereum, Web3, Smart Contracts","Blockchain, Decentralization",Blockchain Developer,Develops decentralized applications and smart contracts on blockchain platforms.
+"IoT, Embedded Systems, MQTT, Arduino, Raspberry Pi","Hardware, Connectivity",IoT Engineer,Designs and implements Internet of Things solutions connecting physical devices.
+"Azure, AKS, Functions, DevOps, ARM Templates","Cloud Services, Microsoft Azure",Azure Cloud Engineer,Implements and manages cloud solutions on Microsoft Azure platform.
+"GCP, Kubernetes Engine, Cloud Functions, BigQuery","Google Cloud, Data Analytics",GCP Cloud Engineer,Develops and deploys applications on Google Cloud Platform.
+"Terraform, Ansible, Puppet, Chef, Infrastructure as Code","Automation, Configuration Management",Infrastructure Automation Engineer,Automates infrastructure provisioning and configuration management.
+"Datadog, New Relic, Prometheus, Grafana, Monitoring","Observability, Performance",Observability Engineer,Implements monitoring and observability solutions for distributed systems.
+"CircleCI, GitHub Actions, GitLab CI, Jenkins","CI/CD, Build Automation",CI/CD Engineer,Designs and maintains continuous integration and deployment pipelines.
+"PyTorch, TensorFlow, Keras, Computer Vision, NLP","Deep Learning, Research",Deep Learning Engineer,Develops and trains deep neural networks for various AI applications.
+"Hugging Face, LangChain, OpenAI API, Vector Databases","LLM, Generative AI",LLM Engineer,Builds applications using large language models and generative AI technologies.
+"scikit-learn, XGBoost, Feature Engineering, Model Tuning","Machine Learning, Optimization",ML Research Engineer,Researches and develops novel machine learning algorithms and techniques.
+"MLflow, Kubeflow, Model Registry, A/B Testing","Model Management, Experimentation",ML Platform Engineer,Builds platforms for training and deploying machine learning models at scale.
+"RAG, Fine-tuning, Prompt Engineering, Vector Search","AI Applications, Retrieval",AI Application Engineer,Develops retrieval-augmented generation and fine-tuned AI applications.
+"Apache Spark, Databricks, PySpark, Scala","Big Data Processing, Analytics",Big Data Engineer,Processes and analyzes large-scale datasets using distributed computing frameworks.
+"dbt, Snowflake, Data Modeling, SQL, Analytics","Data Transformation, Warehousing",Analytics Engineer,Transforms raw data into analytics-ready datasets using modern data stack.
+"Kafka, Event Streaming, Real-time Processing","Data Streaming, Event-Driven",Streaming Data Engineer,Builds real-time data streaming and processing pipelines.
+"Airflow, Prefect, Dagster, Python, Scheduling","Workflow Orchestration, Automation",Data Pipeline Engineer,Orchestrates complex data workflows and batch processing jobs.
+"BigQuery, Redshift, Snowflake, SQL, Data Warehousing","Cloud Data Platforms, Analytics",Cloud Data Engineer,Designs and implements cloud-based data warehousing solutions.
+"OWASP, Burp Suite, Metasploit, Nmap, Security Testing","Application Security, Testing",Application Security Engineer,Tests applications for security vulnerabilities and implements security best practices.
+"SOC, Incident Response, SIEM, Threat Hunting","Security Operations, Monitoring",Security Operations Analyst,Monitors and responds to security incidents and threats.
+"Wireshark, Network Security, Firewall, IDS/IPS","Network Protection, Analysis",Network Security Engineer,Secures network infrastructure and analyzes network traffic for threats.
+"GRC, Compliance, Risk Assessment, Security Policies","Governance, Regulatory",Security Compliance Analyst,Ensures organizational compliance with security standards and regulations.
+"Threat Intelligence, Forensics, Malware Analysis","Security Research, Investigation",Cyber Threat Analyst,Analyzes cyber threats and provides intelligence to prevent attacks.
+"Next.js, React, TypeScript, Tailwind CSS","Modern Web, Performance",Frontend Engineer,Builds high-performance web applications using modern JavaScript frameworks.
+"Nuxt.js, Vue, Composition API, Pinia","Vue Ecosystem, SPA",Vue.js Developer,Develops single-page applications using Vue.js and its ecosystem.
+"Svelte, SvelteKit, Reactive Programming","Lightweight Frameworks, Performance",Svelte Developer,Creates fast web applications using Svelte's reactive paradigm.
+"Three.js, WebGL, Canvas, 3D Graphics","3D Web, Visualization",WebGL Developer,Develops interactive 3D graphics and visualizations for the web.
+"Tailwind CSS, Styled Components, CSS-in-JS, Design Systems","Styling, Component Design",UI Engineer,Implements user interfaces with modern CSS frameworks and methodologies.
+"FastAPI, Python, Async, Pydantic, REST APIs","High-Performance APIs, Python",FastAPI Developer,Builds fast and modern APIs using FastAPI framework.
+"NestJS, Node.js, TypeScript, Microservices","Enterprise Applications, Node",NestJS Developer,Develops scalable server-side applications with NestJS framework.
+"Rust, Actix, Performance, Systems Programming","Low-Level, High Performance",Rust Backend Developer,Builds high-performance backend services using Rust programming language.
+"Go, Gin, Goroutines, Microservices","Concurrent Systems, Cloud Native",Go Developer,Develops efficient concurrent applications and microservices with Go.
+"gRPC, Protocol Buffers, Microservices, APIs","RPC, Distributed Systems",gRPC Developer,Implements high-performance RPC services using gRPC and Protocol Buffers.
+"GraphQL, Apollo, Schema Design, Resolvers","API Design, Data Fetching",GraphQL Developer,Designs and implements GraphQL APIs for efficient data querying.
+"Event Sourcing, CQRS, Domain-Driven Design","Architecture Patterns, Complex Systems",Event-Driven Architect,Designs systems using event sourcing and CQRS architectural patterns.
+"SwiftUI, iOS, Combine, Swift","Apple Development, Mobile",iOS Developer,Develops native iOS applications using Swift and SwiftUI.
+"Jetpack Compose, Kotlin, Android, Material Design","Android Development, Modern UI",Android Developer,Creates Android applications using Kotlin and Jetpack Compose.
+"React Native, Expo, JavaScript, Cross-Platform","Mobile Development, React",React Native Developer,Builds cross-platform mobile applications with React Native.
+"Flutter, Dart, Cross-Platform, Material Design","Mobile Apps, UI",Flutter Developer,Develops beautiful cross-platform mobile applications using Flutter.
+"Capacitor, Ionic, Web Technologies, Hybrid Apps","Cross-Platform, Web to Mobile",Hybrid Mobile Developer,Creates hybrid mobile applications using web technologies.
+"Stakeholder Management, Communication, Requirements","Business Relations, Coordination",Technical Product Manager,Manages technical products while communicating with stakeholders and development teams.
+"Cross-functional Collaboration, Agile, Team Coordination","Collaboration, Project Delivery",Agile Coach,Coaches teams on agile methodologies and facilitates organizational transformation.
+"Technical Documentation, API Docs, Developer Experience","Writing, Technical Communication",Developer Advocate,Creates content and documentation to improve developer experience with products.
+"Mentoring, Code Review, Technical Leadership","Coaching, Knowledge Sharing",Engineering Mentor,Mentors junior developers and provides technical guidance to teams.
+"OKR Setting, Performance Management, Goal Alignment","Strategy, Metrics",Engineering Manager,Manages engineering teams and aligns work with organizational objectives.
+"REST, GraphQL, API Design, Documentation","API Development, Integration",API Developer,Designs and implements APIs for application integration.
+"Microservices, Docker, Service Mesh, Distributed Systems","Architecture, Scalability",Microservices Architect,Designs and implements microservices-based architectures.
+"Solution Design, Enterprise Architecture, Technology Strategy","Architecture, Planning",Solutions Architect,Designs comprehensive technical solutions for enterprise clients.
+"System Design, Scalability, Performance, High Availability","Large-Scale Systems, Infrastructure",Systems Architect,Designs large-scale distributed systems and infrastructure.
+"Design Patterns, Code Quality, Technical Decisions","Software Design, Best Practices",Software Architect,Defines software architecture and ensures adherence to design principles.
+"TDD, BDD, Selenium, Test Automation","Quality Assurance, Testing",QA Automation Engineer,Develops and maintains automated test suites for software quality.
+"Performance Testing, Load Testing, JMeter, Gatling","Testing, Optimization",Performance Test Engineer,Conducts performance and load testing to ensure system scalability.
+"Mobile Testing, Appium, XCTest, Espresso","Mobile QA, Automation",Mobile QA Engineer,Tests mobile applications for functionality and quality across platforms.
+"Security Testing, Penetration Testing, OWASP","Security QA, Vulnerability Testing",Security QA Engineer,Performs security testing and vulnerability assessments on applications.
+"Accessibility, WCAG, Screen Readers, Inclusive Design","Web Accessibility, Compliance",Accessibility Engineer,Ensures digital products are accessible to users with disabilities.
+"Game Development, Unity, C#, Game Design","Gaming, Interactive Media",Game Developer,Develops video games using game engines and programming.
+"Unreal Engine, C++, 3D Graphics, Blueprint","AAA Games, Real-time Rendering",Unreal Engine Developer,Creates high-fidelity games and simulations using Unreal Engine.
+"AR, VR, Unity, Spatial Computing","Extended Reality, Immersive Tech",AR/VR Developer,Develops augmented and virtual reality experiences.
+"Computer Vision, OpenCV, Image Processing, Deep Learning","Visual AI, Pattern Recognition",Computer Vision Engineer,Develops systems that can understand and analyze visual information.
+"NLP, Transformers, BERT, Text Processing","Language AI, Text Analysis",NLP Engineer,Builds natural language processing systems for text understanding.
+"Speech Recognition, TTS, Audio Processing","Voice AI, Speech Technology",Speech Recognition Engineer,Develops speech recognition and synthesis systems.
+"Recommender Systems, Collaborative Filtering, Personalization","ML Applications, User Experience",Recommendation Systems Engineer,Builds recommendation engines for personalized user experiences.
+"Time Series, Forecasting, Statistical Models","Predictive Analytics, Trend Analysis",Time Series Analyst,Analyzes time series data and builds forecasting models.
+"A/B Testing, Experimentation, Statistics, Data Analysis","Product Analytics, Optimization",Experimentation Engineer,Designs and analyzes experiments to optimize product features.
+"ETL, Data Integration, APIs, Data Quality","Data Management, Integration",Data Integration Engineer,Integrates data from various sources into unified systems.
+"Data Governance, Data Quality, Metadata Management","Data Management, Compliance",Data Governance Analyst,Ensures data quality and compliance with governance policies.
+"Master Data, Data Stewardship, Data Standards","Data Management, Quality",Master Data Analyst,Manages master data across the organization ensuring consistency.
+"BI Tools, Dashboards, Reporting, Visualization","Business Intelligence, Analytics",BI Developer,Creates business intelligence reports and dashboards for stakeholders.
+"Looker, LookML, Data Modeling, Visualization","Analytics Platform, Reporting",Looker Developer,Develops data models and visualizations using Looker platform.
+"Tableau, Data Visualization, Dashboard Design","Visual Analytics, Reporting",Tableau Developer,Creates interactive dashboards and visualizations using Tableau.
+"Power BI, DAX, M Query, Microsoft Stack","Microsoft BI, Analytics",Power BI Developer,Develops business intelligence solutions using Microsoft Power BI.
+"Data Science, Statistics, Python, R, ML","Research, Analytics",Research Scientist,Conducts research and develops new analytical methods and algorithms.
+"Quantitative Analysis, Financial Modeling, Trading Algorithms","Finance, Trading",Quantitative Analyst,Develops mathematical models for financial trading and risk management.
+"Bioinformatics, Genomics, Python, R, Statistics","Life Sciences, Computational Biology",Bioinformatics Engineer,Applies computational methods to biological and genetic data.
+"GIS, Spatial Analysis, Mapping, Remote Sensing","Geographic Information, Mapping",GIS Analyst,Analyzes geographic and spatial data for various applications.
+"Climate Data, Environmental Modeling, Python, R","Sustainability, Climate Science",Climate Data Scientist,Analyzes climate and environmental data to support sustainability initiatives.
+"Healthcare Analytics, Clinical Data, HIPAA, SQL","Healthcare, Medical Data",Healthcare Data Analyst,Analyzes healthcare data while ensuring compliance with regulations.
+"Sales Analytics, CRM, Forecasting, Reporting","Sales Operations, Analytics",Sales Operations Analyst,Analyzes sales data and optimizes sales processes and strategies.
+"Marketing Analytics, Attribution, Customer Journey","Marketing, Data Analysis",Marketing Analytics Manager,Analyzes marketing performance and optimizes campaigns using data.
+"Customer Data, Segmentation, Personalization, Analytics","Customer Insights, Targeting",Customer Analytics Analyst,Analyzes customer behavior and develops segmentation strategies.
+"Product Analytics, User Behavior, Metrics, A/B Testing","Product Management, Data",Product Analyst,Analyzes product usage and provides insights for product development.
+"Growth Hacking, Experimentation, Analytics, Marketing","Growth Strategy, Optimization",Growth Analyst,Analyzes growth metrics and experiments to drive user acquisition.
+"Pricing Strategy, Revenue Optimization, Analytics","Pricing, Revenue Management",Pricing Analyst,Develops pricing strategies and analyzes revenue optimization opportunities.
+"Operations Analytics, Process Optimization, Efficiency","Operations, Data Analysis",Operations Analyst,Analyzes operational data to improve efficiency and reduce costs.
+"Financial Planning, FP&A, Modeling, Forecasting","Finance, Strategic Planning",FP&A Analyst,Conducts financial planning and analysis to support business decisions.
+"Fraud Detection, Pattern Recognition, ML, Analytics","Security, Risk Management",Fraud Analyst,Detects and prevents fraudulent activities using data analysis.
+"Credit Risk, Underwriting, Scoring Models, Analytics","Finance, Risk Assessment",Credit Risk Analyst,Assesses credit risk and develops scoring models for lending decisions.
+"DevSecOps, Security Automation, Container Security","Security, DevOps Integration",DevSecOps Engineer,Integrates security practices into DevOps workflows and automation.
+"Robotics, ROS, Control Systems, Embedded Systems","Automation, Robotics",Robotics Engineer,Designs and programs robotic systems for automation applications.
+"Embedded Systems, C, Microcontrollers, Firmware","Hardware, Low-Level Programming",Embedded Systems Engineer,Develops software for embedded systems and microcontrollers.
+"Automation Testing, RPA, Process Automation","Test Automation, Efficiency",Test Automation Architect,Designs comprehensive test automation strategies and frameworks.
+"Release Management, Deployment, Change Management","Software Delivery, Operations",Release Manager,Manages software release processes and coordinates deployments.
+"Technical Support, Troubleshooting, Customer Service","Support, Problem Solving",Technical Support Engineer,Provides technical assistance and troubleshooting for software products.
+"Customer Success, Onboarding, Account Management","Client Relations, Support",Customer Success Manager,Ensures customer satisfaction and drives product adoption.
+"Solutions Engineering, Pre-sales, Technical Demos","Sales Support, Technical",Solutions Engineer,Provides technical expertise during sales process and demos products.
+"Sales Engineering, Technical Sales, Product Knowledge","Sales, Technical Communication",Sales Engineer,Combines technical knowledge with sales skills to close deals.
+"Partner Management, Ecosystem, Business Development","Partnerships, Strategy",Partner Manager,Manages partner relationships and develops partner ecosystem.
+"Developer Relations, Community, Advocacy","Community Building, Engagement",Developer Relations Manager,Builds and engages developer communities around products.
+"Open Source, Community Management, Contribution","Open Source, Collaboration",Open Source Program Manager,Manages open source initiatives and community contributions.
+"Technical Recruiting, Talent Acquisition, Interviewing","Recruiting, HR Tech",Technical Recruiter,Recruits technical talent for engineering and technology positions.
+"Engineering Management, Team Leadership, Strategy","Management, Leadership",VP of Engineering,Leads engineering organization and defines technical strategy.
+"Technical Strategy, Innovation, Technology Leadership","Strategy, Innovation",CTO (Chief Technology Officer),Defines technology vision and strategy for the organization.
+"Data Strategy, Analytics Leadership, Data Science","Data, Leadership",Chief Data Officer,Leads data strategy and analytics initiatives across the organization.
+"Information Security, Security Strategy, Risk Management","Security, Leadership",CISO (Chief Information Security Officer),Leads information security strategy and risk management.
+"Product Vision, Strategy, Product Portfolio","Product Leadership, Strategy",Chief Product Officer,Defines product vision and manages product portfolio strategy.
