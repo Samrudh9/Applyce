@@ -640,6 +640,23 @@ def dashboard():
             except Exception as e:
                 logging.warning(f"Roadmap calculation error: {e}")
     
+    # Fetch matching jobs based on user's predicted career
+    matching_jobs = []
+    if top_career:
+        try:
+            # Fetch jobs matching the user's career
+            jobs = job_service.search_jobs(
+                career=top_career,
+                location="India",
+                user_skills=list(all_skills),
+                limit=20
+            )
+            matching_jobs = jobs[:5]  # Top 5 jobs for dashboard
+            logger.info(f"Fetched {len(matching_jobs)} matching jobs for {top_career}")
+        except Exception as e:
+            logger.warning(f"Failed to fetch matching jobs: {e}")
+            matching_jobs = []
+    
     return render_template('dashboard.html',
         user=current_user,
         history=history,
@@ -655,7 +672,8 @@ def dashboard():
         career_confidence=career_confidence,
         missing_skills=missing_skills,
         roadmap_data=roadmap_data,
-        roadmap_progress=roadmap_progress
+        roadmap_progress=roadmap_progress,
+        matching_jobs=matching_jobs
     )
 
 
