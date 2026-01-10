@@ -10,7 +10,8 @@ db = SQLAlchemy()
 from models.user import User
 from models.resume import Resume, ResumeVersion
 from models.feedback import Feedback
-from models.career import Career
+from models.career import Caree
+from models.admin import Admin
 from models.skill_pattern import SkillPattern
 from models.resume_history import ResumeHistory
 from models.user_preferences import UserPreferences

@@ -1957,40 +1957,64 @@ def admin_required(f):
 
 
 def init_db():
-    with app.app_context():
-        db.create_all()
-        create_default_admins()  # Create default admins
-        logger.info("✅ Database ready with admin users!")
+    """Initialize database and create tables with auto-migration"""
+    try:
+        with app.app_context():
+            # First, check and add missing columns to existing tables
+            columns_added = auto_migrate_db()
+            
+            if columns_added:
+                logger. info(f"🔄 Auto-migration completed.  Added columns: {columns_added}")
+            
+            # Create any new tables
+            db.create_all()
+            logger.info("✅ Database tables created/verified!")
+            
+            # Create default admin users
+            from models.admin import create_default_admins
+            create_default_admins()
+            logger.info("✅ Admin users created/verified!")
+            
+            logger.info("✅ Database ready!")
+    except Exception as e: 
+        logger.error(f"⚠️ Database setup error: {e}")
 
 # Update admin login route:
-@app. route('/admin/login', methods=['GET', 'POST'])
+@app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
     """Admin login with database authentication"""
+    from models.admin import Admin
+    
     if session.get('admin_authenticated'):
-        return redirect(url_for('admin_dashboard'))
+        return redirect(url_for('admin_backup_page'))
     
     error = None
-    if request.method == 'POST': 
+    if request.method == 'POST':
         admin_id = request.form.get('admin_id', '').strip()
         admin_password = request.form.get('admin_password', '')
+        
+        print(f"🔐 Login attempt: {admin_id}")  # Debug
         
         # Check database for admin
         admin = Admin.query.filter_by(username=admin_id, is_active=True).first()
         
+        print(f"🔍 Found admin: {admin}")  # Debug
+        
         if admin and admin.check_password(admin_password):
             session['admin_authenticated'] = True
-            session['admin_username'] = admin. username
+            session['admin_username'] = admin.username
             session['admin_role'] = admin.role
             
             # Update last login
             admin.last_login = datetime.utcnow()
-            db.session.commit()
+            db.session. commit()
             
-            logger.info(f"Admin login:  {admin.username} ({admin.role})")
-            return redirect(url_for('admin_dashboard'))
+            print(f"✅ Admin login successful:  {admin.username}")
+            flash(f'Welcome, {admin.username}! ', 'success')
+            return redirect(url_for('admin_backup_page'))
         else:
             error = 'Invalid admin credentials'
-            logger.warning(f"Failed admin login:  {admin_id}")
+            print(f"❌ Admin login failed for: {admin_id}")
     
     return render_template('admin/login.html', error=error)
 
@@ -2000,6 +2024,25 @@ def admin_logout():
     session.pop('admin_authenticated', None)
     flash('Logged out from admin panel.', 'info')
     return redirect(url_for('home'))
+
+
+@app.route('/debug-admins')
+def debug_admins():
+    """Debug:  Check if admin users exist"""
+    from models.admin import Admin
+    
+    try:
+        admins = Admin.query.all()
+        if not admins:
+            return "❌ No admin users found in database!  Visit /setup-admins first."
+        
+        result = "<h2>Admin Users in Database: </h2><ul>"
+        for admin in admins:
+            result += f"<li><b>{admin.username}</b> - {admin.email} - Role: {admin.role} - Active: {admin.is_active}</li>"
+        result += "</ul>"
+        return result
+    except Exception as e: 
+        return f"❌ Error: {str(e)} - Table might not exist.  Visit /setup-admins"
 
 
 # ===== Admin Panel Routes =====
