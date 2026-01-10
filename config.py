@@ -60,15 +60,32 @@ class Config:
         
         # Admin credentials for backup access
         # Set these environment variables for production security
-        # Example: ADMIN_ID=myadmin, ADMIN_PASSWORD=mysecurepassword
-        self.ADMIN_ID = os.getenv('ADMIN_ID', 'admin@skillfit.onrender.com')
-        self.ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', 'skillfit@admin')
+        
         
         # File upload settings
         self.UPLOAD_FOLDER = os.getenv('UPLOAD_FOLDER', self.base_dir / 'uploads')
         self.MAX_CONTENT_LENGTH = self.security.max_file_size_mb * 1024 * 1024
         
         self._validate_config()
+
+    ADMIN_CREDENTIALS_RAW = os.environ.get('ADMIN_CREDENTIALS', 
+        'admin: admin123,samrudh:sam@2024,manager:mgr@2024,developer:dev@2024,viewer:view@2024'
+    )
+    
+    @classmethod
+    def get_admin_credentials(cls) -> dict:
+        """Parse admin credentials from environment variable"""
+        credentials = {}
+        if cls.ADMIN_CREDENTIALS_RAW:
+            for pair in cls.ADMIN_CREDENTIALS_RAW.split(','):
+                if ': ' in pair:
+                    admin_id, password = pair.strip().split(':', 1)
+                    credentials[admin_id. strip()] = password.strip()
+        return credentials
+    
+    # Keep backward compatibility
+    ADMIN_ID = os.environ. get('ADMIN_ID', 'admin')
+    ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin123')
     
     def _generate_secret_key(self) -> str:
         """Generate a secure secret key if none provided"""
