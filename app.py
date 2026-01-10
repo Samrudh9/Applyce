@@ -116,7 +116,7 @@ else:
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # Initialize database
-from models import db
+from models import db, User, Feedback, SkillPattern, ResumeHistory
 db.init_app(app)
 migrate = Migrate(app, db)
 # Create tables on startup (needed for Render)
@@ -1992,38 +1992,50 @@ def admin_dashboard():
     from datetime import datetime, timedelta
     from sqlalchemy import func
     
-    # Get statistics
-    total_users = User.query.count()
-    today = datetime.utcnow().date()
-    new_users_today = User.query.filter(
-        func.date(User.created_at) == today
-    ).count()
-    
-    total_resumes = ResumeHistory.query.count()
-    avg_score = db.session.query(func.avg(ResumeHistory.overall_score)).scalar() or 0
-    
-    total_feedback = Feedback.query.count()
-    positive_feedback = Feedback.query.filter_by(feedback_type='positive').count()
-    
-    # Active users in last 7 days
-    seven_days_ago = datetime.utcnow() - timedelta(days=7)
-    active_users = User.query.filter(User.last_login >= seven_days_ago).count()
-    
-    # Recent activity
-    recent_users = User.query.order_by(User.created_at.desc()).limit(5).all()
-    recent_resumes = ResumeHistory.query.order_by(ResumeHistory.upload_date.desc()).limit(5).all()
-    
-    return render_template('admin/dashboard.html',
-        total_users=total_users,
-        new_users_today=new_users_today,
-        total_resumes=total_resumes,
-        avg_score=round(avg_score, 1),
-        total_feedback=total_feedback,
-        positive_feedback=positive_feedback,
-        active_users=active_users,
-        recent_users=recent_users,
-        recent_resumes=recent_resumes
-    )
+    try:
+        # Get statistics
+        total_users = User.query.count()
+        
+        # Get new users today (SQLite compatible)
+        today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+        today_end = datetime.utcnow().replace(hour=23, minute=59, second=59, microsecond=999999)
+        new_users_today = User.query.filter(
+            User.created_at >= today_start,
+            User.created_at <= today_end
+        ).count()
+        
+        total_resumes = ResumeHistory.query.count()
+        avg_score = db.session.query(func.avg(ResumeHistory.overall_score)).scalar() or 0
+        
+        total_feedback = Feedback.query.count()
+        positive_feedback = Feedback.query.filter_by(feedback_type='positive').count()
+        
+        # Active users in last 7 days
+        seven_days_ago = datetime.utcnow() - timedelta(days=7)
+        active_users = User.query.filter(
+            User.last_login.isnot(None),
+            User.last_login >= seven_days_ago
+        ).count()
+        
+        # Recent activity
+        recent_users = User.query.order_by(User.created_at.desc()).limit(5).all()
+        recent_resumes = ResumeHistory.query.order_by(ResumeHistory.upload_date.desc()).limit(5).all()
+        
+        return render_template('admin/dashboard.html',
+            total_users=total_users,
+            new_users_today=new_users_today,
+            total_resumes=total_resumes,
+            avg_score=round(avg_score, 1),
+            total_feedback=total_feedback,
+            positive_feedback=positive_feedback,
+            active_users=active_users,
+            recent_users=recent_users,
+            recent_resumes=recent_resumes
+        )
+    except Exception as e:
+        logger.error(f"Error in admin dashboard: {str(e)}")
+        flash(f'Error loading dashboard: {str(e)}', 'error')
+        return redirect(url_for('admin_backup_page'))
 
 
 @app.route('/admin/users')
@@ -2162,35 +2174,46 @@ def admin_system():
 def api_admin_chart_users():
     """User registration chart data"""
     from datetime import datetime, timedelta
-    from sqlalchemy import func
     
-    # Last 30 days
-    data = []
-    for i in range(30, -1, -1):
-        date = datetime.utcnow().date() - timedelta(days=i)
-        count = User.query.filter(func.date(User.created_at) == date).count()
-        data.append({'date': date.isoformat(), 'count': count})
-    
-    return jsonify({'success': True, 'data': data})
+    try:
+        # Last 30 days
+        data = []
+        for i in range(30, -1, -1):
+            date = datetime.utcnow().date() - timedelta(days=i)
+            # SQLite compatible date filtering
+            start = datetime.combine(date, datetime.min.time())
+            end = datetime.combine(date, datetime.max.time())
+            count = User.query.filter(
+                User.created_at >= start,
+                User.created_at <= end
+            ).count()
+            data.append({'date': date.isoformat(), 'count': count})
+        
+        return jsonify({'success': True, 'data': data})
+    except Exception as e:
+        logger.error(f"Error in user chart: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 
 @app.route('/api/admin/chart/scores')
 @admin_required
 def api_admin_chart_scores():
     """Score distribution chart data"""
-    from sqlalchemy import func
-    
-    # Group scores into ranges
-    ranges = [(0, 20), (21, 40), (41, 60), (61, 80), (81, 100)]
-    data = []
-    for low, high in ranges:
-        count = ResumeHistory.query.filter(
-            ResumeHistory.overall_score >= low,
-            ResumeHistory.overall_score <= high
-        ).count()
-        data.append({'range': f'{low}-{high}', 'count': count})
-    
-    return jsonify({'success': True, 'data': data})
+    try:
+        # Group scores into ranges
+        ranges = [(0, 20), (21, 40), (41, 60), (61, 80), (81, 100)]
+        data = []
+        for low, high in ranges:
+            count = ResumeHistory.query.filter(
+                ResumeHistory.overall_score >= low,
+                ResumeHistory.overall_score <= high
+            ).count()
+            data.append({'range': f'{low}-{high}', 'count': count})
+        
+        return jsonify({'success': True, 'data': data})
+    except Exception as e:
+        logger.error(f"Error in score chart: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 
 @app.route('/admin/backup')
