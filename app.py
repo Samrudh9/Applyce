@@ -1,3 +1,4 @@
+from datetime import datetime
 import os
 import sys
 import pickle
@@ -10,6 +11,7 @@ import json
 from typing import List
 from services.job_service import job_service, Job
 from dataclasses import asdict
+from models.admin import Admin, create_default_admins
 from flask_migrate import Migrate
 from flask import Flask, request, render_template, jsonify, redirect, url_for, flash, session, Response
 from werkzeug.utils import secure_filename
@@ -1954,26 +1956,43 @@ def admin_required(f):
     return decorated_function
 
 
-@app.route('/admin/login', methods=['GET', 'POST'])
+def init_db():
+    with app.app_context():
+        db.create_all()
+        create_default_admins()  # Create default admins
+        logger.info("✅ Database ready with admin users!")
+
+# Update admin login route:
+@app. route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
-    """Admin login page for backup access"""
+    """Admin login with database authentication"""
     if session.get('admin_authenticated'):
         return redirect(url_for('admin_dashboard'))
     
     error = None
-    if request.method == 'POST':
+    if request.method == 'POST': 
         admin_id = request.form.get('admin_id', '').strip()
         admin_password = request.form.get('admin_password', '')
         
-        # Check credentials against config
-        if admin_id == config.ADMIN_ID and admin_password == config.ADMIN_PASSWORD:
+        # Check database for admin
+        admin = Admin.query.filter_by(username=admin_id, is_active=True).first()
+        
+        if admin and admin.check_password(admin_password):
             session['admin_authenticated'] = True
+            session['admin_username'] = admin. username
+            session['admin_role'] = admin.role
+            
+            # Update last login
+            admin.last_login = datetime.utcnow()
+            db.session.commit()
+            
+            logger.info(f"Admin login:  {admin.username} ({admin.role})")
             return redirect(url_for('admin_dashboard'))
         else:
             error = 'Invalid admin credentials'
+            logger.warning(f"Failed admin login:  {admin_id}")
     
     return render_template('admin/login.html', error=error)
-
 
 @app.route('/admin/logout')
 def admin_logout():
