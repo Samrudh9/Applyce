@@ -1,0 +1,189 @@
+{% extends "admin/base.html" %}
+
+{% block title %}User Details - {{ user.username }}{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 1.5rem;">
+  <a href="{{ url_for('admin_users') }}" style="color: var(--text-muted); text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+    <i class="fas fa-arrow-left"></i> Back to Users
+  </a>
+</div>
+
+<div class="page-header">
+  <h1>👤 {{ user.username }}</h1>
+  <p>User ID: {{ user.id }} • {{ user.email }}</p>
+</div>
+
+<!-- User Stats -->
+<div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
+  <div class="stat-card">
+    <div class="stat-icon" style="background: rgba(0, 194, 255, 0.15); color: var(--accent);">
+      <i class="fas fa-calendar-alt"></i>
+    </div>
+    <div class="stat-label">Member Since</div>
+    <div style="font-size: 1.1rem; font-weight: 600; color: #fff; margin-top: 0.5rem;">
+      {{ user.created_at.strftime('%Y-%m-%d') if user.created_at else 'N/A' }}
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon" style="background: rgba(0, 255, 136, 0.15); color: var(--success);">
+      <i class="fas fa-clock"></i>
+    </div>
+    <div class="stat-label">Last Login</div>
+    <div style="font-size: 1.1rem; font-weight: 600; color: #fff; margin-top: 0.5rem;">
+      {{ user.last_login.strftime('%Y-%m-%d') if user.last_login else 'Never' }}
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon" style="background: rgba(255, 170, 0, 0.15); color: var(--warning);">
+      <i class="fas fa-file-alt"></i>
+    </div>
+    <div class="stat-label">Total Resumes</div>
+    <div class="stat-value">{{ resumes|length }}</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon" style="background: rgba(168, 85, 247, 0.15); color: var(--accent-purple);">
+      <i class="fas fa-comments"></i>
+    </div>
+    <div class="stat-label">Feedback Given</div>
+    <div class="stat-value">{{ feedback|length }}</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-icon" style="background: rgba(0, 255, 224, 0.15); color: var(--accent-secondary);">
+      <i class="fas fa-crown"></i>
+    </div>
+    <div class="stat-label">Account Type</div>
+    <div style="margin-top: 0.5rem;">
+      {% if user.account_type == 'premium' %}
+        <span class="badge badge-warning" style="font-size: 0.85rem;">Premium</span>
+      {% elif user.account_type == 'enterprise' %}
+        <span class="badge badge-info" style="font-size: 0.85rem;">Enterprise</span>
+      {% else %}
+        <span class="badge" style="background: rgba(255, 255, 255, 0.1); color: var(--text-muted); font-size: 0.85rem;">Free</span>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Resume History -->
+<div class="card">
+  <div class="card-header">
+    <h2><i class="fas fa-file-alt"></i> Resume History</h2>
+  </div>
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Filename</th>
+          <th>Upload Date</th>
+          <th>Overall Score</th>
+          <th>ATS Score</th>
+          <th>Predicted Career</th>
+          <th>Experience Level</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for resume in resumes %}
+          <tr>
+            <td style="font-size: 0.85rem;">{{ resume.filename }}</td>
+            <td style="color: var(--text-muted); font-size: 0.85rem;">
+              {{ resume.upload_date.strftime('%Y-%m-%d %H:%M') if resume.upload_date else 'N/A' }}
+            </td>
+            <td>
+              {% if resume.overall_score >= 80 %}
+                <span class="badge badge-success">{{ resume.overall_score }}</span>
+              {% elif resume.overall_score >= 60 %}
+                <span class="badge badge-warning">{{ resume.overall_score }}</span>
+              {% else %}
+                <span class="badge badge-error">{{ resume.overall_score }}</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if resume.ats_score >= 80 %}
+                <span class="badge badge-success">{{ resume.ats_score }}</span>
+              {% elif resume.ats_score >= 60 %}
+                <span class="badge badge-warning">{{ resume.ats_score }}</span>
+              {% else %}
+                <span class="badge badge-error">{{ resume.ats_score }}</span>
+              {% endif %}
+            </td>
+            <td style="color: var(--text-muted); font-size: 0.85rem;">{{ resume.predicted_career or 'N/A' }}</td>
+            <td style="color: var(--text-muted); font-size: 0.85rem;">{{ resume.experience_level or 'N/A' }}</td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+              No resumes uploaded yet
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Feedback History -->
+<div class="card">
+  <div class="card-header">
+    <h2><i class="fas fa-comments"></i> Feedback History</h2>
+  </div>
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Predicted Career</th>
+          <th>Correct Career</th>
+          <th>Comments</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for fb in feedback %}
+          <tr>
+            <td>
+              {% if fb.feedback_type == 'positive' %}
+                <span class="badge badge-success">Positive</span>
+              {% elif fb.feedback_type == 'negative' %}
+                <span class="badge badge-error">Negative</span>
+              {% else %}
+                <span class="badge badge-info">{{ fb.feedback_type }}</span>
+              {% endif %}
+            </td>
+            <td style="color: var(--text-muted); font-size: 0.85rem;">{{ fb.predicted_career or 'N/A' }}</td>
+            <td style="color: var(--text-muted); font-size: 0.85rem;">{{ fb.correct_career or 'N/A' }}</td>
+            <td style="color: var(--text-muted); font-size: 0.85rem;">{{ fb.comments[:50] if fb.comments else 'N/A' }}</td>
+            <td style="color: var(--text-muted); font-size: 0.85rem;">
+              {{ fb.created_at.strftime('%Y-%m-%d') if fb.created_at else 'N/A' }}
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+              No feedback given yet
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Actions -->
+<div class="card">
+  <div class="card-header">
+    <h2><i class="fas fa-cog"></i> Actions</h2>
+  </div>
+  <div style="display: flex; gap: 1rem;">
+    <form method="POST" action="{{ url_for('admin_delete_user', user_id=user.id) }}" onsubmit="return confirm('Are you sure you want to delete this user? This action cannot be undone and will delete all their data.');">
+      <button type="submit" class="btn btn-danger">
+        <i class="fas fa-trash"></i> Delete User
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}
