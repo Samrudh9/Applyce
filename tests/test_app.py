@@ -17,40 +17,47 @@ class TestFlaskApp:
         assert response.status_code == 200
     
     def test_upload_page(self, client):
-        response = client.get('/upload')
-        assert response.status_code == 200
+        """Upload page should redirect to login when not authenticated"""
+        response = client.get('/upload', follow_redirects=False)
+        assert response.status_code == 302
+        assert '/login' in response.location
     
     def test_about_page(self, client):
         response = client.get('/about')
         assert response.status_code == 200
 
     def test_guide_page(self, client):
-        """Test the resume guide page loads correctly"""
-        response = client.get('/guide')
-        assert response.status_code == 200
-        assert b'Resume Writing Guide' in response.data
+        """Test the resume guide page requires authentication"""
+        response = client.get('/guide', follow_redirects=False)
+        assert response.status_code == 302
+        assert '/login' in response.location
 
     def test_checklist_redirect_without_data(self, client):
-        """Test checklist redirects when no evaluation data exists"""
-        response = client.get('/checklist')
-        # Should redirect to upload page
+        """Test checklist requires authentication"""
+        response = client.get('/checklist', follow_redirects=False)
+        # Should redirect to login (not to upload page anymore)
         assert response.status_code == 302
+        assert '/login' in response.location
 
     def test_feedback_endpoint(self, client):
-        """Test the feedback endpoint accepts POST requests"""
+        """Test the feedback endpoint requires authentication"""
         response = client.post('/feedback', 
                                json={'feedback_type': 'positive'},
-                               content_type='application/json')
-        assert response.status_code == 200
-        data = response.get_json()
-        assert data['success'] == True
+                               content_type='application/json',
+                               follow_redirects=False)
+        # Should redirect to login since user is not authenticated
+        assert response.status_code == 302
+        assert '/login' in response.location
 
     def test_feedback_endpoint_missing_data(self, client):
-        """Test the feedback endpoint handles missing data"""
+        """Test the feedback endpoint requires authentication"""
         response = client.post('/feedback',
                                data='',
-                               content_type='application/json')
-        assert response.status_code == 400
+                               content_type='application/json',
+                               follow_redirects=False)
+        # Should redirect to login since user is not authenticated
+        assert response.status_code == 302
+        assert '/login' in response.location
 
 
 class TestResumeEvaluator:
