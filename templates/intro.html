@@ -354,12 +354,21 @@
       <h1>Discover Your Ideal Career Path with AI</h1>
       <p>Our intelligent career guidance system analyzes your skills, interests, and experience to recommend the perfect career path for you. Get personalized salary estimates, skill gap analysis, and a roadmap to success.</p>
       <div class="cta-buttons">
-        <a href="/upload" class="btn btn-primary">
-          <i class="fas fa-upload"></i> Upload Resume
-        </a>
-        <a href="/form" class="btn btn-secondary">
-          <i class="fas fa-edit"></i> Enter Manually
-        </a>
+        {% if current_user.is_authenticated %}
+          <a href="{{ url_for('upload') }}" class="btn btn-primary">
+            <i class="fas fa-upload"></i> Upload Resume
+          </a>
+          <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+            <i class="fas fa-tachometer-alt"></i> My Dashboard
+          </a>
+        {% else %}
+          <a href="{{ url_for('register') }}" class="btn btn-primary">
+            <i class="fas fa-rocket"></i> Get Started Free
+          </a>
+          <a href="{{ url_for('login') }}" class="btn btn-secondary">
+            <i class="fas fa-sign-in-alt"></i> Sign In
+          </a>
+        {% endif %}
       </div>
     </div>
   </section>
@@ -450,13 +459,39 @@
     </div>
   </section>
 
+  <!-- Sign Up CTA Section (show only if not logged in) -->
+  {% if not current_user.is_authenticated %}
+  <section class="signup-cta" style="background: linear-gradient(135deg, rgba(0, 194, 255, 0.1), rgba(0, 255, 224, 0.1)); padding: 4rem 2rem; text-align: center; margin: 2rem 0; border-radius: 20px;">
+    <h2 style="font-size: 2rem; margin-bottom: 1rem; background: linear-gradient(90deg, var(--accent), var(--accent-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+      🚀 Ready to Boost Your Career?
+    </h2>
+    <p style="color: var(--text-muted); margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+      Create a free account to unlock all features: AI Resume Analysis, ATS Scoring, Job Matching, Career Roadmaps, and more!
+    </p>
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+      <a href="{{ url_for('register') }}" class="btn btn-primary" style="padding: 1rem 2rem; font-size: 1.1rem;">
+        <i class="fas fa-user-plus"></i> Create Free Account
+      </a>
+      <a href="{{ url_for('login') }}" class="btn btn-secondary" style="padding: 1rem 2rem; font-size: 1.1rem;">
+        <i class="fas fa-sign-in-alt"></i> Already have an account?
+      </a>
+    </div>
+  </section>
+  {% endif %}
+
   <!-- CTA Section -->
   <section class="cta-section">
     <h2>Ready to Find Your Dream Career?</h2>
     <p>Join thousands of users who have discovered their ideal career path using our AI-powered guidance system</p>
-    <a href="/upload" class="btn btn-primary">
-      <i class="fas fa-rocket"></i> Get Started Now
-    </a>
+    {% if current_user.is_authenticated %}
+      <a href="{{ url_for('upload') }}" class="btn btn-primary">
+        <i class="fas fa-rocket"></i> Get Started Now
+      </a>
+    {% else %}
+      <a href="{{ url_for('register') }}" class="btn btn-primary">
+        <i class="fas fa-rocket"></i> Get Started Now
+      </a>
+    {% endif %}
   </section>
 
   <!-- Footer -->

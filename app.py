@@ -142,6 +142,64 @@ from services.auth_service import AuthService
 from services.feedback_service import FeedbackService
 from services.learning_engine import LearningEngine
 
+# ===== Global Authentication Requirement =====
+# Routes that DON'T require login (public pages)
+PUBLIC_ENDPOINTS = {
+    'home',              # Landing page (/)
+    'about',             # About page
+    'login',             # Login page
+    'register',          # Register page
+    'pricing',           # Pricing page
+    'forgot_password',   # Forgot password
+    'reset_password',    # Reset password with token
+    'static',            # Static files (CSS, JS, images)
+    'admin_login',       # Admin login (separate auth)
+    'admin_logout',      # Admin logout
+    'admin_setup',       # Admin setup (if exists)
+    'admin_debug',       # Admin debug (if exists)
+}
+
+
+@app.before_request
+def require_login_for_features():
+    """
+    Global authentication check.
+    Requires users to sign in before accessing any feature.
+    Only public pages (landing, about, login, register, pricing) are accessible without auth.
+    """
+    # Skip authentication check for public endpoints
+    if request.endpoint in PUBLIC_ENDPOINTS:
+        return None
+    
+    # Allow static files
+    if request.path.startswith('/static/'):
+        return None
+    
+    # Allow admin routes (they have separate admin authentication)
+    if request.path.startswith('/admin'):
+        return None
+    
+    # Check if user is authenticated
+    if not current_user.is_authenticated:
+        # For API requests, return JSON error
+        if request.path.startswith('/api/'):
+            return jsonify({
+                'success': False,
+                'error': 'Authentication required',
+                'message': 'Please sign in to use this feature'
+            }), 401
+        
+        # For regular pages, redirect to login
+        flash('🔐 Please sign in to access this feature.', 'info')
+        
+        # Remember the page they wanted to visit
+        next_url = request.url
+        return redirect(url_for('login', next=next_url))
+    
+    # User is authenticated, allow request
+    return None
+
+
 # ===== Configuration =====
 UPLOAD_FOLDER = 'uploads'
 # Only include DOCX if supported
@@ -391,8 +449,12 @@ def login():
         if success:
             AuthService.login(result, remember=bool(remember))
             flash(f'Welcome back, {result.username}!', 'success')
+            
+            # Redirect to the page they originally wanted, or home
             next_page = request.args.get('next')
-            return redirect(next_page or url_for('home'))
+            if next_page and next_page.startswith('/'):
+                return redirect(next_page)
+            return redirect(url_for('home'))
         else:
             flash(result, 'error')
     
