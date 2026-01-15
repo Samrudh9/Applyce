@@ -68,7 +68,6 @@ def create_default_admins():
     admins_created = 0
     
     for admin_data in default_admins:
-        # Check if admin already exists
         existing = Admin.query.filter_by(username=admin_data['username']).first()
         
         if not existing:

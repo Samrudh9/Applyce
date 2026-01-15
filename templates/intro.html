@@ -302,6 +302,33 @@
       color: var(--text-muted);
     }
 
+    .step {
+      text-align: center;
+      flex:  1;
+      min-width: 200px;  /* Changed from 250px */
+      max-width: 280px;  /* Changed from 300px */
+      background: rgba(255, 255, 255, 0.03);
+      padding: 1.75rem;  /* Slightly smaller padding */
+      border-radius:  16px;
+      border: 1px solid var(--border-color);
+      transition: all 0.3s ease;
+    }
+
+    .step-number {
+      width: 50px;       /* Changed from 60px */
+      height: 50px;      /* Changed from 60px */
+      background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;  /* Changed from 1.5rem */
+      font-weight: 700;
+      color: #000;
+      margin:  0 auto 1. 25rem;
+      box-shadow: 0 4px 15px rgba(0, 194, 255, 0.4);
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
       .hero h1 {
@@ -432,32 +459,38 @@
   </section>
 
   <!-- How It Works Section -->
-  <section class="how-it-works" id="how-it-works">
-    <div class="features-container">
-      <h2 class="section-title">How It Works</h2>
-      <p class="section-subtitle">Three simple steps to discover your perfect career path</p>
-      
-      <div class="steps">
-        <div class="step">
-          <div class="step-number">1</div>
-          <h3>Upload or Enter</h3>
-          <p>Upload your resume (PDF/DOCX) or manually enter your skills, interests, and qualifications</p>
-        </div>
+<section class="how-it-works" id="how-it-works">
+  <div class="features-container">
+    <h2 class="section-title">How It Works</h2>
+    <p class="section-subtitle">Four simple steps to discover your perfect career path</p>
+    
+    <div class="steps">
+      <div class="step">
+        <div class="step-number">1</div>
+        <h3>🔐 Sign Up Free</h3>
+        <p>Create your free account in seconds to unlock all AI-powered career guidance features</p>
+      </div>
 
-        <div class="step">
-          <div class="step-number">2</div>
-          <h3>AI Analysis</h3>
-          <p>Our ML algorithm analyzes your profile and matches it against various career paths</p>
-        </div>
+      <div class="step">
+        <div class="step-number">2</div>
+        <h3>📄 Upload Resume</h3>
+        <p>Upload your resume (PDF/DOCX) or manually enter your skills, interests, and qualifications</p>
+      </div>
 
-        <div class="step">
-          <div class="step-number">3</div>
-          <h3>Get Results</h3>
-          <p>Receive personalized career recommendations, salary estimates, and a learning roadmap</p>
-        </div>
+      <div class="step">
+        <div class="step-number">3</div>
+        <h3>🤖 AI Analysis</h3>
+        <p>Our ML algorithm analyzes your profile, scores your resume for ATS, and matches you with careers</p>
+      </div>
+
+      <div class="step">
+        <div class="step-number">4</div>
+        <h3>🎯 Get Results</h3>
+        <p>Receive career recommendations, ATS score, job matches, salary estimates, and a personalized learning roadmap</p>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
   <!-- Sign Up CTA Section (show only if not logged in) -->
   {% if not current_user.is_authenticated %}
