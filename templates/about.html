@@ -771,6 +771,7 @@
   </style>
 </head>
 <body>
+  {% include 'components/navbar.html' %}
   <!-- Animated background particles -->
   <div class="bg-particles">
     <div class="particle" style="top: 10%; left: 10%; animation-delay: 0s;"></div>
@@ -822,68 +823,84 @@
       </div>
 
       <!-- Key Features Grid -->
-      <div class="section-header">
-        <h2><i class="fas fa-star"></i> Key Features</h2>
-      </div>
-      <div class="features-grid">
-        <div class="feature-card fade-in">
-          <div class="feature-icon">🧠</div>
-          <h3>Self-Learning AI</h3>
-          <p>Our model improves with every feedback. Pattern recognition + Bayesian confidence adjustment.</p>
-        </div>
-        <div class="feature-card fade-in">
-          <div class="feature-icon">📊</div>
-          <h3>ATS Scoring</h3>
-          <p>Get a detailed 0-100 ATS compatibility score with actionable improvement tips.</p>
-        </div>
-        <div class="feature-card fade-in">
-          <div class="feature-icon">🎯</div>
-          <h3>Career Prediction</h3>
-          <p>ML-powered predictions with confidence scores. Top 3 career matches ranked.</p>
-        </div>
-        <div class="feature-card fade-in">
-          <div class="feature-icon">📈</div>
-          <h3>Progress Tracking</h3>
-          <p>Dashboard with charts showing your score improvement over time.</p>
-        </div>
-        <div class="feature-card fade-in">
-          <div class="feature-icon">🗺️</div>
-          <h3>Career Roadmaps</h3>
-          <p>Personalized learning paths with curated resources for 500+ careers.</p>
-        </div>
-        <div class="feature-card fade-in">
-          <div class="feature-icon">💰</div>
-          <h3>Salary Estimation</h3>
-          <p>Get predicted salary ranges based on your skills and experience level.</p>
-        </div>
-      </div>
+      <!-- Key Features Grid -->
+<div class="section-header">
+  <h2><i class="fas fa-star"></i> Key Features</h2>
+</div>
+<div class="features-grid">
+  <div class="feature-card fade-in">
+    <div class="feature-icon">🧠</div>
+    <h3>Self-Learning AI</h3>
+    <p>Our model improves with every feedback. Pattern recognition + Bayesian confidence adjustment. </p>
+  </div>
+  <div class="feature-card fade-in">
+    <div class="feature-icon">📊</div>
+    <h3>ATS Scoring</h3>
+    <p>Get a detailed 0-100 ATS compatibility score with actionable improvement tips.</p>
+  </div>
+  <div class="feature-card fade-in">
+    <div class="feature-icon">🎯</div>
+    <h3>Career Prediction</h3>
+    <p>ML-powered predictions with confidence scores. Top 3 career matches ranked. </p>
+  </div>
+  <div class="feature-card fade-in">
+    <div class="feature-icon">💼</div>
+    <h3>Real Job Search</h3>
+    <p>Find jobs from LinkedIn, Indeed, Glassdoor with skill-based match scores.</p>
+  </div>
+  <div class="feature-card fade-in">
+    <div class="feature-icon">📈</div>
+    <h3>Progress Tracking</h3>
+    <p>Dashboard with charts showing your score improvement over time.</p>
+  </div>
+  <div class="feature-card fade-in">
+    <div class="feature-icon">🗺️</div>
+    <h3>Career Roadmaps</h3>
+    <p>Personalized learning paths with curated resources for 500+ careers.</p>
+  </div>
+  <div class="feature-card fade-in">
+    <div class="feature-icon">💰</div>
+    <h3>Salary Estimation</h3>
+    <p>Get predicted salary ranges based on your skills and experience level.</p>
+  </div>
+  <div class="feature-card fade-in">
+    <div class="feature-icon">🔍</div>
+    <h3>Skill Gap Analysis</h3>
+    <p>Identify missing skills for your target career and get learning recommendations.</p>
+  </div>
+</div>
 
       <!-- How It Works -->
-      <div class="nested-glass-card fade-in">
-        <h2><i class="fas fa-cogs"></i> How It Works</h2>
-        <div class="how-it-works">
-          <div class="step">
-            <div class="step-number">1</div>
-            <h4>Upload Resume</h4>
-            <p>PDF or DOCX format</p>
-          </div>
-          <div class="step">
-            <div class="step-number">2</div>
-            <h4>AI Analysis</h4>
-            <p>Skills, ATS, Career Match</p>
-          </div>
-          <div class="step">
-            <div class="step-number">3</div>
-            <h4>Get Results</h4>
-            <p>Scores & Recommendations</p>
-          </div>
-          <div class="step">
-            <div class="step-number">4</div>
-            <h4>Give Feedback</h4>
-            <p>Help AI learn & improve</p>
-          </div>
-        </div>
-      </div>
+<div class="nested-glass-card fade-in">
+  <h2><i class="fas fa-cogs"></i> How It Works</h2>
+  <div class="how-it-works">
+    <div class="step">
+      <div class="step-number">1</div>
+      <h4>🔐 Sign Up Free</h4>
+      <p>Create your account</p>
+    </div>
+    <div class="step">
+      <div class="step-number">2</div>
+      <h4>📄 Upload Resume</h4>
+      <p>PDF or DOCX format</p>
+    </div>
+    <div class="step">
+      <div class="step-number">3</div>
+      <h4>🤖 AI Analysis</h4>
+      <p>Skills, ATS, Career Match</p>
+    </div>
+    <div class="step">
+      <div class="step-number">4</div>
+      <h4>🎯 Get Results</h4>
+      <p>Scores & Recommendations</p>
+    </div>
+    <div class="step">
+      <div class="step-number">5</div>
+      <h4>💬 Give Feedback</h4>
+      <p>Help AI learn & improve</p>
+    </div>
+  </div>
+</div>
 
       <!-- Self-Learning Engine -->
       <div class="nested-glass-card fade-in">
@@ -920,25 +937,47 @@
       </div>
 
       <!-- Future Roadmap -->
-      <div class="nested-glass-card fade-in">
-        <h2><i class="fas fa-road"></i> Future Roadmap</h2>
-        <p class="subtitle">
-          <strong>✅ Phase 1 (Complete):</strong> Database, Authentication, Self-Learning Engine
-          <br>
-          <strong>✅ Phase 2 (Complete):</strong> 500+ Careers, ATS Analyzer, Career Roadmaps
-          <br>
-          <strong>🔄 Phase 3 (In Progress):</strong> User Dashboard with Progress Charts
-          <br>
-          <strong>⬜ Phase 4 (Planned):</strong> Job Market Integration (LinkedIn/Indeed APIs)
-          <br>
-          <strong>⬜ Phase 5 (Planned):</strong> Email Reports & External API Access
-        </p>
-      </div>
+<div class="nested-glass-card fade-in">
+  <h2><i class="fas fa-road"></i> Future Roadmap</h2>
+  <p class="subtitle">
+    <strong>✅ Phase 1 (Complete):</strong> Database, Authentication, Self-Learning Engine
+    <br>
+    <strong>✅ Phase 2 (Complete):</strong> 500+ Careers, ATS Analyzer, Career Roadmaps
+    <br>
+    <strong>✅ Phase 3 (Complete):</strong> User Dashboard with Progress Charts, Job Search
+    <br>
+    <strong>✅ Phase 4 (Complete):</strong> Job Market Integration (LinkedIn/Indeed/Glassdoor APIs)
+    <br>
+    <strong>🔄 Phase 5 (In Progress):</strong> AI Resume Builder, Cover Letter Generator
+    <br>
+    <strong>⬜ Phase 6 (Planned):</strong> Interview Prep & Mock AI Interview
+    <br>
+    <strong>⬜ Phase 7 (Planned):</strong> Skill Validation & Portfolio Optimization
+  </p>
+</div>
+
+      <!-- Action Buttons -->
 
       <div class="action-buttons">
-        <a href="/upload" class="action-btn primary"><i class="fas fa-rocket"></i> Get Started</a>
-        <a href="https://github.com/Samrudh9/Career-Recommendation-demo" target="_blank" class="action-btn secondary"><i class="fab fa-github"></i> View on GitHub</a>
-      </div>
+  {% if current_user.is_authenticated %}
+    <a href="{{ url_for('upload') }}" class="action-btn primary">
+      <i class="fas fa-upload"></i> Upload Resume
+    </a>
+    <a href="{{ url_for('dashboard') }}" class="action-btn secondary">
+      <i class="fas fa-tachometer-alt"></i> My Dashboard
+    </a>
+  {% else %}
+    <a href="{{ url_for('register') }}" class="action-btn primary">
+      <i class="fas fa-rocket"></i> Get Started Free
+    </a>
+    <a href="{{ url_for('login') }}" class="action-btn secondary">
+      <i class="fas fa-sign-in-alt"></i> Sign In
+    </a>
+  {% endif %}
+  <a href="https://github.com/Samrudh9/Career-Recommendation-demo" target="_blank" class="action-btn secondary">
+    <i class="fab fa-github"></i> View on GitHub
+  </a>
+</div>
 
       <!-- Team Section -->
       <section class="team-section">
