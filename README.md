@@ -8,11 +8,11 @@ An intelligent, self-learning career recommendation platform that analyzes resum
 ![ML](https://img.shields.io/badge/Machine%20Learning-Scikit--learn-orange.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-🌐 **Live Demo**: [https://skillfit. onrender.com](https://skillfit.onrender.com)
+🌐 **Live Demo**: [https://skillfit.onrender.com](https://skillfit.onrender.com)
 
 ---
 
-## 🚀 What Makes SkillFit Unique? 
+## 🚀 What Makes SkillFit Unique?
 
 | Feature | Description |
 |---------|-------------|
@@ -24,6 +24,33 @@ An intelligent, self-learning career recommendation platform that analyzes resum
 | 🗺️ **Career Roadmaps** | Personalized learning paths with curated resources |
 | 💼 **Job Fit Analysis** | Calculate match percentage between resume and job descriptions |
 | 🔍 **Real Job Search** | Find jobs from LinkedIn, Indeed, Glassdoor & more |
+| 🔐 **Secure Authentication** | Sign up required to access all features |
+| 🛡️ **Admin Panel** | Comprehensive admin dashboard for team monitoring |
+
+---
+
+## 🔐 Authentication Required
+
+**SkillFit requires users to sign up (free) to access features. ** This ensures:
+- ✅ Personalized experience with saved history
+- ✅ Progress tracking over time
+- ✅ Secure data storage
+- ✅ Better AI learning from user feedback
+
+### Public Pages (No Login)
+- `/` - Landing page
+- `/about` - About page
+- `/pricing` - Pricing information
+- `/login` - Sign in
+- `/register` - Sign up
+
+### Protected Features (Login Required)
+- `/upload` - Resume upload & analysis
+- `/dashboard` - Personal dashboard
+- `/jobs` - Job search & matching
+- `/roadmap/*` - Career roadmaps
+- `/ats-report` - ATS detailed report
+- `/api/*` - All API endpoints
 
 ---
 
@@ -32,7 +59,7 @@ An intelligent, self-learning career recommendation platform that analyzes resum
 ### 🧠 Self-Learning Engine
 - **Pattern Recognition**: Tracks skill-to-career associations
 - **Bayesian Confidence**: Updates predictions based on feedback
-- **Continuous Improvement**: Gets smarter with every user interaction
+- **Continuous Improvement**:  Gets smarter with every user interaction
 - **Feedback Loop**: Positive/negative feedback adjusts confidence scores
 
 ### 📊 Resume Analysis
@@ -56,14 +83,23 @@ An intelligent, self-learning career recommendation platform that analyzes resum
 
 ### 👤 User Dashboard
 - **Resume History**: Track all uploaded resumes
-- **Progress Charts**: Visualize score improvement over time
+- **Progress Charts**:  Visualize score improvement over time
 - **Career Roadmap**: Progress tracking for learning paths
-- **Skills Analysis**: Your skills vs. skills to learn
+- **Skills Analysis**: Your skills vs.  skills to learn
 
-### 🔐 Authentication
+### 🔐 Authentication & Security
 - **Secure Registration**: Email and password authentication
-- **Session Management**: Flask-Login integration
+- **Session Management**:  Flask-Login integration
 - **Personal Dashboard**: Private resume history and progress
+- **Admin Panel**: Team monitoring with user/resume/feedback management
+
+### 🛡️ Admin Panel
+- **Dashboard**: Real-time statistics and charts
+- **User Management**: View, search, and manage users
+- **Resume Analytics**: Track all resume analyses
+- **Feedback Management**: Review user feedback
+- **System Health**: Monitor database and server status
+- **Backup & Restore**: Export and import data
 
 ---
 
@@ -83,14 +119,14 @@ An intelligent, self-learning career recommendation platform that analyzes resum
 │  │    PARSER    │ │   PREDICTOR  │ │   ANALYZER   │            │
 │  └──────────────┘ └──────────────┘ └──────────────┘            │
 │  ┌──────────────┐ ┌──────────────┐ ┌──────────────┐            │
-│  │   FEEDBACK   │ │   LEARNING   │ │    SALARY    │            │
-│  │   SERVICE    │ │    ENGINE    │ │  ESTIMATOR   │            │
+│  │   FEEDBACK   │ │   LEARNING   │ │  JOB MATCH   │            │
+│  │   SERVICE    │ │    ENGINE    │ │   SERVICE    │            │
 │  └──────────────┘ └──────────────┘ └──────────────┘            │
 ├─────────────────────────────────────────────────────────────────┤
 │                        DATA LAYER                               │
 │  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐   │
-│  │   USERS    │ │  RESUMES   │ │  FEEDBACK  │ │  PATTERNS  │   │
-│  │  History   │ │   Scores   │ │  Learning  │ │ Confidence │   │
+│  │   USERS    │ │  RESUMES   │ │  FEEDBACK  │ │   ADMINS   │   │
+│  │  History   │ │   Scores   │ │  Learning  │ │   Roles    │   │
 │  └────────────┘ └────────────┘ └────────────┘ └────────────┘   │
 │                    PostgreSQL / SQLite                          │
 └─────────────────────────────────────────────────────────────────┘
@@ -108,6 +144,7 @@ An intelligent, self-learning career recommendation platform that analyzes resum
 | **Authentication** | Flask-Login, Werkzeug |
 | **Document Processing** | PyPDF2, pdfplumber, python-docx |
 | **Frontend** | HTML5, CSS3, JavaScript, Chart.js |
+| **Job APIs** | JSearch (RapidAPI), Adzuna, RemoteOK, Arbeitnow |
 | **Deployment** | Render, GitHub Actions |
 
 ---
@@ -129,12 +166,16 @@ Career-Recommendation-demo/
 │   ├── learning_engine.py      # Self-learning AI
 │   ├── ats_analyzer.py         # ATS scoring
 │   ├── resume_service.py       # Resume operations
+│   ├── job_service.py          # Real job search APIs
+│   ├── job_match_service.py    # Job fit calculation
+│   ├── backup_service.py       # Data backup/restore
 │   └── unified_scorer.py       # Score calculation
 ├── models/
 │   ├── user. py                 # User model
 │   ├── feedback.py             # Feedback model
 │   ├── skill_pattern.py        # Learning patterns
 │   ├── resume_history.py       # Resume history
+│   ├── admin.py                # Admin model (multi-admin)
 │   └── career. py               # Career database
 ├── dataset/
 │   ├── roadmaps.py             # 500+ career roadmaps
@@ -143,14 +184,25 @@ Career-Recommendation-demo/
 ├── templates/
 │   ├── intro.html              # Landing page
 │   ├── login.html              # User login
-│   ├── register.html           # User registration
+│   ├── register. html           # User registration
 │   ├── dashboard.html          # User dashboard
 │   ├── upload_form.html        # Resume upload
 │   ├── result.html             # Analysis results
+│   ├── jobs. html               # Job search page
 │   ├── ats_report.html         # ATS detailed report
 │   ├── checklist.html          # Resume checklist
 │   ├── roadmap.html            # Career roadmap
-│   └── about.html              # About page
+│   ├── pricing.html            # Pricing page
+│   ├── about.html              # About page
+│   ├── admin/                  # Admin panel templates
+│   │   ├── login.html
+│   │   ├── dashboard.html
+│   │   ├── users.html
+│   │   ├── backup.html
+│   │   └── ... 
+│   └── components/             # Reusable components
+│       ├── navbar.html
+│       └── footer.html
 ├── model/
 │   └── career_model.pkl        # Trained ML model
 └── requirements.txt            # Dependencies
@@ -188,133 +240,53 @@ pip install -r requirements.txt
 python app.py
 ```
 
-5.  **Open browser**
+5. **Open browser**
 ```
 http://localhost:5000
 ```
 
-### Database Setup (PostgreSQL/Supabase)
-
-For production deployment with Supabase PostgreSQL:
-
-1. **Create a Supabase project** at https://supabase.com
-
-2. **Set up the database schema**
-   - Go to SQL Editor in Supabase
-   - Run the SQL script from `supabase_schema.sql`
-
-3. **Configure environment variables**
-   ```bash
-   cp .env.example .env
-   # Edit .env and add your Supabase connection string
-   DATABASE_URL=postgresql://postgres:[PASSWORD]@db.xxxxx.supabase.co:5432/postgres
-   ```
-
-4. **Test database connection**
-   ```bash
-   python test_database.py
-   ```
-
-📚 **Detailed Guide**: See [DATABASE_SETUP.md](DATABASE_SETUP.md) for complete instructions  
-🔄 **Migration Guide**: See [MIGRATION.md](MIGRATION.md) for migrating from Render to Supabase
+6. **Create an account** to access features
 
 ---
 
 ## 🔌 API Endpoints
 
 ### Authentication
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/login` | GET/POST | User login |
-| `/register` | GET/POST | User registration |
-| `/logout` | GET | User logout |
+| Endpoint | Method | Auth | Description |
+|----------|--------|------|-------------|
+| `/login` | GET/POST | ❌ | User login |
+| `/register` | GET/POST | ❌ | User registration |
+| `/logout` | GET | ✅ | User logout |
 
-### Core Features
+### Core Features (Login Required)
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/` | GET | Landing page |
 | `/upload` | GET | Resume upload page |
 | `/resume` | POST | Process resume |
 | `/dashboard` | GET | User dashboard |
+| `/jobs` | GET | Job search page |
 | `/roadmap/<career>` | GET | Career roadmap |
 | `/ats-report` | GET | ATS analysis report |
 | `/checklist` | GET | Resume checklist |
 
-### REST API
+### REST API (Login Required)
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | `/api/predict` | POST | Career prediction |
 | `/api/analyze-resume` | POST | Resume analysis |
 | `/api/skill-gap` | POST | Skill gap analysis |
+| `/api/job-match` | POST | Job fit calculation |
+| `/api/jobs/search` | GET | Search real jobs |
 | `/api/roadmap/<career>` | GET | Get roadmap data |
 | `/feedback` | POST | Submit feedback |
 
-### API Examples
-
-**Career Prediction**
-```bash
-POST /api/predict
-Content-Type: application/json
-
-{
-    "skills": "python, machine learning, sql",
-    "interests": "data analysis, statistics"
-}
-```
-
-**Response:**
-```json
-{
-    "success": true,
-    "predictions": [
-        {"career": "Data Scientist", "confidence": 85. 5},
-        {"career": "ML Engineer", "confidence": 78.2},
-        {"career": "Data Analyst", "confidence": 72.1}
-    ]
-}
-```
-
----
-
-## 🧠 Self-Learning System
-
-### How It Works
-
-```
-User Uploads Resume
-        │
-        ▼
-┌─────────────────┐
-│   ML Model      │──── Base Prediction (70%)
-└─────────────────┘
-        │
-        ▼
-┌─────────────────┐
-│ Learning Engine │──── Adjusts based on patterns
-└─────────────────┘
-        │
-        ▼
-   Final Prediction (75%)
-        │
-        ▼
-┌─────────────────┐
-│ User Feedback   │──── 👍 or 👎
-└─────────────────┘
-        │
-        ▼
-┌─────────────────┐
-│ Update Patterns │──── Improves future predictions
-└─────────────────┘
-```
-
-### Confidence Adjustment Formula
-```python
-# Bayesian-like update
-confidence = (positive_feedback + 1) / (positive_feedback + negative_feedback + 2)
-
-# Weighted blend with ML model
-final = (1 - weight) * ml_confidence + weight * learned_confidence
-```
+### Admin Panel
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/admin/login` | GET/POST | Admin login |
+| `/admin/dashboard` | GET | Admin dashboard |
+| `/admin/users` | GET | User management |
+| `/admin/backup` | GET | Backup management |
 
 ---
 
@@ -327,47 +299,41 @@ final = (1 - weight) * ml_confidence + weight * learned_confidence
 | **Sections** | 20% | Required sections present |
 | **Content** | 15% | Achievements, metrics |
 
-### Red Flags Detected
-- ❌ Generic phrases ("hardworking team player")
-- ❌ Personal info (DOB, marital status)
-- ❌ Outdated skills
-- ❌ Missing contact info
-- ❌ No quantifiable achievements
+---
+
+## 📈 Roadmap & Feature Status
+
+| Feature | Status |
+|---------|--------|
+| ✅ Database + Authentication | Complete |
+| ✅ Self-Learning Engine | Complete |
+| ✅ 500+ Careers Database | Complete |
+| ✅ ATS Analyzer | Complete |
+| ✅ Career Roadmaps | Complete |
+| ✅ User Dashboard with Charts | Complete |
+| ✅ Job Market Integration (LinkedIn/Indeed/Glassdoor) | Complete |
+| ✅ Job Fit Analysis | Complete |
+| ✅ Admin Panel | Complete |
+| ✅ Global Authentication | Complete |
+| 🔄 AI Resume Builder | In Progress |
+| 🔄 Cover Letter Generator | In Progress |
+| ⬜ Interview Prep & Mock AI Interview | Planned |
+| ⬜ Skill Validation (Quizzes) | Planned |
+| ⬜ Portfolio/LinkedIn Optimization | Planned |
 
 ---
 
-## 🚀 Deployment
+## 🔐 Admin Access
 
-### Environment Variables
-```bash
-SECRET_KEY=your-secret-key
-DATABASE_URL=postgresql://user:pass@host:5432/db
-FLASK_ENV=production
-```
+SkillFit supports **multiple admin accounts** with role-based access:
 
-### Render Deployment
-1. Connect GitHub repository
-2. Set environment variables
-3. Deploy with:
-   - Build Command: `pip install -r requirements.txt`
-   - Start Command: `gunicorn app:app`
-
-### Production (Gunicorn)
-```bash
-gunicorn -w 4 -b 0.0.0.0:8000 app:app
-```
-
----
-
-## 📈 Future Roadmap
-
-| Phase | Feature | Status |
-|-------|---------|--------|
-| Phase 1 | Database + Auth + Learning Engine | ✅ Complete |
-| Phase 2 | 500+ Careers + ATS + Roadmaps | ✅ Complete |
-| Phase 3 | User Dashboard + Charts | 🔄 In Progress |
-| Phase 4 | Job Market Integration (LinkedIn/Indeed) | ⬜ Planned |
-| Phase 5 | Email Reports + External API | ⬜ Planned |
+| Role | Access |
+|------|--------|
+| `superadmin` | Full access to all features |
+| `admin` | User management, analytics |
+| `manager` | View reports, feedback |
+| `developer` | System health, backups |
+| `viewer` | Read-only dashboard |
 
 ---
 
@@ -379,7 +345,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
 3. Commit changes (`git commit -m 'Add AmazingFeature'`)
 4. Push to branch (`git push origin feature/AmazingFeature`)
-5.  Open a Pull Request
+5. Open a Pull Request
 
 ---
 
@@ -391,10 +357,22 @@ This project is licensed under the MIT License.
 
 ## ⭐ Support
 
-If you found this project helpful, please give it a star!  ⭐
+If you found this project helpful, please give it a star! ⭐
 
 **Repository**: [github.com/Samrudh9/Career-Recommendation-demo](https://github.com/Samrudh9/Career-Recommendation-demo)
 
 ---
 
+## 👥 Team
+
 Built with ❤️ by the SkillFit Team
+
+- **[Dishita Kotian](https://www.linkedin.com/in/dishita-kotian-15357129b/)** - Backend/Lead Developer
+- **[Khyathi Jain](https://www.linkedin.com/in/khyathi-j-975201290/)** - Data Specialist
+- **[Shaabdhik M Jain](https://www.linkedin.com/in/shaabdhik-jain-19181528b/)** - Frontend Developer
+- **[Sathwik R Shetty](https://www.linkedin.com/in/sathwik-shetty-6847172b2)** - UI/UX Designer
+- **[Samrudh S Shetty](https://www.linkedin.com/in/samrudhsshetty/)** - Developer
+
+---
+
+*Last Updated: January 2026*
