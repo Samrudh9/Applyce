@@ -6,121 +6,226 @@
   <title>Job Search | Applyce</title>
   <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
-<body class="text-slate-100">
-  <header class="max-w-6xl mx-auto px-6 pt-8">
-    <nav class="glass-soft flex items-center justify-between px-6 py-4">
-      <a href="/" class="flex items-center gap-3">
-        <div class="h-10 w-10 rounded-full bg-gradient-to-br from-cyan-400 to-teal-300 glow"></div>
-        <span class="text-lg font-semibold">Applyce</span>
-      </a>
-      <div class="flex items-center gap-6 text-sm text-slate-300">
-        <a href="/dashboard" class="hover:text-white">Dashboard</a>
-        <a href="/jobs" class="text-white">Jobs</a>
-      </div>
-    </nav>
-  </header>
+<body>
+  {% include 'components/navbar.html' %}
 
-  <main class="max-w-6xl mx-auto px-6 py-12">
-    <section class="glass p-8">
-      <div class="flex flex-wrap items-center justify-between gap-6">
+  <main class="section">
+    <div class="container">
+      <div class="section-header">
         <div>
-          <p class="text-cyan-200 uppercase tracking-[0.3em] text-xs">Job search</p>
-          <h1 class="text-3xl font-semibold mt-3">Curated roles with AI match scores.</h1>
-          <p class="text-slate-400 mt-2">Refine filters to see the most relevant opportunities based on your profile.</p>
+          <p class="section-subtitle">Job Search</p>
+          <h1 class="section-title">Find roles aligned with your AI career match.</h1>
+          <p class="helper-text">Search thousands of roles with precision filtering and AI fit scores.</p>
         </div>
-        <button class="px-5 py-2 rounded-full border border-cyan-300/40 text-cyan-200 hover:bg-cyan-400/10 transition">Save search</button>
       </div>
 
-      <div class="mt-8 grid lg:grid-cols-[0.35fr_0.65fr] gap-6">
-        <aside class="glass-soft p-6 space-y-4">
-          <h2 class="text-lg font-semibold">Filters</h2>
-          <div>
-            <label class="text-sm text-slate-400">Location</label>
-            <select class="w-full mt-2 px-4 py-2 rounded-xl bg-slate-900/60 border border-slate-700/60 focus-ring">
-              <option>Remote</option>
-              <option>San Francisco</option>
-              <option>New York</option>
-              <option>London</option>
-            </select>
+      <div class="glass card" style="margin-top:2rem;">
+        <form class="job-search-form" method="GET" action="/jobs">
+          <div class="input-group">
+            <input class="input-field" type="text" name="job_title" placeholder=" " value="{{ request.args.get('job_title', '') }}" />
+            <label class="floating-label">Job Title</label>
           </div>
-          <div>
-            <label class="text-sm text-slate-400">Level</label>
-            <select class="w-full mt-2 px-4 py-2 rounded-xl bg-slate-900/60 border border-slate-700/60 focus-ring">
-              <option>Mid-Senior</option>
-              <option>Senior</option>
-              <option>Lead</option>
-              <option>Director</option>
-            </select>
+          <div class="input-group">
+            <input class="input-field" type="text" name="location" placeholder=" " value="{{ request.args.get('location', '') }}" />
+            <label class="floating-label">Location</label>
           </div>
-          <div>
-            <label class="text-sm text-slate-400">Focus area</label>
-            <div class="mt-2 flex flex-wrap gap-2">
-              <span class="badge">Product</span>
-              <span class="badge">AI/ML</span>
-              <span class="badge">Growth</span>
-            </div>
-          </div>
-          <button class="w-full px-4 py-3 rounded-full bg-gradient-to-r from-cyan-400 to-teal-300 text-slate-900 font-semibold hover:scale-[1.02] transition">Apply filters</button>
-        </aside>
+          <label class="checkbox-row" style="margin-bottom:1.5rem;">
+            <input type="checkbox" name="remote_only" {% if request.args.get('remote_only') %}checked{% endif %} /> Remote Only
+          </label>
+          <button class="btn btn-primary" type="submit">Search Jobs</button>
+        </form>
+      </div>
 
-        <div class="space-y-4">
-          <div class="glass-soft p-6 hover-lift">
-            <div class="flex items-center justify-between">
-              <div>
-                <h3 class="text-xl font-semibold">Senior Product Strategy Lead</h3>
-                <p class="text-sm text-slate-400">Nova Labs · Remote</p>
-              </div>
-              <div class="progress-ring" style="--value: 94%;">
-                <span class="text-sm">94%</span>
-              </div>
-            </div>
-            <p class="mt-3 text-sm text-slate-300">Drive AI initiatives, set product vision, and scale cross-functional programs.</p>
-            <div class="mt-4 flex flex-wrap gap-2">
-              <span class="badge">$165K-$190K</span>
-              <span class="badge">Equity</span>
-              <span class="badge">Hybrid team</span>
+      <div class="section" style="padding-top:2.5rem;">
+        <div class="stats-grid">
+          <div class="glass card stats-card">
+            <p class="helper-text">Open Positions</p>
+            <h3>12,500</h3>
+            <span class="badge-success">+8% this month</span>
+          </div>
+          <div class="glass card stats-card">
+            <p class="helper-text">Growth Rate</p>
+            <h3>18%</h3>
+            <span class="badge">Stable</span>
+          </div>
+          <div class="glass card stats-card">
+            <p class="helper-text">Demand Level</p>
+            <h3>High</h3>
+            <span class="badge-purple">Top tier</span>
+          </div>
+          <div class="glass card stats-card">
+            <p class="helper-text">Remote %</p>
+            <h3>42%</h3>
+            <span class="badge">Remote friendly</span>
+          </div>
+          <div class="glass card stats-card">
+            <p class="helper-text">Salary Range</p>
+            <h3>$95k - $135k</h3>
+            <span class="badge-success">Median $118k</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="section" style="padding-top:2.5rem;">
+        <div class="grid" style="display:grid; gap:2rem; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));">
+          <div class="glass card">
+            <h2>Hot Skills</h2>
+            <div class="chip-list" style="margin-top:1.5rem;">
+              <span class="tag tag-green">AI Product Strategy</span>
+              <span class="tag tag-green">Prompt Engineering</span>
+              <span class="tag tag-green">Product Analytics</span>
+              <span class="tag tag-green">Leadership</span>
+              <span class="tag tag-green">Go-to-market</span>
             </div>
           </div>
-          <div class="glass-soft p-6 hover-lift">
-            <div class="flex items-center justify-between">
-              <div>
-                <h3 class="text-xl font-semibold">AI Program Manager</h3>
-                <p class="text-sm text-slate-400">Stellar AI · New York</p>
-              </div>
-              <div class="progress-ring" style="--value: 89%;">
-                <span class="text-sm">89%</span>
-              </div>
-            </div>
-            <p class="mt-3 text-sm text-slate-300">Lead AI deployments, optimize delivery timelines, and partner with stakeholders.</p>
-            <div class="mt-4 flex flex-wrap gap-2">
-              <span class="badge">$150K-$178K</span>
-              <span class="badge">Bonus</span>
-              <span class="badge">Onsite</span>
-            </div>
-          </div>
-          <div class="glass-soft p-6 hover-lift">
-            <div class="flex items-center justify-between">
-              <div>
-                <h3 class="text-xl font-semibold">Growth Operations Lead</h3>
-                <p class="text-sm text-slate-400">Flux Mobility · London</p>
-              </div>
-              <div class="progress-ring" style="--value: 86%;">
-                <span class="text-sm">86%</span>
-              </div>
-            </div>
-            <p class="mt-3 text-sm text-slate-300">Scale lifecycle campaigns, drive analytics, and optimize growth loops.</p>
-            <div class="mt-4 flex flex-wrap gap-2">
-              <span class="badge">£120K-£140K</span>
-              <span class="badge">Remote</span>
-              <span class="badge">Series B</span>
+          <div class="glass card">
+            <h2>Top Hiring Companies</h2>
+            <div class="chip-list" style="margin-top:1.5rem;">
+              <span class="badge">Meta</span>
+              <span class="badge">Google</span>
+              <span class="badge">OpenAI</span>
+              <span class="badge">Stripe</span>
+              <span class="badge">Airbnb</span>
             </div>
           </div>
         </div>
       </div>
-    </section>
+
+      <div class="section" style="padding-top:2.5rem;">
+        <div class="section-header">
+          <h2>Job Listings</h2>
+          <span class="badge">AI matched</span>
+        </div>
+        <div class="icon-grid" style="margin-top:2rem;">
+          {% for job in matching_jobs %}
+          <div class="glass card job-card">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <h3>{{ job.title }}</h3>
+                <p class="helper-text">{{ job.company }}</p>
+              </div>
+              <span class="badge-success">{{ job.match_score or 92 }}% Match</span>
+            </div>
+            <p style="margin-top:0.75rem;">{{ job.location }} · {{ job.salary or 'Salary Competitive' }}</p>
+            <div class="chip-list" style="margin-top:1rem;">
+              {% for skill in job.matching_skills or [] %}
+                <span class="tag tag-green">{{ skill }}</span>
+              {% endfor %}
+              {% for skill in job.missing_skills or [] %}
+                <span class="tag tag-red">{{ skill }}</span>
+              {% endfor %}
+            </div>
+            <div style="display:flex; gap:1rem; margin-top:1.5rem; flex-wrap:wrap;">
+              <a class="btn btn-primary" href="{{ job.apply_url or '#' }}">Apply Now</a>
+              <button class="btn btn-outline" type="button" data-modal="jobFitModal" data-job="{{ job.title }}">Check Job Fit</button>
+              <span class="badge">{{ job.source or 'LinkedIn' }}</span>
+            </div>
+          </div>
+          {% else %}
+          <div class="glass card">
+            <h3>No jobs found yet</h3>
+            <p class="helper-text">Search for a role to see AI-matched listings.</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
   </main>
+
+  <div class="modal" id="jobFitModal" aria-hidden="true">
+    <div class="modal-content glass card">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h3>Job Fit Analysis</h3>
+        <button class="btn btn-outline" data-close>Close</button>
+      </div>
+      <p class="helper-text">Role: <span id="modalJobTitle">AI Product Manager</span></p>
+      <div class="grid" style="display:grid; gap:1.5rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-top:1.5rem;">
+        <div>
+          <h4>Matching Skills</h4>
+          <div class="chip-list">
+            <span class="tag tag-green">Product strategy</span>
+            <span class="tag tag-green">Analytics</span>
+            <span class="tag tag-green">AI roadmap</span>
+          </div>
+        </div>
+        <div>
+          <h4>Skills to Build</h4>
+          <div class="chip-list">
+            <span class="tag tag-orange">Prompt design</span>
+            <span class="tag tag-orange">Leadership coaching</span>
+          </div>
+        </div>
+      </div>
+      <div class="glass-soft card" style="margin-top:1.5rem;">
+        <p><i class="fas fa-lightbulb"></i> Recommendation: Focus on advanced AI experimentation to push match score above 95%.</p>
+      </div>
+    </div>
+  </div>
+
+  {% include 'components/footer.html' %}
+
+  <style>
+    .job-search-form {
+      display: grid;
+      gap: 1.25rem;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      align-items: end;
+    }
+
+    .job-card h3 {
+      margin: 0;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 6, 12, 0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      z-index: 1200;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      width: min(720px, 90vw);
+    }
+  </style>
+
+  <script>
+    const modal = document.getElementById('jobFitModal');
+    const modalTitle = document.getElementById('modalJobTitle');
+
+    document.querySelectorAll('[data-modal="jobFitModal"]').forEach(button => {
+      button.addEventListener('click', () => {
+        modalTitle.textContent = button.dataset.job || 'Job Fit Analysis';
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+      });
+    });
+
+    document.querySelectorAll('[data-close]').forEach(button => {
+      button.addEventListener('click', () => {
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+      });
+    });
+
+    if (modal) {
+      modal.addEventListener('click', (event) => {
+        if (event.target === modal) {
+          modal.classList.remove('active');
+          modal.setAttribute('aria-hidden', 'true');
+        }
+      });
+    }
+  </script>
 </body>
 </html>

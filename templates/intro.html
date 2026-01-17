@@ -6,244 +6,306 @@
   <title>Applyce | AI Career Recommendation Platform</title>
   <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
-<body class="text-slate-100">
-  <header class="max-w-6xl mx-auto px-6 pt-8">
-    <nav class="glass-soft flex items-center justify-between px-6 py-4">
-      <div class="flex items-center gap-3">
-        <div class="h-10 w-10 rounded-full bg-gradient-to-br from-cyan-400 to-teal-300 glow"></div>
-        <span class="text-lg font-semibold">Applyce</span>
-      </div>
-      <div class="hidden md:flex items-center gap-8 text-sm text-slate-300">
-        <a href="#features" class="hover:text-white transition">Features</a>
-        <a href="#how" class="hover:text-white transition">How it works</a>
-        <a href="#pricing" class="hover:text-white transition">Pricing</a>
-        <a href="/login" class="hover:text-white transition">Login</a>
-      </div>
-      <a href="/register" class="px-5 py-2 rounded-full bg-gradient-to-r from-cyan-400 to-teal-300 text-slate-900 font-semibold hover:scale-105 transition">Get Started</a>
-    </nav>
-  </header>
+<body>
+  {% include 'components/navbar.html' %}
 
-  <main class="max-w-6xl mx-auto px-6 pb-16">
-    <section class="grid lg:grid-cols-[1.1fr_0.9fr] gap-12 items-center pt-16">
-      <div>
-        <p class="uppercase tracking-[0.3em] text-xs text-cyan-200/70">AI-Powered Career Engine</p>
-        <h1 class="text-4xl md:text-6xl font-bold leading-tight mt-4 gradient-text">Build the career you were meant for with Applyce.</h1>
-        <p class="mt-6 text-lg text-slate-300">Applyce is a modern SaaS platform that combines AI insights, skill intelligence, and market analytics to recommend your next best career move.</p>
-        <div class="mt-8 flex flex-wrap gap-4">
-          <a href="/register" class="px-6 py-3 rounded-full bg-gradient-to-r from-cyan-400 to-teal-300 text-slate-900 font-semibold hover:scale-105 transition">Start free trial</a>
-          <a href="#how" class="px-6 py-3 rounded-full border border-cyan-300/40 text-cyan-200 hover:bg-cyan-400/10 transition">Watch demo</a>
-        </div>
-        <div class="mt-10 flex flex-wrap gap-6 text-sm text-slate-400">
-          <div>
-            <p class="text-2xl font-semibold text-white">92%</p>
-            <p>match accuracy</p>
+  <main>
+    <section class="hero">
+      <div class="hero-orb orb-1"></div>
+      <div class="hero-orb orb-2"></div>
+      <div class="hero-orb orb-3"></div>
+      <div class="container hero-grid">
+        <div class="hero-content fade-up">
+          <p class="section-subtitle">AI-Powered Career Engine</p>
+          <h1 class="hero-title">Discover Your Ideal Career Path with AI</h1>
+          <p class="hero-description">Applyce blends deep-learning career matching, ATS analysis, and market intelligence to help you make confident, future-ready career decisions.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="/register">Get Started Free</a>
+            <a class="btn btn-outline" href="/login">Sign In</a>
           </div>
-          <div>
-            <p class="text-2xl font-semibold text-white">150K+</p>
-            <p>career paths analyzed</p>
-          </div>
-          <div>
-            <p class="text-2xl font-semibold text-white">4.9/5</p>
-            <p>user satisfaction</p>
-          </div>
-        </div>
-      </div>
-      <div class="relative">
-        <div class="absolute -top-10 -right-10 h-32 w-32 rounded-full bg-cyan-500/20 blur-2xl"></div>
-        <div class="glass p-8 space-y-6 hover-lift">
-          <div class="flex items-center justify-between">
+          <div class="hero-highlights">
             <div>
-              <p class="text-sm text-slate-400">Recommendation readiness</p>
-              <p class="text-2xl font-semibold">94%</p>
+              <h3>500+ Careers</h3>
+              <p>Mapped with AI intelligence</p>
+            </div>
+            <div>
+              <h3>10,000+ Users</h3>
+              <p>Growing across industries</p>
+            </div>
+            <div>
+              <h3>98% Accuracy</h3>
+              <p>Career fit prediction</p>
+            </div>
+          </div>
+        </div>
+        <div class="hero-card glass card fade-up">
+          <div class="hero-card-header">
+            <div>
+              <p class="helper-text">Career readiness score</p>
+              <h3>94%</h3>
             </div>
             <div class="progress-ring" style="--value: 94%;">
-              <span class="text-sm">94%</span>
+              <span>94%</span>
             </div>
           </div>
           <div class="neon-divider"></div>
-          <div class="space-y-3">
-            <p class="text-sm text-slate-400">Top career match</p>
-            <h3 class="text-xl font-semibold">Product Strategy Lead</h3>
-            <div class="flex flex-wrap gap-2">
+          <div class="hero-card-body">
+            <h4>Top Match</h4>
+            <p>AI Product Strategist</p>
+            <div class="chip-list">
               <span class="badge">AI leadership</span>
-              <span class="badge">Growth analytics</span>
-              <span class="badge">Cross-functional</span>
+              <span class="badge">Data storytelling</span>
+              <span class="badge">Growth strategy</span>
             </div>
           </div>
-          <div class="glass-soft p-4">
-            <p class="text-sm text-slate-400">Next step</p>
-            <p class="text-base font-medium">Complete the leadership assessment to unlock executive tracks.</p>
+          <div class="glass-soft card">
+            <p class="helper-text">Next best action</p>
+            <p>Upload a recent resume to unlock ATS scores and career roadmaps.</p>
           </div>
         </div>
       </div>
     </section>
 
-    <section id="features" class="pt-20">
-      <div class="flex items-center justify-between flex-wrap gap-6">
-        <div>
-          <p class="text-cyan-200 text-sm uppercase tracking-[0.3em]">Platform</p>
-          <h2 class="text-3xl md:text-4xl font-semibold mt-3">Intelligent insights across your career lifecycle.</h2>
+    <section id="features" class="section">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <p class="section-subtitle">Platform</p>
+            <h2 class="section-title">Everything you need to build a future-proof career.</h2>
+          </div>
+          <a class="btn btn-secondary" href="/dashboard">Explore the dashboard</a>
         </div>
-        <a href="/dashboard" class="text-sm text-cyan-200 hover:text-white transition">Explore dashboard →</a>
-      </div>
-      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
-        <div class="glass p-6 hover-lift">
-          <h3 class="text-xl font-semibold">Neural skill graph</h3>
-          <p class="mt-2 text-sm text-slate-400">Map your skills to high-growth roles with instant gap analysis and confidence scores.</p>
-        </div>
-        <div class="glass p-6 hover-lift">
-          <h3 class="text-xl font-semibold">AI career simulator</h3>
-          <p class="mt-2 text-sm text-slate-400">Preview how each career choice changes compensation, lifestyle, and success metrics.</p>
-        </div>
-        <div class="glass p-6 hover-lift">
-          <h3 class="text-xl font-semibold">Personalized roadmap</h3>
-          <p class="mt-2 text-sm text-slate-400">Deliver curated learning plans, mentors, and milestones built just for you.</p>
-        </div>
-        <div class="glass p-6 hover-lift">
-          <h3 class="text-xl font-semibold">Job match engine</h3>
-          <p class="mt-2 text-sm text-slate-400">Get live job matches with AI-calculated fit and interview readiness insights.</p>
-        </div>
-        <div class="glass p-6 hover-lift">
-          <h3 class="text-xl font-semibold">Resume intelligence</h3>
-          <p class="mt-2 text-sm text-slate-400">Optimize every resume with ATS scoring, sentiment analysis, and quantifiable impact.</p>
-        </div>
-        <div class="glass p-6 hover-lift">
-          <h3 class="text-xl font-semibold">Talent network</h3>
-          <p class="mt-2 text-sm text-slate-400">Unlock referrals, community sessions, and AI mentoring from industry leaders.</p>
+        <div class="icon-grid section-grid">
+          <div class="glass card">
+            <h3>🧠 AI Career Matching</h3>
+            <p>Personalized role suggestions based on skill signals, interests, and market demand.</p>
+          </div>
+          <div class="glass card">
+            <h3>📊 ATS Score Analysis</h3>
+            <p>Instant resume diagnostics with category-level optimization guidance.</p>
+          </div>
+          <div class="glass card">
+            <h3>💼 Real Job Search</h3>
+            <p>Search curated jobs with AI fit scores and recommended next steps.</p>
+          </div>
+          <div class="glass card">
+            <h3>🗺️ Career Roadmaps</h3>
+            <p>Step-by-step learning paths built for your desired career transitions.</p>
+          </div>
+          <div class="glass card">
+            <h3>💰 Salary Estimation</h3>
+            <p>Get compensation insights with location-aware salary forecasts.</p>
+          </div>
+          <div class="glass card">
+            <h3>🔍 Skill Gap Analysis</h3>
+            <p>Pinpoint missing skills and get learning resources instantly.</p>
+          </div>
+          <div class="glass card">
+            <h3>📈 Progress Tracking</h3>
+            <p>Track your resume scores, ATS improvements, and job fit progress.</p>
+          </div>
+          <div class="glass card">
+            <h3>💡 Improvement Tips</h3>
+            <p>Actionable steps prioritized by impact to boost your career outcomes.</p>
+          </div>
         </div>
       </div>
     </section>
 
-    <section id="how" class="pt-20">
-      <div class="grid lg:grid-cols-[0.9fr_1.1fr] gap-10">
-        <div class="glass p-8">
-          <h2 class="text-3xl font-semibold">How Applyce works</h2>
-          <p class="mt-3 text-slate-400">A guided journey from resume upload to AI recommended roles, all delivered in a few minutes.</p>
-          <div class="mt-8 space-y-6">
-            <div class="flex gap-4">
-              <div class="h-10 w-10 rounded-full bg-cyan-400/20 flex items-center justify-center text-cyan-200 font-semibold">1</div>
-              <div>
-                <h4 class="font-semibold">Upload your resume</h4>
-                <p class="text-sm text-slate-400">We ingest your history, achievements, and skill patterns.</p>
-              </div>
-            </div>
-            <div class="flex gap-4">
-              <div class="h-10 w-10 rounded-full bg-cyan-400/20 flex items-center justify-center text-cyan-200 font-semibold">2</div>
-              <div>
-                <h4 class="font-semibold">AI analyzes fit</h4>
-                <p class="text-sm text-slate-400">Our models map you to future-ready roles and talent needs.</p>
-              </div>
-            </div>
-            <div class="flex gap-4">
-              <div class="h-10 w-10 rounded-full bg-cyan-400/20 flex items-center justify-center text-cyan-200 font-semibold">3</div>
-              <div>
-                <h4 class="font-semibold">Act on recommendations</h4>
-                <p class="text-sm text-slate-400">Launch tailored learning, apply to curated jobs, and track progress.</p>
-              </div>
-            </div>
+    <section id="how-it-works" class="section">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <p class="section-subtitle">How It Works</p>
+            <h2 class="section-title">Four steps to your next big opportunity.</h2>
           </div>
         </div>
-        <div class="glass p-8">
-          <div class="flex items-center justify-between">
-            <h3 class="text-xl font-semibold">Live insights preview</h3>
-            <span class="badge">Realtime</span>
+        <div class="steps glass card">
+          <div class="step">
+            <div class="step-circle">1</div>
+            <div>
+              <h4>🔐 Sign Up Free</h4>
+              <p>Create your Applyce profile and set career goals.</p>
+            </div>
           </div>
-          <div class="mt-6 grid gap-4">
-            <div class="glass-soft p-4 flex items-center justify-between">
-              <div>
-                <p class="text-sm text-slate-400">Career confidence</p>
-                <p class="text-lg font-semibold">86%</p>
-              </div>
-              <div class="h-12 w-12 rounded-full bg-cyan-400/10 flex items-center justify-center text-cyan-200">↑</div>
+          <div class="step">
+            <div class="step-circle">2</div>
+            <div>
+              <h4>📄 Upload Resume</h4>
+              <p>Bring your latest resume or add career history manually.</p>
             </div>
-            <div class="glass-soft p-4 flex items-center justify-between">
-              <div>
-                <p class="text-sm text-slate-400">Skill gap</p>
-                <p class="text-lg font-semibold">12 points</p>
-              </div>
-              <div class="h-12 w-12 rounded-full bg-teal-300/10 flex items-center justify-center text-teal-200">⚡</div>
+          </div>
+          <div class="step">
+            <div class="step-circle">3</div>
+            <div>
+              <h4>🤖 AI Analysis</h4>
+              <p>We analyze ATS readiness, skills, and role fit instantly.</p>
             </div>
-            <div class="glass-soft p-4 flex items-center justify-between">
-              <div>
-                <p class="text-sm text-slate-400">Mentor matches</p>
-                <p class="text-lg font-semibold">4 available</p>
-              </div>
-              <div class="h-12 w-12 rounded-full bg-blue-400/10 flex items-center justify-center text-blue-200">★</div>
+          </div>
+          <div class="step">
+            <div class="step-circle">4</div>
+            <div>
+              <h4>🎯 Get Results</h4>
+              <p>Receive tailored career roadmaps, job matches, and next steps.</p>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <section id="pricing" class="pt-20">
-      <div class="text-center">
-        <p class="text-cyan-200 text-sm uppercase tracking-[0.3em]">Pricing</p>
-        <h2 class="text-3xl md:text-4xl font-semibold mt-3">Choose the plan that fits your ambition.</h2>
-      </div>
-      <div class="grid lg:grid-cols-3 gap-6 mt-10">
-        <div class="glass p-8 hover-lift">
-          <h3 class="text-xl font-semibold">Starter</h3>
-          <p class="text-3xl font-semibold mt-4">$19 <span class="text-sm text-slate-400">/ month</span></p>
-          <ul class="mt-6 space-y-3 text-sm text-slate-300">
-            <li>AI career recommendations</li>
-            <li>Resume scorecard</li>
-            <li>3 job matches daily</li>
-          </ul>
-          <a href="/register" class="mt-8 inline-flex justify-center w-full px-5 py-3 rounded-full border border-cyan-300/40 text-cyan-200 hover:bg-cyan-400/10 transition">Start Starter</a>
-        </div>
-        <div class="gradient-border hover-lift">
-          <div class="gradient-border-inner glass p-8">
-            <div class="flex items-center justify-between">
-              <h3 class="text-xl font-semibold">Growth</h3>
-              <span class="badge">Most popular</span>
-            </div>
-            <p class="text-3xl font-semibold mt-4">$49 <span class="text-sm text-slate-400">/ month</span></p>
-            <ul class="mt-6 space-y-3 text-sm text-slate-300">
-              <li>Unlimited AI insights</li>
-              <li>Career roadmap builder</li>
-              <li>ATS-optimized resumes</li>
-            </ul>
-            <a href="/register" class="mt-8 inline-flex justify-center w-full px-5 py-3 rounded-full bg-gradient-to-r from-cyan-400 to-teal-300 text-slate-900 font-semibold hover:scale-105 transition">Start Growth</a>
+    <section class="section">
+      <div class="container">
+        <div class="stats-grid">
+          <div class="glass card stats-card">
+            <p class="helper-text">Careers Mapped</p>
+            <h3 class="gradient-text">500+</h3>
+            <p class="helper-text">Across tech, design, finance, and more</p>
           </div>
-        </div>
-        <div class="glass p-8 hover-lift">
-          <h3 class="text-xl font-semibold">Enterprise</h3>
-          <p class="text-3xl font-semibold mt-4">$99 <span class="text-sm text-slate-400">/ month</span></p>
-          <ul class="mt-6 space-y-3 text-sm text-slate-300">
-            <li>Team analytics & dashboards</li>
-            <li>Dedicated talent advisor</li>
-            <li>API + SSO access</li>
-          </ul>
-          <a href="/contact" class="mt-8 inline-flex justify-center w-full px-5 py-3 rounded-full border border-cyan-300/40 text-cyan-200 hover:bg-cyan-400/10 transition">Talk to sales</a>
+          <div class="glass card stats-card">
+            <p class="helper-text">Skills Indexed</p>
+            <h3 class="gradient-text">100+</h3>
+            <p class="helper-text">Covering modern and emerging roles</p>
+          </div>
+          <div class="glass card stats-card">
+            <p class="helper-text">Active Users</p>
+            <h3 class="gradient-text">10,000+</h3>
+            <p class="helper-text">Professionals advancing every day</p>
+          </div>
         </div>
       </div>
     </section>
 
-    <section class="pt-20">
-      <div class="glass p-10 text-center hover-lift">
-        <h2 class="text-3xl font-semibold">Ready to navigate your next career move?</h2>
-        <p class="mt-4 text-slate-300">Join Applyce and unlock your personalized AI career recommendation system.</p>
-        <div class="mt-8 flex flex-wrap justify-center gap-4">
-          <a href="/register" class="px-6 py-3 rounded-full bg-gradient-to-r from-cyan-400 to-teal-300 text-slate-900 font-semibold hover:scale-105 transition">Launch Applyce</a>
-          <a href="/about" class="px-6 py-3 rounded-full border border-cyan-300/40 text-cyan-200 hover:bg-cyan-400/10 transition">Meet the team</a>
+    <section class="section">
+      <div class="container">
+        <div class="glass card cta-card">
+          <div>
+            <p class="section-subtitle">Ready to level up?</p>
+            <h2 class="section-title">Ready to Find Your Dream Career?</h2>
+            <p>Join Applyce and unlock a personalized AI-powered career journey today.</p>
+          </div>
+          <div class="cta-actions">
+            <a class="btn btn-primary" href="/register">Create Your Account</a>
+            <a class="btn btn-outline" href="/pricing">View Pricing</a>
+          </div>
         </div>
       </div>
     </section>
   </main>
 
-  <footer class="max-w-6xl mx-auto px-6 py-10 text-sm text-slate-500">
-    <div class="neon-divider"></div>
-    <div class="mt-6 flex flex-wrap justify-between gap-4">
-      <p>© 2024 Applyce. AI-powered career recommendations.</p>
-      <div class="flex gap-4">
-        <a href="/about" class="hover:text-white">About</a>
-        <a href="/pricing" class="hover:text-white">Pricing</a>
-        <a href="/login" class="hover:text-white">Login</a>
-      </div>
-    </div>
-  </footer>
+  {% include 'components/footer.html' %}
+
+  <style>
+    .hero-grid {
+      display: grid;
+      gap: 3rem;
+      align-items: center;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+
+    .hero-title {
+      font-size: clamp(2.8rem, 5vw, 4.6rem);
+      margin: 1rem 0;
+      line-height: 1.1;
+    }
+
+    .hero-description {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      max-width: 540px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .hero-highlights {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      margin-top: 2.5rem;
+      color: var(--text-muted);
+    }
+
+    .hero-highlights h3 {
+      margin: 0;
+      color: #fff;
+    }
+
+    .hero-card {
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .hero-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .hero-card-body h4 {
+      margin-bottom: 0.35rem;
+    }
+
+    .section-grid {
+      margin-top: 2.5rem;
+    }
+
+    .steps {
+      position: relative;
+      display: grid;
+      gap: 1.5rem;
+      margin-top: 2.5rem;
+    }
+
+    .steps::before {
+      content: '';
+      position: absolute;
+      left: 26px;
+      top: 24px;
+      bottom: 24px;
+      width: 2px;
+      background: linear-gradient(180deg, rgba(0, 194, 255, 0.6), rgba(0, 255, 224, 0.2));
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 52px 1fr;
+      gap: 1.25rem;
+      align-items: center;
+    }
+
+    .step-circle {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      background: rgba(0, 194, 255, 0.2);
+      color: var(--accent);
+      box-shadow: 0 0 20px rgba(0, 194, 255, 0.4);
+    }
+
+    .cta-card {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+
+    .cta-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+  </style>
 </body>
 </html>

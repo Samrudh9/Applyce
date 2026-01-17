@@ -6,66 +6,136 @@
   <title>Career Roadmap | Applyce</title>
   <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
-<body class="text-slate-100">
-  <header class="max-w-6xl mx-auto px-6 pt-8">
-    <nav class="glass-soft flex items-center justify-between px-6 py-4">
-      <a href="/" class="flex items-center gap-3">
-        <div class="h-10 w-10 rounded-full bg-gradient-to-br from-cyan-400 to-teal-300 glow"></div>
-        <span class="text-lg font-semibold">Applyce</span>
-      </a>
-      <a href="/dashboard" class="text-sm text-cyan-200 hover:text-white">Back to dashboard</a>
-    </nav>
-  </header>
+<body>
+  {% include 'components/navbar.html' %}
 
-  <main class="max-w-6xl mx-auto px-6 py-12">
-    <section class="glass p-10">
-      <div class="flex flex-wrap items-center justify-between gap-6">
+  <main class="section">
+    <div class="container">
+      <div class="section-header">
         <div>
-          <p class="text-cyan-200 uppercase tracking-[0.3em] text-xs">Career roadmap</p>
-          <h1 class="text-3xl font-semibold mt-3">Your AI-driven growth journey.</h1>
-          <p class="text-slate-400 mt-2">Structured phases that guide you from current role to future leadership positions.</p>
+          <p class="section-subtitle">Career Roadmap</p>
+          <h1 class="section-title">{{ career or 'AI Product Strategist' }} Roadmap</h1>
+          <p class="helper-text">A structured journey from foundations to expert-level mastery.</p>
         </div>
-        <button class="px-5 py-2 rounded-full border border-cyan-300/40 text-cyan-200 hover:bg-cyan-400/10 transition">Download roadmap</button>
+        <div class="chip-list">
+          <span class="badge">Overall Progress</span>
+          <span class="badge-success">{{ roadmap.overall_progress or 38 }}%</span>
+        </div>
       </div>
 
-      <div class="relative mt-10 timeline">
-        <div class="space-y-8">
-          <div class="timeline-item glass-soft p-6">
-            <span class="timeline-dot"></span>
-            <h3 class="text-xl font-semibold">Phase 1: Skill foundation (Weeks 1-4)</h3>
-            <p class="text-sm text-slate-400 mt-2">Complete advanced analytics coursework and refresh product strategy fundamentals.</p>
-            <div class="mt-4 flex flex-wrap gap-2">
-              <span class="badge">Analytics certification</span>
-              <span class="badge">Strategic thinking</span>
-              <span class="badge">Mentor session</span>
-            </div>
-          </div>
-          <div class="timeline-item glass-soft p-6">
-            <span class="timeline-dot"></span>
-            <h3 class="text-xl font-semibold">Phase 2: Portfolio acceleration (Weeks 5-8)</h3>
-            <p class="text-sm text-slate-400 mt-2">Lead a cross-functional initiative, publish outcomes, and update your portfolio.</p>
-            <div class="mt-4 flex flex-wrap gap-2">
-              <span class="badge">Impact story</span>
-              <span class="badge">Leadership feedback</span>
-              <span class="badge">Resume update</span>
-            </div>
-          </div>
-          <div class="timeline-item glass-soft p-6">
-            <span class="timeline-dot"></span>
-            <h3 class="text-xl font-semibold">Phase 3: Opportunity launch (Weeks 9-12)</h3>
-            <p class="text-sm text-slate-400 mt-2">Activate targeted job search, prepare interviews, and secure referrals.</p>
-            <div class="mt-4 flex flex-wrap gap-2">
-              <span class="badge">Mock interviews</span>
-              <span class="badge">Job outreach</span>
-              <span class="badge">Offer strategy</span>
-            </div>
+      <div class="grid" style="display:grid; gap:2rem; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); margin-top:2.5rem;">
+        <div class="glass card">
+          <div class="timeline">
+            {% for phase in roadmap.phases if roadmap else [] %}
+              <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <h3>{{ phase.title }}</h3>
+                <p class="helper-text">{{ phase.duration }}</p>
+                <div class="progress" style="margin:0.75rem 0;">
+                  <div class="progress-bar" style="width: {{ phase.progress }}%;"></div>
+                </div>
+                <h4>Skills to Learn</h4>
+                <div class="chip-list">
+                  {% for skill in phase.skills %}
+                    <span class="tag tag-orange">{{ skill }}</span>
+                  {% endfor %}
+                </div>
+                <h4 style="margin-top:1rem;">Resources</h4>
+                <ul class="helper-text">
+                  {% for resource in phase.resources %}
+                    <li>{{ resource }}</li>
+                  {% endfor %}
+                </ul>
+                <h4 style="margin-top:1rem;">Projects</h4>
+                <ul class="helper-text">
+                  {% for project in phase.projects %}
+                    <li>{{ project }}</li>
+                  {% endfor %}
+                </ul>
+              </div>
+            {% else %}
+              <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <h3>Foundation (0-3 months)</h3>
+                <p class="helper-text">Build your AI and product strategy fundamentals.</p>
+                <div class="progress" style="margin:0.75rem 0;">
+                  <div class="progress-bar" style="width: 35%;"></div>
+                </div>
+                <div class="chip-list">
+                  <span class="tag tag-orange">AI fundamentals</span>
+                  <span class="tag tag-orange">Product discovery</span>
+                  <span class="tag tag-orange">Market analysis</span>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <h3>Intermediate (3-6 months)</h3>
+                <p class="helper-text">Apply AI insights and deliver cross-functional projects.</p>
+                <div class="progress" style="margin:0.75rem 0;">
+                  <div class="progress-bar" style="width: 52%;"></div>
+                </div>
+                <div class="chip-list">
+                  <span class="tag tag-orange">Prompt optimization</span>
+                  <span class="tag tag-orange">User research</span>
+                  <span class="tag tag-orange">OKR planning</span>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <h3>Advanced (6-12 months)</h3>
+                <p class="helper-text">Lead strategic AI initiatives and scale product impact.</p>
+                <div class="progress" style="margin:0.75rem 0;">
+                  <div class="progress-bar" style="width: 68%;"></div>
+                </div>
+                <div class="chip-list">
+                  <span class="tag tag-orange">AI roadmapping</span>
+                  <span class="tag tag-orange">Executive storytelling</span>
+                  <span class="tag tag-orange">Growth strategy</span>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <h3>Expert (12+ months)</h3>
+                <p class="helper-text">Drive AI innovation and mentor teams.</p>
+                <div class="progress" style="margin:0.75rem 0;">
+                  <div class="progress-bar" style="width: 22%;"></div>
+                </div>
+                <div class="chip-list">
+                  <span class="tag tag-orange">Portfolio leadership</span>
+                  <span class="tag tag-orange">AI governance</span>
+                  <span class="tag tag-orange">Org transformation</span>
+                </div>
+              </div>
+            {% endfor %}
           </div>
         </div>
+
+        <aside class="glass card">
+          <h3>Quick Stats</h3>
+          <div class="stats-card" style="margin-top:1.5rem;">
+            <p class="helper-text">Projected Salary</p>
+            <h4>$125k - $160k</h4>
+          </div>
+          <div class="stats-card" style="margin-top:1.5rem;">
+            <p class="helper-text">Demand Level</p>
+            <span class="badge-success">High</span>
+          </div>
+          <div class="stats-card" style="margin-top:1.5rem;">
+            <p class="helper-text">Related Careers</p>
+            <div class="chip-list">
+              <span class="badge">AI Product Manager</span>
+              <span class="badge">Growth Strategist</span>
+              <span class="badge">Innovation Lead</span>
+            </div>
+          </div>
+        </aside>
       </div>
-    </section>
+    </div>
   </main>
+
+  {% include 'components/footer.html' %}
 </body>
 </html>

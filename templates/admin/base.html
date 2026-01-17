@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{% block title %}Admin Panel{% endblock %} - SkillFit</title>
+  <title>{% block title %}Admin Panel{% endblock %} - Applyce</title>
   <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -11,7 +11,7 @@
     :root {
       --bg-color: #0a0b0f;
       --bg-secondary: #12131a;
-      --card-bg: #1a1b22;
+      --card-bg: rgba(26, 27, 34, 0.85);
       --card-bg-hover: #22232d;
       --text-color: #e0e0e0;
       --text-muted: #888;
@@ -490,7 +490,7 @@
   <div class="admin-layout">
     <!-- Sidebar -->
     <nav class="admin-sidebar" id="adminSidebar">
-      <div class="admin-logo">🔧 Admin Panel</div>
+      <div class="admin-logo">🪐 Applyce Admin</div>
       <ul class="admin-nav">
         <li><a href="{{ url_for('admin_dashboard') }}" class="{% if request.endpoint == 'admin_dashboard' %}active{% endif %}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
         <li><a href="{{ url_for('admin_users') }}" class="{% if 'admin_users' in request.endpoint %}active{% endif %}"><i class="fas fa-users"></i> Users</a></li>
