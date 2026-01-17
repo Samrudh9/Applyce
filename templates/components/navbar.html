@@ -1,285 +1,200 @@
-<!-- Navigation Component -->
-<nav class="navbar">
-  <div class="nav-container">
-    <a href="/" class="nav-logo">
-      <span class="logo-icon">🎯</span>
-      <span class="logo-text">SkillFit</span>
+<nav class="site-nav">
+  <div class="container nav-inner glass-soft">
+    <a href="/" class="nav-brand">
+      <span class="brand-icon">🪐</span>
+      <span class="brand-name">Applyce</span>
     </a>
-    
-    <!-- Hamburger Menu Button (mobile only) -->
+
     <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
       <span class="hamburger"></span>
     </button>
-    
-    <!-- Navigation Links -->
-    <ul class="nav-menu" id="navMenu">
+
+    <ul class="nav-links" id="navMenu">
       <li><a href="/" class="nav-link">Home</a></li>
-      <li><a href="/#features" class="nav-link">Features</a></li>
-      <li><a href="/#how-it-works" class="nav-link">How It Works</a></li>
+      <li><a href="/dashboard" class="nav-link">Dashboard</a></li>
+      <li><a href="/jobs" class="nav-link">Jobs</a></li>
+      <li><a href="/roadmap" class="nav-link">Roadmap</a></li>
+      <li><a href="/pricing" class="nav-link">Pricing</a></li>
       <li><a href="/about" class="nav-link">About</a></li>
-      
-      <!-- Auth Buttons Section -->
       {% if current_user.is_authenticated %}
-        <li>
-          <span class="user-greeting" style="color: var(--accent); margin-right: 0.5rem;">
-            <i class="fas fa-user-circle"></i> {{ current_user.username }}
-          </span>
-        </li>
-        <li><a href="{{ url_for('dashboard') }}" class="nav-link">
-          <i class="fas fa-tachometer-alt"></i> Dashboard
-        </a></li>
-        <li><a href="{{ url_for('logout') }}" class="btn btn-outline" style="margin-left: 0.5rem; padding: 0.5rem 1rem; border-radius: 20px; border: 1px solid var(--accent);">
-          <i class="fas fa-sign-out-alt"></i> Logout
-        </a></li>
+        <li class="nav-user">Hi, {{ current_user.username }}</li>
+        <li><a href="{{ url_for('dashboard') }}" class="btn btn-secondary">My Dashboard</a></li>
+        <li><a href="{{ url_for('logout') }}" class="btn btn-outline">Logout</a></li>
       {% else %}
-        <li><a href="{{ url_for('login') }}" class="btn btn-outline" style="padding: 0.5rem 1rem; border-radius: 20px; border: 1px solid var(--accent);">
-          <i class="fas fa-sign-in-alt"></i> Sign In
-        </a></li>
-        <li><a href="{{ url_for('register') }}" class="btn btn-primary" style="margin-left: 0.5rem; padding: 0.5rem 1rem; border-radius: 20px; background: linear-gradient(90deg, var(--accent), var(--accent-secondary)); color: #000;">
-          <i class="fas fa-user-plus"></i> Sign Up Free
-        </a></li>
+        <li><a href="{{ url_for('login') }}" class="btn btn-outline">Sign In</a></li>
+        <li><a href="{{ url_for('register') }}" class="btn btn-primary">Sign Up Free</a></li>
       {% endif %}
     </ul>
   </div>
 </nav>
 
-<!-- Navbar Styles -->
 <style>
-/* Navigation Base */
-.navbar {
-  background: rgba(10, 11, 15, 0.95);
-  backdrop-filter: blur(10px);
-  position: fixed;
+.site-nav {
+  position: sticky;
   top: 0;
-  left: 0;
-  right: 0;
   z-index: 1000;
-  padding: 1rem 2rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+  padding: 1.5rem 0 0;
 }
 
-.nav-container {
-  max-width: 1200px;
-  margin: 0 auto;
+.nav-inner {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: center;
+  gap: 1.5rem;
+  padding: 1rem 1.5rem;
 }
 
-.nav-logo {
+.nav-brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 0.65rem;
   text-decoration: none;
   font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.brand-icon {
   font-size: 1.5rem;
-  background: linear-gradient(90deg, var(--accent, #00c2ff), var(--accent-secondary, #00ffe0));
+}
+
+.brand-name {
+  background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
   background-clip: text;
+  color: transparent;
 }
 
-.logo-icon {
-  font-size: 1.5rem;
-  -webkit-text-fill-color: initial;
-}
-
-.logo-text {
-  background: linear-gradient(90deg, var(--accent, #00c2ff), var(--accent-secondary, #00ffe0));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.nav-menu {
+.nav-links {
   display: flex;
   align-items: center;
-  gap: 2rem;
+  gap: 1.25rem;
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
 .nav-link {
-  color: var(--text-muted, #888);
+  color: var(--text-muted);
   text-decoration: none;
   font-weight: 500;
   transition: color 0.3s ease;
-  padding: 0.5rem 0;
 }
 
 .nav-link:hover {
-  color: var(--accent, #00c2ff);
+  color: var(--accent);
 }
 
-.nav-link.nav-cta {
-  background: linear-gradient(90deg, var(--accent, #00c2ff), var(--accent-secondary, #00ffe0));
-  color: #000;
-  padding: 0.6rem 1.25rem;
-  border-radius: 25px;
-  font-weight: 600;
+.nav-user {
+  color: var(--text-muted);
+  font-size: 0.9rem;
 }
 
-.nav-link.nav-cta:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(0, 194, 255, 0.4);
-  color: #000;
-}
-
-.nav-link.nav-auth {
-  border: 1px solid var(--accent, #00c2ff);
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  transition: all 0.3s ease;
-}
-
-.nav-link.nav-auth:hover {
-  background: rgba(0, 194, 255, 0.1);
-}
-
-/* Hamburger Button - Hidden on Desktop */
 .nav-toggle {
   display: none;
   background: none;
   border: none;
   cursor: pointer;
-  padding: 10px;
-  z-index: 1001;
 }
 
-.hamburger {
-  display: block;
-  width: 25px;
-  height: 3px;
-  background: var(--text-color, #e0e0e0);
-  border-radius: 3px;
-  position: relative;
-  transition: all 0.3s ease;
-}
-
+.hamburger,
 .hamburger::before,
 .hamburger::after {
   content: '';
-  position: absolute;
-  width: 25px;
+  display: block;
+  width: 26px;
   height: 3px;
-  background: var(--text-color, #e0e0e0);
-  border-radius: 3px;
+  border-radius: 6px;
+  background: var(--text-color);
   transition: all 0.3s ease;
 }
 
 .hamburger::before {
-  top: -8px;
+  transform: translateY(-8px);
 }
 
 .hamburger::after {
-  top: 8px;
+  transform: translateY(5px);
 }
 
-/* Hamburger Animation when Active */
 .nav-toggle.active .hamburger {
   background: transparent;
 }
 
 .nav-toggle.active .hamburger::before {
-  top: 0;
-  transform: rotate(45deg);
+  transform: rotate(45deg) translateY(0);
 }
 
 .nav-toggle.active .hamburger::after {
-  top: 0;
-  transform: rotate(-45deg);
+  transform: rotate(-45deg) translateY(-1px);
 }
 
-/* Overlay when menu is open */
 .nav-overlay {
   display: none;
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 999;
+  inset: 0;
+  background: rgba(5, 6, 12, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 900;
 }
 
 .nav-overlay.active {
   display: block;
 }
 
-/* Mobile Styles */
-@media (max-width: 768px) {
+@media (max-width: 960px) {
   .nav-toggle {
     display: block;
   }
-  
-  .nav-menu {
+
+  .nav-links {
     position: fixed;
     top: 0;
     right: -100%;
-    width: 80%;
-    max-width: 300px;
     height: 100vh;
-    background: var(--card-bg, #1a1b22);
+    width: min(320px, 80vw);
     flex-direction: column;
     justify-content: center;
-    align-items: center;
-    gap: 2rem;
+    gap: 1.5rem;
+    background: rgba(12, 13, 18, 0.95);
+    border-left: 1px solid rgba(148, 163, 184, 0.15);
     transition: right 0.3s ease;
-    box-shadow: -5px 0 20px rgba(0, 0, 0, 0.5);
     z-index: 1000;
   }
-  
-  .nav-menu.active {
+
+  .nav-links.active {
     right: 0;
-  }
-  
-  .nav-link {
-    font-size: 1.25rem;
-    padding: 0.75rem 1.5rem;
-  }
-  
-  .nav-link.nav-cta {
-    margin-top: 1rem;
   }
 }
 </style>
 
-<!-- Navbar JavaScript -->
 <script>
-// Mobile Navigation Toggle
 (function() {
   const navToggle = document.getElementById('navToggle');
   const navMenu = document.getElementById('navMenu');
-  
+
   if (navToggle && navMenu) {
-    // Create overlay element if it doesn't exist
     let overlay = document.querySelector('.nav-overlay');
     if (!overlay) {
       overlay = document.createElement('div');
       overlay.className = 'nav-overlay';
       document.body.appendChild(overlay);
     }
-    
-    // Toggle menu on hamburger click
+
     navToggle.addEventListener('click', function() {
       navToggle.classList.toggle('active');
       navMenu.classList.toggle('active');
       overlay.classList.toggle('active');
       document.body.style.overflow = navMenu.classList.contains('active') ? 'hidden' : '';
     });
-    
-    // Close menu when clicking overlay
+
     overlay.addEventListener('click', function() {
       navToggle.classList.remove('active');
       navMenu.classList.remove('active');
       overlay.classList.remove('active');
       document.body.style.overflow = '';
     });
-    
-    // Close menu when clicking a link
-    navMenu.querySelectorAll('.nav-link').forEach(function(link) {
+
+    navMenu.querySelectorAll('a').forEach(function(link) {
       link.addEventListener('click', function() {
         navToggle.classList.remove('active');
         navMenu.classList.remove('active');

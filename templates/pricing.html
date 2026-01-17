@@ -6,70 +6,79 @@
   <title>Pricing | Applyce</title>
   <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
-<body class="text-slate-100">
-  <header class="max-w-6xl mx-auto px-6 pt-8">
-    <nav class="glass-soft flex items-center justify-between px-6 py-4">
-      <a href="/" class="flex items-center gap-3">
-        <div class="h-10 w-10 rounded-full bg-gradient-to-br from-cyan-400 to-teal-300 glow"></div>
-        <span class="text-lg font-semibold">Applyce</span>
-      </a>
-      <div class="flex items-center gap-6 text-sm text-slate-300">
-        <a href="/pricing" class="text-white">Pricing</a>
-        <a href="/login" class="hover:text-white">Login</a>
-      </div>
-    </nav>
-  </header>
+<body>
+  {% include 'components/navbar.html' %}
 
-  <main class="max-w-6xl mx-auto px-6 py-16">
-    <section class="text-center">
-      <p class="text-cyan-200 uppercase tracking-[0.3em] text-xs">Pricing</p>
-      <h1 class="text-4xl font-semibold mt-3">Flexible plans built for every career stage.</h1>
-      <p class="text-slate-400 mt-3">Scale from individual growth to enterprise talent intelligence with Applyce.</p>
-    </section>
-
-    <section class="grid lg:grid-cols-3 gap-6 mt-12">
-      <div class="glass p-8 hover-lift">
-        <h3 class="text-xl font-semibold">Starter</h3>
-        <p class="text-3xl font-semibold mt-4">$19 <span class="text-sm text-slate-400">/ month</span></p>
-        <p class="text-sm text-slate-400 mt-2">Ideal for early career exploration.</p>
-        <ul class="mt-6 space-y-3 text-sm text-slate-300">
-          <li>AI recommendations</li>
-          <li>Resume scan & score</li>
-          <li>Weekly job matches</li>
-        </ul>
-        <button class="mt-8 w-full px-5 py-3 rounded-full border border-cyan-300/40 text-cyan-200 hover:bg-cyan-400/10 transition">Start Starter</button>
-      </div>
-      <div class="gradient-border hover-lift">
-        <div class="gradient-border-inner glass p-8">
-          <div class="flex items-center justify-between">
-            <h3 class="text-xl font-semibold">Growth</h3>
-            <span class="badge">Best value</span>
-          </div>
-          <p class="text-3xl font-semibold mt-4">$49 <span class="text-sm text-slate-400">/ month</span></p>
-          <p class="text-sm text-slate-400 mt-2">For ambitious professionals ready to level up.</p>
-          <ul class="mt-6 space-y-3 text-sm text-slate-300">
-            <li>Unlimited AI insights</li>
-            <li>Career roadmap builder</li>
-            <li>Priority job matching</li>
-          </ul>
-          <button class="mt-8 w-full px-5 py-3 rounded-full bg-gradient-to-r from-cyan-400 to-teal-300 text-slate-900 font-semibold hover:scale-105 transition">Start Growth</button>
+  <main class="section">
+    <div class="container">
+      <div class="section-header" style="justify-content:center; text-align:center;">
+        <div>
+          <p class="section-subtitle">Pricing</p>
+          <h1 class="section-title">Choose the plan that scales with your ambition.</h1>
+          <p class="helper-text">Start free and unlock premium AI insights whenever you're ready.</p>
         </div>
       </div>
-      <div class="glass p-8 hover-lift">
-        <h3 class="text-xl font-semibold">Enterprise</h3>
-        <p class="text-3xl font-semibold mt-4">$99 <span class="text-sm text-slate-400">/ month</span></p>
-        <p class="text-sm text-slate-400 mt-2">Advanced analytics and team reporting.</p>
-        <ul class="mt-6 space-y-3 text-sm text-slate-300">
-          <li>Team dashboards</li>
-          <li>Custom talent analytics</li>
-          <li>Dedicated success lead</li>
-        </ul>
-        <button class="mt-8 w-full px-5 py-3 rounded-full border border-cyan-300/40 text-cyan-200 hover:bg-cyan-400/10 transition">Contact sales</button>
+
+      <div class="grid" style="display:grid; gap:2rem; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); margin-top:3rem;">
+        <div class="glass card">
+          <h3>Free</h3>
+          <p class="helper-text">$0 / month</p>
+          <ul class="helper-text" style="padding-left:1.2rem;">
+            <li>Basic career recommendations</li>
+            <li>Resume upload & scoring</li>
+            <li>Limited job search access</li>
+          </ul>
+          <a class="btn btn-outline" href="/register" style="margin-top:1.5rem;">Get Started</a>
+        </div>
+        <div class="glass card" style="border:1px solid rgba(168, 85, 247, 0.5); position:relative;">
+          <span class="badge-purple" style="position:absolute; top:1.5rem; right:1.5rem;">Popular</span>
+          <h3>Pro</h3>
+          <p class="helper-text">$9.99 / month</p>
+          <ul class="helper-text" style="padding-left:1.2rem;">
+            <li>Unlimited ATS reports</li>
+            <li>Full career roadmaps</li>
+            <li>Advanced job matching</li>
+            <li>Skill gap insights</li>
+          </ul>
+          <a class="btn btn-primary" href="/register" style="margin-top:1.5rem;">Upgrade to Pro</a>
+        </div>
+        <div class="glass card">
+          <h3>Enterprise</h3>
+          <p class="helper-text">Custom pricing</p>
+          <ul class="helper-text" style="padding-left:1.2rem;">
+            <li>Team analytics & dashboards</li>
+            <li>API access and SSO</li>
+            <li>Dedicated success manager</li>
+          </ul>
+          <a class="btn btn-secondary" href="mailto:hello@applyce.ai" style="margin-top:1.5rem;">Contact Us</a>
+        </div>
       </div>
-    </section>
+
+      <div class="section" style="padding-top:3rem;">
+        <div class="glass card">
+          <h2>FAQ</h2>
+          <div class="accordion" style="margin-top:1.5rem; display:grid; gap:1rem;">
+            <details class="glass-soft card">
+              <summary>Can I cancel anytime?</summary>
+              <p class="helper-text">Yes. You can cancel your subscription anytime from your account settings.</p>
+            </details>
+            <details class="glass-soft card">
+              <summary>Is there a free trial?</summary>
+              <p class="helper-text">The Free plan includes core features so you can try Applyce without risk.</p>
+            </details>
+            <details class="glass-soft card">
+              <summary>Do you offer team discounts?</summary>
+              <p class="helper-text">Enterprise pricing is customized based on team size and requirements.</p>
+            </details>
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
+
+  {% include 'components/footer.html' %}
 </body>
 </html>
