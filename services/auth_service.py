@@ -10,7 +10,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from models import db
 from models.user import User
-from flask import current_app, url_for
+from flask import url_for
 from flask_login import login_user, logout_user
 from models import db
 from models.user import User
@@ -54,34 +54,39 @@ class AuthService:
         Returns:
             tuple: (success: bool, user_or_error: User or str)
         """
-        # Validate input
-        valid, error = cls.validate_username(username)
-        if not valid:
-            return False, error
-        
-        if not cls.validate_email(email):
-            return False, "Invalid email format"
-        
-        valid, error = cls.validate_password(password)
-        if not valid:
-            return False, error
-        
-        # Check if user already exists
-        if User.query.filter_by(username=username).first():
-            return False, "Username already taken"
-        
-        if User.query.filter_by(email=email).first():
-            return False, "Email already registered"
-        
-        # Create new user
         try:
+            # Validate input
+            valid, error = cls.validate_username(username)
+            if not valid:
+                return False, error
+
+            if not cls.validate_email(email):
+                return False, "Invalid email format"
+
+            valid, error = cls.validate_password(password)
+            if not valid:
+                return False, error
+
+            # Check if user already exists
+            if User.query.filter_by(username=username).first():
+                return False, "Username already taken"
+
+            if User.query.filter_by(email=email).first():
+                return False, "Email already registered"
+
+            # Create new user
             user = User(username=username, email=email)
             user.set_password(password)
             db.session.add(user)
             db.session.commit()
+            try:
+                cls._send_welcome_email(user.email, user.username)
+            except Exception:
+                logger.exception("Welcome email failed after registration")
             return True, user
         except Exception as e:
             db.session.rollback()
+            logger.exception("Registration failed")
             return False, f"Registration failed: {str(e)}"
     
     @staticmethod
@@ -263,17 +268,86 @@ The Applyce Team
         </div>
     </div>
 </body>
-</html>
+        </html>
         """
-        
+
         # Attach both versions
         message.attach(MIMEText(text_content, 'plain'))
         message.attach(MIMEText(html_content, 'html'))
-        
+
         # Send email via Gmail SMTP
         with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
             server.login(sender_email, sender_password)
             server.sendmail(sender_email, email, message.as_string())
+
+    @classmethod
+    def _send_welcome_email(cls, recipient_email: str, username: str) -> None:
+        """
+        Send a welcome email after successful registration.
+
+        Args:
+            recipient_email: Recipient email address
+            username: User's username for personalization
+        """
+        try:
+            smtp_user = os.environ.get('MAIL_USERNAME')
+            smtp_password = os.environ.get('MAIL_PASSWORD')
+            sender = os.environ.get('MAIL_DEFAULT_SENDER', smtp_user or '')
+
+            message = MIMEMultipart('alternative')
+            message['Subject'] = 'Welcome to Applyce'
+            message['To'] = recipient_email
+
+            text_body = f"""\
+Hi {username},
+
+Welcome to Applyce!
+
+Your account has been successfully created.
+Start analyzing your resume and exploring career paths.
+
+– Applyce Team
+"""
+            html_body = f"""\
+<!DOCTYPE html>
+<html>
+<body>
+  <p>Hi <strong>{username}</strong>,</p>
+  <p>Welcome to Applyce 🎯</p>
+  <p>Your account has been successfully created.<br>
+     Start analyzing your resume and exploring career paths.</p>
+  <p>– Applyce Team</p>
+</body>
+</html>
+"""
+            message.attach(MIMEText(text_body, 'plain'))
+            message.attach(MIMEText(html_body, 'html'))
+
+            if smtp_user and smtp_password:
+                smtp_server = os.environ.get('MAIL_SERVER', 'smtp-relay.brevo.com')
+                smtp_port_value = os.environ.get('MAIL_PORT')
+                smtp_port = int(smtp_port_value) if smtp_port_value else 587
+                message['From'] = sender
+                with smtplib.SMTP(smtp_server, smtp_port) as server:
+                    server.starttls()
+                    server.login(smtp_user, smtp_password)
+                    server.sendmail(sender, recipient_email, message.as_string())
+                logger.info("Welcome email sent to %s via SMTP relay", recipient_email)
+                return
+
+            sender_email = os.environ.get('EMAIL_ADDRESS')
+            sender_password = os.environ.get('EMAIL_PASSWORD')
+            if sender_email and sender_password:
+                message['From'] = sender_email
+                with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
+                    server.login(sender_email, sender_password)
+                    server.sendmail(sender_email, recipient_email, message.as_string())
+                logger.info("Welcome email sent to %s via Gmail SMTP", recipient_email)
+                return
+
+            logger.warning("SMTP credentials missing; welcome email not sent.")
+        except Exception:
+            logger.exception("Failed to send welcome email")
     
     @classmethod
     def reset_password(cls, token: str, new_password: str) -> tuple:
@@ -320,75 +394,3 @@ The Applyce Team
         """
         return User.query.filter_by(reset_token=token).first()
      
-    @classmethod
-    def register_user(cls, username, email, password):
-
-        # (validate input and create user)
-        user = User(username=username, email=email)
-        user.set_password(password)
-        db.session.add(user)
-        db.session.commit()
-
-        # Send welcome email; log but don’t block registration on errors
-        try:
-            cls._send_welcome_email(user.email, user.username)
-        except Exception as e:
-            logger.error(f"Failed to send welcome email: {e}")
-        return True, user
-
-    @staticmethod
-    def _send_welcome_email(recipient_email: str, username: str) -> None:
-        """
-        Compose and send a welcome email using Brevo’s SMTP relay.
-        Reads the SMTP configuration from environment variables.
-        """
-        smtp_server = os.environ.get('MAIL_SERVER', 'smtp-relay.brevo.com')
-        smtp_port = int(os.environ.get('MAIL_PORT', 587))
-        smtp_user = os.environ.get('MAIL_USERNAME')
-        smtp_password = os.environ.get('MAIL_PASSWORD')
-        sender = os.environ.get('MAIL_DEFAULT_SENDER', smtp_user or '')
-
-        if not smtp_user or not smtp_password:
-            logger.warning("SMTP credentials missing; welcome email not sent.")
-            return
-
-        # Create email content
-        message = MIMEMultipart('alternative')
-        message['Subject'] = 'Welcome to Applyce '
-        message['From'] = sender
-        message['To'] = recipient_email
-
-        # Plain text fallback
-        text_body = f"""\
-Hi {username},
-
-Welcome to Applyce 
-
-Your account has been successfully created.
-Start analyzing your resume and exploring career paths.
-
-– Applyce Team
-"""
-        # Simple HTML version
-        html_body = f"""\
-<!DOCTYPE html>
-<html>
-<body>
-  <p>Hi <strong>{username}</strong>,</p>
-  <p>Welcome to Applyce 🎯</p>
-  <p>Your account has been successfully created.<br>
-     Start analyzing your resume and exploring career paths.</p>
-  <p>– Applyce Team</p>
-</body>
-</html>
-"""
-        message.attach(MIMEText(text_body, 'plain'))
-        message.attach(MIMEText(html_body, 'html'))
-
-        # Send via SMTP
-        with smtplib.SMTP(smtp_server, smtp_port) as server:
-            server.starttls()  # enable TLS
-            server.login(smtp_user, smtp_password)
-            server.sendmail(sender, recipient_email, message.as_string())
-
-        logger.info(f"Welcome email sent to {recipient_email}")
