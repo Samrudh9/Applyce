@@ -6,123 +6,218 @@
   <title>Dashboard | Applyce</title>
   <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="text-slate-100">
-  <header class="max-w-6xl mx-auto px-6 pt-8">
-    <nav class="glass-soft flex flex-wrap items-center justify-between gap-4 px-6 py-4">
-      <div class="flex items-center gap-3">
-        <div class="h-10 w-10 rounded-full bg-gradient-to-br from-cyan-400 to-teal-300 glow"></div>
-        <span class="text-lg font-semibold">Applyce</span>
-      </div>
-      <div class="flex flex-wrap items-center gap-6 text-sm text-slate-300">
-        <a href="/dashboard" class="text-white">Dashboard</a>
-        <a href="/upload" class="hover:text-white">Upload</a>
-        <a href="/jobs" class="hover:text-white">Jobs</a>
-        <a href="/roadmap" class="hover:text-white">Roadmap</a>
-      </div>
-      <div class="flex items-center gap-3">
-        <span class="text-sm text-slate-400">Jordan Lee</span>
-        <div class="h-9 w-9 rounded-full bg-slate-800"></div>
-      </div>
-    </nav>
-  </header>
+<body>
+  {% include 'components/navbar.html' %}
 
-  <main class="max-w-6xl mx-auto px-6 pb-16">
-    <section class="pt-10 grid lg:grid-cols-[1.2fr_0.8fr] gap-6">
-      <div class="glass p-8">
-        <p class="text-sm text-cyan-200 uppercase tracking-[0.3em]">Dashboard</p>
-        <h1 class="text-3xl md:text-4xl font-semibold mt-2">Your career intelligence center.</h1>
-        <p class="text-slate-400 mt-3">Track progress, review AI insights, and monitor your latest resume performance.</p>
-        <div class="mt-6 grid md:grid-cols-3 gap-4">
-          <div class="glass-soft p-4">
-            <p class="text-xs text-slate-400 uppercase tracking-wide">Career match</p>
-            <p class="text-2xl font-semibold">92%</p>
-            <p class="text-xs text-emerald-300">+4% this week</p>
-          </div>
-          <div class="glass-soft p-4">
-            <p class="text-xs text-slate-400 uppercase tracking-wide">Skill momentum</p>
-            <p class="text-2xl font-semibold">78</p>
-            <p class="text-xs text-cyan-200">AI-driven growth</p>
-          </div>
-          <div class="glass-soft p-4">
-            <p class="text-xs text-slate-400 uppercase tracking-wide">Job matches</p>
-            <p class="text-2xl font-semibold">18</p>
-            <p class="text-xs text-slate-400">New this month</p>
-          </div>
+  <main class="section">
+    <div class="container">
+      <div class="section-header">
+        <div>
+          <p class="section-subtitle">Dashboard</p>
+          <h1 class="section-title">Welcome back, {{ user.username if user else 'Professional' }}!</h1>
+          <p class="helper-text">Track your resume performance, AI insights, and career progress in one place.</p>
         </div>
+        <a class="btn btn-primary" href="/upload"><i class="fas fa-cloud-upload-alt"></i> Upload New Resume</a>
       </div>
-      <div class="glass p-8">
-        <h2 class="text-xl font-semibold">Weekly insights</h2>
-        <div class="mt-6 space-y-4">
-          <div class="glass-soft p-4 flex items-center justify-between">
-            <div>
-              <p class="text-sm text-slate-400">Interview readiness</p>
-              <p class="text-lg font-semibold">84%</p>
-            </div>
-            <div class="progress-ring" style="--value: 84%;">
-              <span class="text-sm">84%</span>
-            </div>
-          </div>
-          <div class="glass-soft p-4">
-            <p class="text-sm text-slate-400">Top recommendation</p>
-            <p class="text-lg font-semibold">Growth Product Manager</p>
-            <p class="text-xs text-slate-400 mt-2">Next action: complete behavioral assessment.</p>
-          </div>
-        </div>
-      </div>
-    </section>
 
-    <section class="pt-10 grid lg:grid-cols-[1.1fr_0.9fr] gap-6">
-      <div class="glass p-8">
-        <div class="flex items-center justify-between">
-          <h2 class="text-xl font-semibold">Career analytics</h2>
-          <span class="badge">Realtime</span>
+      <div class="stats-grid" style="margin-top:2.5rem;">
+        <div class="glass card stats-card">
+          <p class="helper-text">Resume Score</p>
+          <h3>{{ latest_score or 0 }}%</h3>
+          <span class="badge-success">{{ improvement or 0 }}% ▲</span>
         </div>
-        <div class="mt-6 space-y-6">
-          <div class="glass-soft p-4">
-            <p class="text-sm text-slate-400">Market demand trend</p>
-            <div class="mt-4 h-28 rounded-2xl bg-gradient-to-r from-cyan-400/20 to-teal-300/20"></div>
+        <div class="glass card stats-card">
+          <p class="helper-text">ATS Score</p>
+          <h3>{{ latest_ats_score or 0 }}%</h3>
+          <span class="badge-warning">{{ ats_improvement or 0 }}% ▲</span>
+        </div>
+        <div class="glass card stats-card">
+          <p class="helper-text">Career Match</p>
+          <h3>{{ top_career or 'AI Product Strategist' }}</h3>
+          <span class="badge">{{ career_confidence or 90 }}% confidence</span>
+        </div>
+        <div class="glass card stats-card">
+          <p class="helper-text">Best Score</p>
+          <h3>{{ best_score or 0 }}%</h3>
+          <span class="badge-purple">Top result</span>
+        </div>
+      </div>
+
+      <div class="section" style="padding-top:2.5rem;">
+        <div class="glass card">
+          <div class="section-header" style="margin-bottom:1.5rem;">
+            <h2>Score Progress</h2>
+            <span class="badge">Resume vs ATS</span>
           </div>
-          <div class="glass-soft p-4">
-            <p class="text-sm text-slate-400">Salary projection</p>
-            <div class="mt-4 h-24 rounded-2xl bg-gradient-to-r from-blue-400/20 to-cyan-300/10"></div>
+          <canvas id="scoreChart" height="120"></canvas>
+        </div>
+      </div>
+
+      <div class="section" style="padding-top:2.5rem;">
+        <div class="glass card">
+          <div class="section-header" style="margin-bottom:1.5rem;">
+            <h2>Resume History</h2>
+            <span class="badge">{{ total_resumes or 0 }} uploads</span>
+          </div>
+          <div style="overflow:auto;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Filename</th>
+                  <th>Resume Score</th>
+                  <th>ATS Score</th>
+                  <th>Career Match</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in history %}
+                <tr>
+                  <td>{{ item.upload_date.strftime('%Y-%m-%d') }}</td>
+                  <td>{{ item.filename }}</td>
+                  <td>{{ item.overall_score }}%</td>
+                  <td>{{ item.ats_score }}%</td>
+                  <td>{{ item.predicted_career or top_career }}</td>
+                  <td>
+                    <form method="POST" action="/dashboard/delete/{{ item.id }}">
+                      <button class="btn btn-outline" type="submit">Delete</button>
+                    </form>
+                  </td>
+                </tr>
+                {% else %}
+                <tr>
+                  <td colspan="6" class="helper-text">No uploads yet. Upload a resume to start tracking.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
-      <div class="glass p-8">
-        <h2 class="text-xl font-semibold">Resume history</h2>
-        <div class="mt-6 overflow-hidden rounded-2xl border border-slate-800">
-          <table class="w-full text-sm">
-            <thead class="bg-slate-900/80">
-              <tr class="text-left text-slate-400">
-                <th class="px-4 py-3">Version</th>
-                <th class="px-4 py-3">Score</th>
-                <th class="px-4 py-3">Status</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-800">
-              <tr>
-                <td class="px-4 py-3">Resume v4</td>
-                <td class="px-4 py-3 text-cyan-200">92%</td>
-                <td class="px-4 py-3"><span class="badge">Optimized</span></td>
-              </tr>
-              <tr>
-                <td class="px-4 py-3">Resume v3</td>
-                <td class="px-4 py-3 text-cyan-200">88%</td>
-                <td class="px-4 py-3 text-slate-400">Reviewed</td>
-              </tr>
-              <tr>
-                <td class="px-4 py-3">Resume v2</td>
-                <td class="px-4 py-3 text-cyan-200">82%</td>
-                <td class="px-4 py-3 text-slate-400">Archived</td>
-              </tr>
-            </tbody>
-          </table>
+
+      <div class="section" style="padding-top:2.5rem;">
+        <div class="grid" style="display:grid; gap:2rem; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+          <div class="glass card">
+            <h2>Career Roadmap Progress</h2>
+            <p class="helper-text">Track your journey across each phase.</p>
+            {% if roadmap_data %}
+              {% for phase in roadmap_data %}
+                <div style="margin-top:1.5rem;">
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <strong>{{ phase.phase }}</strong>
+                    <span class="badge">{{ phase.progress or 0 }}%</span>
+                  </div>
+                  <div class="progress" style="margin-top:0.5rem;">
+                    <div class="progress-bar" style="width: {{ phase.progress or 0 }}%;"></div>
+                  </div>
+                  <p class="helper-text" style="margin-top:0.5rem;">{{ phase.skills | join(', ') if phase.skills else 'Skill milestones tailored to your goals.' }}</p>
+                </div>
+              {% endfor %}
+            {% else %}
+              <p class="helper-text" style="margin-top:1.5rem;">Upload a resume to generate your roadmap progress.</p>
+            {% endif %}
+          </div>
+          <div class="glass card">
+            <h2>Skills Analysis</h2>
+            <p class="helper-text">Your current strengths and focus areas.</p>
+            <h4 style="margin-top:1.5rem;">Owned Skills</h4>
+            <div class="chip-list">
+              {% for skill in all_skills[:10] %}
+                <span class="tag tag-green">{{ skill }}</span>
+              {% else %}
+                <span class="tag tag-green">Strategic thinking</span>
+                <span class="tag tag-green">Communication</span>
+                <span class="tag tag-green">Project management</span>
+              {% endfor %}
+            </div>
+            <h4 style="margin-top:1.5rem;">Skills to Learn</h4>
+            <div class="chip-list">
+              {% for skill in missing_skills[:8] %}
+                <span class="tag tag-orange">{{ skill }}</span>
+              {% else %}
+                <span class="tag tag-orange">AI product analytics</span>
+                <span class="tag tag-orange">Data storytelling</span>
+                <span class="tag tag-orange">Leadership coaching</span>
+              {% endfor %}
+            </div>
+          </div>
         </div>
       </div>
-    </section>
+
+      <div class="section" style="padding-top:2.5rem;">
+        <div class="glass card">
+          <div class="section-header" style="margin-bottom:1.5rem;">
+            <h2>Recommendations</h2>
+            <span class="badge">Next best actions</span>
+          </div>
+          <div class="icon-grid">
+            <div class="glass-soft card">
+              <h4><i class="fas fa-magic"></i> Strengthen ATS Keywords</h4>
+              <p class="helper-text">Add 5 missing keywords to boost ATS score by 8-12%.</p>
+            </div>
+            <div class="glass-soft card">
+              <h4><i class="fas fa-road"></i> Complete Roadmap Phase 1</h4>
+              <p class="helper-text">Finish 2 foundational courses to unlock intermediate milestones.</p>
+            </div>
+            <div class="glass-soft card">
+              <h4><i class="fas fa-briefcase"></i> Apply to 3 top matches</h4>
+              <p class="helper-text">Apply to roles with 90%+ match scores in the Job Search tab.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
+
+  {% include 'components/footer.html' %}
+
+  <script>
+    const historyData = {{ score_history|tojson if score_history else '[]' }};
+    const labels = historyData.map(item => item.date || '');
+    const resumeScores = historyData.map(item => item.score || 0);
+    const atsScores = historyData.map(item => item.ats_score || item.score || 0);
+
+    const ctx = document.getElementById('scoreChart');
+    if (ctx) {
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'Resume Score',
+              data: resumeScores,
+              borderColor: '#00c2ff',
+              backgroundColor: 'rgba(0, 194, 255, 0.15)',
+              tension: 0.4,
+              fill: true
+            },
+            {
+              label: 'ATS Score',
+              data: atsScores,
+              borderColor: '#00ff88',
+              backgroundColor: 'rgba(0, 255, 136, 0.12)',
+              tension: 0.4,
+              fill: true
+            }
+          ]
+        },
+        options: {
+          plugins: {
+            legend: { labels: { color: '#e0e0e0' } }
+          },
+          scales: {
+            x: { ticks: { color: '#888' }, grid: { color: 'rgba(148,163,184,0.1)' } },
+            y: { ticks: { color: '#888' }, grid: { color: 'rgba(148,163,184,0.1)' } }
+          }
+        }
+      });
+    }
+  </script>
 </body>
 </html>

@@ -3,85 +3,198 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Results | Applyce</title>
+  <title>Analysis Results | Applyce</title>
   <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
-<body class="text-slate-100">
-  <header class="max-w-6xl mx-auto px-6 pt-8">
-    <nav class="glass-soft flex items-center justify-between px-6 py-4">
-      <a href="/" class="flex items-center gap-3">
-        <div class="h-10 w-10 rounded-full bg-gradient-to-br from-cyan-400 to-teal-300 glow"></div>
-        <span class="text-lg font-semibold">Applyce</span>
-      </a>
-      <a href="/dashboard" class="text-sm text-cyan-200 hover:text-white">Return to dashboard</a>
-    </nav>
-  </header>
+<body>
+  {% include 'components/navbar.html' %}
 
-  <main class="max-w-6xl mx-auto px-6 py-12">
-    <section class="glass p-10">
-      <div class="flex flex-wrap items-center justify-between gap-6">
+  <main class="section">
+    <div class="container">
+      <div class="section-header">
         <div>
-          <p class="text-cyan-200 uppercase tracking-[0.3em] text-xs">Results</p>
-          <h1 class="text-3xl font-semibold mt-3">Your AI career match results</h1>
-          <p class="text-slate-400 mt-3">Applyce analyzed your resume and career goals. Here’s the top insight summary.</p>
+          <p class="section-subtitle">Analysis Results</p>
+          <h1 class="section-title">Your AI-powered career insights.</h1>
+          <p class="helper-text">Explore your scores, career predictions, and actionable improvements.</p>
         </div>
-        <div class="flex gap-4">
-          <div class="progress-ring" style="--value: 92%;">
-            <span class="text-sm">92%</span>
+        <div class="chip-list">
+          <span class="badge">Grade A</span>
+          <span class="badge-purple">AI Verified</span>
+        </div>
+      </div>
+
+      <div class="grid" style="display:grid; gap:2rem; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-top:2.5rem;">
+        <div class="glass card" style="text-align:center;">
+          <h3>Overall Score</h3>
+          <div class="progress-ring" style="--value: {{ quality_score or 82 }}%; margin:1.5rem auto;">
+            <span>{{ quality_score or 82 }}%</span>
           </div>
-          <div class="progress-ring" style="--value: 87%;">
-            <span class="text-sm">87%</span>
+          <p class="helper-text">Resume & ATS combined score</p>
+          <div class="chip-list" style="justify-content:center;">
+            <span class="badge-success">Keywords</span>
+            <span class="badge-warning">Format</span>
+            <span class="badge">Sections</span>
+            <span class="badge-purple">Content</span>
+          </div>
+        </div>
+        <div class="glass card">
+          <h3>Score Breakdown</h3>
+          <div style="margin-top:1.5rem;">
+            <p class="helper-text">Keywords</p>
+            <div class="progress"><div class="progress-bar" style="width: 88%;"></div></div>
+          </div>
+          <div style="margin-top:1rem;">
+            <p class="helper-text">Format</p>
+            <div class="progress"><div class="progress-bar" style="width: 76%;"></div></div>
+          </div>
+          <div style="margin-top:1rem;">
+            <p class="helper-text">Sections</p>
+            <div class="progress"><div class="progress-bar" style="width: 81%;"></div></div>
+          </div>
+          <div style="margin-top:1rem;">
+            <p class="helper-text">Content</p>
+            <div class="progress"><div class="progress-bar" style="width: 92%;"></div></div>
+          </div>
+        </div>
+        <div class="glass card">
+          <h3>Grade</h3>
+          <div style="margin-top:1.5rem; display:flex; align-items:center; gap:1rem;">
+            <span class="badge-success" style="font-size:1.4rem;">A+</span>
+            <div>
+              <p class="helper-text">ATS Score</p>
+              <h3>{{ ats_score or quality_score or 82 }}%</h3>
+            </div>
+          </div>
+          <p class="helper-text" style="margin-top:1rem;">Consistent structure with strong keyword alignment.</p>
+        </div>
+      </div>
+
+      <div class="section" style="padding-top:2.5rem;">
+        <div class="glass card">
+          <div class="section-header" style="margin-bottom:1.5rem;">
+            <h2>Career Predictions</h2>
+            <span class="badge">Top matches</span>
+          </div>
+          <div class="icon-grid">
+            {% if mode == 'manual' %}
+              {% for career in top_3_careers %}
+              <div class="glass-soft card">
+                <h4>{{ career.career }}</h4>
+                <p class="helper-text">Confidence {{ career.confidence }}%</p>
+                <div class="progress" style="margin-top:0.75rem;">
+                  <div class="progress-bar" style="width: {{ career.confidence }}%;"></div>
+                </div>
+                <a class="btn btn-secondary" href="/roadmap">View Roadmap</a>
+              </div>
+              {% endfor %}
+            {% else %}
+              {% for career, confidence in predicted_career.top_careers[:3] %}
+              <div class="glass-soft card">
+                <h4>{{ career }}</h4>
+                <p class="helper-text">Confidence {{ confidence }}%</p>
+                <div class="progress" style="margin-top:0.75rem;">
+                  <div class="progress-bar" style="width: {{ confidence }}%;"></div>
+                </div>
+                <a class="btn btn-secondary" href="/roadmap">View Roadmap</a>
+              </div>
+              {% endfor %}
+            {% endif %}
           </div>
         </div>
       </div>
-      <div class="mt-10 grid lg:grid-cols-[1.1fr_0.9fr] gap-6">
-        <div class="glass-soft p-6">
-          <h2 class="text-xl font-semibold">Top career predictions</h2>
-          <div class="mt-6 space-y-4">
-            <div class="glass-soft p-4">
-              <div class="flex items-center justify-between">
-                <p class="font-semibold">Product Strategy Lead</p>
-                <span class="badge">95% fit</span>
-              </div>
-              <p class="text-sm text-slate-400 mt-2">Strong alignment with leadership, market expansion, and stakeholder influence.</p>
-            </div>
-            <div class="glass-soft p-4">
-              <div class="flex items-center justify-between">
-                <p class="font-semibold">AI Program Manager</p>
-                <span class="badge">91% fit</span>
-              </div>
-              <p class="text-sm text-slate-400 mt-2">Excellent cross-functional execution and AI delivery experience.</p>
-            </div>
-            <div class="glass-soft p-4">
-              <div class="flex items-center justify-between">
-                <p class="font-semibold">Growth Operations Lead</p>
-                <span class="badge">88% fit</span>
-              </div>
-              <p class="text-sm text-slate-400 mt-2">Data-driven growth mindset with operational rigor.</p>
+
+      <div class="section" style="padding-top:2.5rem;">
+        <div class="grid" style="display:grid; gap:2rem; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+          <div class="glass card">
+            <h2>Your Skills</h2>
+            <div class="chip-list" style="margin-top:1.5rem;">
+              {% if technical_skills %}
+                {% for skill in technical_skills.split(',')[:10] %}
+                <span class="tag tag-green">{{ skill.strip() }}</span>
+                {% endfor %}
+              {% else %}
+                <span class="tag tag-green">Product strategy</span>
+                <span class="tag tag-green">Market analysis</span>
+                <span class="tag tag-green">Stakeholder alignment</span>
+              {% endif %}
             </div>
           </div>
-        </div>
-        <div class="glass-soft p-6">
-          <h2 class="text-xl font-semibold">Key strengths</h2>
-          <div class="mt-4 flex flex-wrap gap-2">
-            <span class="badge">Strategic planning</span>
-            <span class="badge">AI adoption</span>
-            <span class="badge">Go-to-market</span>
-            <span class="badge">Leadership</span>
-            <span class="badge">Storytelling</span>
-            <span class="badge">Analytics</span>
+          <div class="glass card">
+            <h2>Skills to Learn</h2>
+            <div class="chip-list" style="margin-top:1.5rem;">
+              {% if skill_gaps %}
+                {% for skill in skill_gaps[:10] %}
+                <span class="tag tag-orange">{{ skill }}</span>
+                {% endfor %}
+              {% else %}
+                <span class="tag tag-orange">AI experimentation</span>
+                <span class="tag tag-orange">Leadership coaching</span>
+                <span class="tag tag-orange">Data storytelling</span>
+              {% endif %}
+            </div>
           </div>
-          <div class="mt-6 glass-soft p-4">
-            <p class="text-sm text-slate-400">Next recommendation</p>
-            <p class="text-lg font-semibold mt-2">Complete the leadership competency course to unlock executive tracks.</p>
-          </div>
-          <button class="mt-6 w-full px-5 py-3 rounded-full bg-gradient-to-r from-cyan-400 to-teal-300 text-slate-900 font-semibold hover:scale-[1.02] transition">View full report</button>
         </div>
       </div>
-    </section>
+
+      <div class="section" style="padding-top:2.5rem;">
+        <div class="grid" style="display:grid; gap:2rem; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+          <div class="glass card">
+            <h2>ATS Report Preview</h2>
+            <p class="helper-text">Snapshot of your ATS readiness with critical issues flagged.</p>
+            <div class="glass-soft card" style="margin-top:1.5rem;">
+              <p><i class="fas fa-exclamation-circle" style="color:var(--warning);"></i> Missing 6 role-specific keywords</p>
+              <p><i class="fas fa-check-circle" style="color:var(--success);"></i> Clear section hierarchy</p>
+              <p><i class="fas fa-exclamation-circle" style="color:var(--warning);"></i> Add quantifiable metrics to 3 bullets</p>
+            </div>
+            <a class="btn btn-secondary" href="/ats-report" style="margin-top:1.5rem;">View Full Report</a>
+          </div>
+          <div class="glass card">
+            <h2>Recommendations</h2>
+            <div class="icon-grid" style="margin-top:1.5rem;">
+              {% if improvements %}
+                {% for item in improvements[:3] %}
+                <div class="glass-soft card">
+                  <h4>{{ item.title or 'Resume Enhancement' }}</h4>
+                  <p class="helper-text">{{ item.description or item }}</p>
+                  <span class="badge">Impact +{{ item.impact or 8 }}%</span>
+                </div>
+                {% endfor %}
+              {% else %}
+                <div class="glass-soft card">
+                  <h4>Highlight measurable impact</h4>
+                  <p class="helper-text">Add metrics to showcase results for recent projects.</p>
+                  <span class="badge">Impact +12%</span>
+                </div>
+                <div class="glass-soft card">
+                  <h4>Strengthen leadership signals</h4>
+                  <p class="helper-text">Include cross-functional leadership achievements.</p>
+                  <span class="badge">Impact +9%</span>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section" style="padding-top:2.5rem;">
+        <div class="glass card" style="display:flex; flex-wrap:wrap; gap:1rem; justify-content:space-between; align-items:center;">
+          <div>
+            <h2>Take action</h2>
+            <p class="helper-text">Download your report or jump into curated job searches.</p>
+          </div>
+          <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+            <a class="btn btn-primary" href="#">Download Report</a>
+            <a class="btn btn-secondary" href="/jobs">Search Jobs</a>
+            <a class="btn btn-outline" href="/roadmap">View Roadmap</a>
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
+
+  {% include 'components/footer.html' %}
 </body>
 </html>

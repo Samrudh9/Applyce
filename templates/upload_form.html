@@ -3,61 +3,45 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Resume Upload | Applyce</title>
+  <title>Upload Resume | Applyce</title>
   <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
-<body class="text-slate-100">
-  <header class="max-w-5xl mx-auto px-6 pt-8">
-    <nav class="glass-soft flex items-center justify-between px-6 py-4">
-      <a href="/" class="flex items-center gap-3">
-        <div class="h-10 w-10 rounded-full bg-gradient-to-br from-cyan-400 to-teal-300 glow"></div>
-        <span class="text-lg font-semibold">Applyce</span>
-      </a>
-      <a href="/dashboard" class="text-sm text-cyan-200 hover:text-white">Back to dashboard</a>
-    </nav>
-  </header>
+<body>
+  {% include 'components/navbar.html' %}
 
-  <main class="max-w-5xl mx-auto px-6 py-16">
-    <div class="glass p-10">
-      <div class="flex flex-wrap items-center justify-between gap-6">
+  <main class="section">
+    <div class="container">
+      <div class="section-header">
         <div>
-          <p class="text-cyan-200 uppercase tracking-[0.3em] text-xs">Resume upload</p>
-          <h1 class="text-3xl font-semibold mt-3">Drop your resume to unlock AI insights.</h1>
-          <p class="text-slate-400 mt-3">We analyze your experience, highlight strengths, and recommend career paths instantly.</p>
+          <p class="section-subtitle">Resume Upload</p>
+          <h1 class="section-title">Upload your resume to begin AI analysis.</h1>
+          <p class="helper-text">Drag and drop your resume or browse your device. We support PDF and DOCX files.</p>
         </div>
-        <div class="glass-soft p-4 text-sm text-slate-300">
-          <p>Formats: PDF, DOCX</p>
-          <p>Max size: 10MB</p>
-        </div>
+        <a class="btn btn-outline" href="/form">Enter Manually</a>
       </div>
 
-      <div class="mt-10 grid lg:grid-cols-[1.1fr_0.9fr] gap-6">
-        <div class="glass-soft p-8 border border-dashed border-cyan-300/40 text-center hover-lift">
-          <div class="h-16 w-16 mx-auto rounded-full bg-cyan-400/15 flex items-center justify-center text-cyan-200 text-2xl">⇪</div>
-          <h2 class="text-xl font-semibold mt-4">Drag & drop your resume</h2>
-          <p class="text-sm text-slate-400 mt-2">or click to browse files on your device.</p>
-          <button class="mt-6 px-6 py-3 rounded-full bg-gradient-to-r from-cyan-400 to-teal-300 text-slate-900 font-semibold hover:scale-105 transition">Upload resume</button>
-          <p class="mt-4 text-xs text-slate-500">We keep your data encrypted and secure.</p>
-        </div>
-        <div class="space-y-4">
-          <div class="glass-soft p-5">
-            <p class="text-sm text-slate-400">Instant feedback</p>
-            <p class="text-lg font-semibold mt-2">ATS readiness, leadership signals, and quantified impact metrics.</p>
+      <div class="glass card" style="margin-top:2.5rem;">
+        <form method="POST" action="{{ url_for('upload') }}" enctype="multipart/form-data">
+          <div class="upload-dropzone">
+            <div style="font-size:2.5rem; color:var(--accent); margin-bottom:1rem;">
+              <i class="fas fa-cloud-upload-alt"></i>
+            </div>
+            <h3>Drag & drop your resume or click to browse</h3>
+            <p class="helper-text">Supported formats: PDF, DOCX · Max size: 10MB</p>
+            <input type="file" name="resume" accept=".pdf,.doc,.docx" style="margin-top:1.5rem;" required />
           </div>
-          <div class="glass-soft p-5">
-            <p class="text-sm text-slate-400">Smart suggestions</p>
-            <p class="text-lg font-semibold mt-2">AI-generated bullet optimizations tailored for target roles.</p>
+          <div style="display:flex; flex-wrap:wrap; gap:1rem; margin-top:2rem;">
+            <button type="submit" class="btn btn-primary"><i class="fas fa-bolt"></i> Upload & Analyze</button>
+            <button type="button" class="btn btn-secondary"><i class="fas fa-spinner"></i> Uploading...</button>
           </div>
-          <div class="glass-soft p-5">
-            <p class="text-sm text-slate-400">Career match score</p>
-            <p class="text-lg font-semibold mt-2">Compare against 150,000+ job profiles instantly.</p>
-          </div>
-        </div>
+        </form>
       </div>
     </div>
   </main>
+
+  {% include 'components/footer.html' %}
 </body>
 </html>

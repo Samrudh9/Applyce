@@ -6,72 +6,174 @@
   <title>About | Applyce</title>
   <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
-<body class="text-slate-100">
-  <header class="max-w-6xl mx-auto px-6 pt-8">
-    <nav class="glass-soft flex items-center justify-between px-6 py-4">
-      <a href="/" class="flex items-center gap-3">
-        <div class="h-10 w-10 rounded-full bg-gradient-to-br from-cyan-400 to-teal-300 glow"></div>
-        <span class="text-lg font-semibold">Applyce</span>
-      </a>
-      <div class="flex items-center gap-6 text-sm text-slate-300">
-        <a href="/about" class="text-white">About</a>
-        <a href="/pricing" class="hover:text-white">Pricing</a>
-      </div>
-    </nav>
-  </header>
+<body>
+  {% include 'components/navbar.html' %}
 
-  <main class="max-w-6xl mx-auto px-6 py-16">
-    <section class="glass p-10">
-      <p class="text-cyan-200 uppercase tracking-[0.3em] text-xs">Our mission</p>
-      <h1 class="text-4xl font-semibold mt-3">We help ambitious professionals build future-proof careers.</h1>
-      <p class="text-slate-400 mt-4">Applyce combines AI insights, skill intelligence, and career coaching to deliver personalized recommendations that help people unlock their next opportunity.</p>
-      <div class="mt-8 grid md:grid-cols-3 gap-6">
-        <div class="glass-soft p-6">
-          <p class="text-sm text-slate-400">Founded</p>
-          <p class="text-2xl font-semibold">2024</p>
+  <main>
+    <section class="hero">
+      <div class="hero-orb orb-1"></div>
+      <div class="hero-orb orb-2"></div>
+      <div class="container hero-grid">
+        <div class="hero-content">
+          <p class="section-subtitle">About Applyce</p>
+          <h1 class="hero-title">An AI career platform designed for bold, ambitious professionals.</h1>
+          <p class="hero-description">Applyce helps job seekers move faster with AI guidance, ATS-ready insights, and personalized career roadmaps.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="/register">Get Started</a>
+            <a class="btn btn-outline" href="/pricing">View Pricing</a>
+          </div>
         </div>
-        <div class="glass-soft p-6">
-          <p class="text-sm text-slate-400">Talent profiles</p>
-          <p class="text-2xl font-semibold">150K+</p>
-        </div>
-        <div class="glass-soft p-6">
-          <p class="text-sm text-slate-400">Global reach</p>
-          <p class="text-2xl font-semibold">42 countries</p>
+        <div class="glass card hero-card">
+          <h3>Our Mission</h3>
+          <p>Empower every professional with the AI intelligence needed to build a meaningful career journey.</p>
+          <div class="chip-list" style="margin-top:1.5rem;">
+            <span class="badge">Career equity</span>
+            <span class="badge">Future-ready skills</span>
+            <span class="badge">AI transparency</span>
+          </div>
         </div>
       </div>
     </section>
 
-    <section class="pt-12">
-      <div class="flex items-center justify-between flex-wrap gap-6">
-        <div>
-          <p class="text-cyan-200 uppercase tracking-[0.3em] text-xs">Team</p>
-          <h2 class="text-3xl font-semibold mt-3">Meet the minds behind Applyce.</h2>
+    <section class="section">
+      <div class="container stats-grid">
+        <div class="glass card stats-card">
+          <p class="helper-text">Careers Analyzed</p>
+          <h3>500+</h3>
+        </div>
+        <div class="glass card stats-card">
+          <p class="helper-text">Skills Modeled</p>
+          <h3>100+</h3>
+        </div>
+        <div class="glass card stats-card">
+          <p class="helper-text">Industries Served</p>
+          <h3>6+</h3>
         </div>
       </div>
-      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-        <div class="glass p-6 hover-lift">
-          <div class="h-14 w-14 rounded-full bg-slate-800 mb-4"></div>
-          <h3 class="text-xl font-semibold">Avery Chen</h3>
-          <p class="text-sm text-slate-400">CEO & AI Strategist</p>
-          <p class="text-sm text-slate-300 mt-3">Former product lead at a top AI lab, focused on human-centered innovation.</p>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <p class="section-subtitle">What is Applyce?</p>
+            <h2 class="section-title">The career co-pilot built for modern job seekers.</h2>
+          </div>
         </div>
-        <div class="glass p-6 hover-lift">
-          <div class="h-14 w-14 rounded-full bg-slate-800 mb-4"></div>
-          <h3 class="text-xl font-semibold">Maya Singh</h3>
-          <p class="text-sm text-slate-400">Head of Talent Science</p>
-          <p class="text-sm text-slate-300 mt-3">Organizational psychologist dedicated to unlocking peak career potential.</p>
+        <div class="glass card" style="margin-top:2rem;">
+          <p>Applyce combines AI-powered resume analysis, market intelligence, and personalized career roadmaps to help professionals make smart, data-backed career decisions. Our platform continuously learns from hiring trends and skill demands so you can stay ahead of the curve.</p>
         </div>
-        <div class="glass p-6 hover-lift">
-          <div class="h-14 w-14 rounded-full bg-slate-800 mb-4"></div>
-          <h3 class="text-xl font-semibold">Leo Martinez</h3>
-          <p class="text-sm text-slate-400">VP of Growth</p>
-          <p class="text-sm text-slate-300 mt-3">Scaled SaaS growth teams and built global communities of professionals.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <p class="section-subtitle">Key Features</p>
+            <h2 class="section-title">Everything you need to level up.</h2>
+          </div>
+        </div>
+        <div class="icon-grid" style="margin-top:2rem;">
+          <div class="glass card">AI career matching</div>
+          <div class="glass card">ATS scoring and insights</div>
+          <div class="glass card">Skill gap analysis</div>
+          <div class="glass card">Career roadmaps</div>
+          <div class="glass card">Salary estimation</div>
+          <div class="glass card">Real job search</div>
+          <div class="glass card">Progress tracking</div>
+          <div class="glass card">Interview prep tips</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <p class="section-subtitle">How It Works</p>
+            <h2 class="section-title">A simple 5-step journey.</h2>
+          </div>
+        </div>
+        <div class="steps glass card" style="margin-top:2rem;">
+          <div class="step"><div class="step-circle">1</div><div>Create your profile</div></div>
+          <div class="step"><div class="step-circle">2</div><div>Upload your resume</div></div>
+          <div class="step"><div class="step-circle">3</div><div>Run AI analysis</div></div>
+          <div class="step"><div class="step-circle">4</div><div>Explore career matches</div></div>
+          <div class="step"><div class="step-circle">5</div><div>Follow your roadmap</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <p class="section-subtitle">Technology Stack</p>
+            <h2 class="section-title">Built with modern, scalable tech.</h2>
+          </div>
+        </div>
+        <div class="chip-list" style="margin-top:2rem;">
+          <span class="badge">Python</span>
+          <span class="badge">Flask</span>
+          <span class="badge">PostgreSQL</span>
+          <span class="badge">AI/ML</span>
+          <span class="badge">Chart.js</span>
+          <span class="badge">Tailwind Ready</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <p class="section-subtitle">Team</p>
+            <h2 class="section-title">Meet the people behind Applyce.</h2>
+          </div>
+        </div>
+        <div class="icon-grid" style="margin-top:2rem;">
+          <div class="glass card" style="text-align:center;">
+            <div class="progress-ring" style="--value: 100%; margin:0 auto 1rem;"><span>AL</span></div>
+            <h4>Avery Lee</h4>
+            <p class="helper-text">CEO & Co-founder</p>
+            <a href="#" style="color:var(--accent);">LinkedIn</a>
+          </div>
+          <div class="glass card" style="text-align:center;">
+            <div class="progress-ring" style="--value: 100%; margin:0 auto 1rem;"><span>SM</span></div>
+            <h4>Sasha Morgan</h4>
+            <p class="helper-text">Head of Product</p>
+            <a href="#" style="color:var(--accent);">LinkedIn</a>
+          </div>
+          <div class="glass card" style="text-align:center;">
+            <div class="progress-ring" style="--value: 100%; margin:0 auto 1rem;"><span>DJ</span></div>
+            <h4>Devon James</h4>
+            <p class="helper-text">AI Lead</p>
+            <a href="#" style="color:var(--accent);">LinkedIn</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="glass card cta-card">
+          <div>
+            <p class="section-subtitle">Ready to get started?</p>
+            <h2 class="section-title">Unlock your career with Applyce today.</h2>
+          </div>
+          <div class="cta-actions">
+            <a class="btn btn-primary" href="/register">Get Started</a>
+            <a class="btn btn-outline" href="/contact">Contact Us</a>
+          </div>
         </div>
       </div>
     </section>
   </main>
+
+  {% include 'components/footer.html' %}
 </body>
 </html>
