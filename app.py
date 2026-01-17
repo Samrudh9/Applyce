@@ -438,9 +438,9 @@ def login():
         return redirect(url_for('home'))
     
     if request.method == 'POST':
-        username_or_email = request.form.get('username', '').strip()
+        username_or_email = request.form.get('email_or_username', '').strip()
         password = request.form.get('password', '')
-        remember = request.form.get('remember', False)
+        remember = request.form.get('remember_me', False)
         
         if not username_or_email or not password:
             flash('Please enter both username/email and password.', 'error')
