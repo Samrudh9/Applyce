@@ -1,8 +1,22 @@
+"""
+Configuration module for SkillFit.
+Loads environment variables safely from .env file (local) or system environment (production).
+"""
+
 import os
 import logging
 from typing import Dict, Any
 from dataclasses import dataclass
 from pathlib import Path
+
+# Try to load .env file for local development
+try:
+    from dotenv import load_dotenv
+    env_path = Path('.') / '.env'
+    if env_path.exists():
+        load_dotenv(dotenv_path=env_path)
+except ImportError:
+    pass  # python-dotenv not installed, use system env vars
 
 @dataclass
 class SecurityConfig:
@@ -36,13 +50,47 @@ class Config:
         # Base configuration
         self.SECRET_KEY = os.getenv('SECRET_KEY', self._generate_secret_key())
         self.DEBUG = self.env == 'development'
+        self.BASE_URL = os.getenv('BASE_URL', 'http://localhost:5000')
         
         # Database
-        self.DATABASE_URL = os.getenv('DATABASE_URL', 'sqlite:///resume_parser.db')
+        self.DATABASE_URL = os.getenv('DATABASE_URL', '')
+        self.SQLALCHEMY_DATABASE_URI = self.DATABASE_URL if self.DATABASE_URL else 'sqlite:///skillfit.db'
+        self.SQLALCHEMY_TRACK_MODIFICATIONS = False
         
-        # API Keys (from environment only)
-        self.OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-        self.GITHUB_API_TOKEN = os.getenv('GITHUB_API_TOKEN')
+        # Admin credentials - MUST be set via environment variables in production
+        self.ADMIN_ID = os.getenv('ADMIN_ID', 'admin@skillfit.com')
+        self.ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', 'changeme')
+        
+        # Legacy admin credentials support (deprecated)
+        self.ADMIN_CREDENTIALS_RAW = os.getenv('ADMIN_CREDENTIALS', '')
+        
+        # Job Search APIs
+        self.ADZUNA_APP_ID = os.getenv('ADZUNA_APP_ID', '')
+        self.ADZUNA_API_KEY = os.getenv('ADZUNA_API_KEY', '')
+        self.RAPIDAPI_KEY = os.getenv('RAPIDAPI_KEY', '')
+        
+        # Email (Brevo/Sendinblue)
+        self.MAIL_SERVER = os.getenv('MAIL_SERVER', 'smtp-relay.brevo.com')
+        self.MAIL_PORT = int(os.getenv('MAIL_PORT', '587'))
+        self.MAIL_USE_TLS = os.getenv('MAIL_USE_TLS', 'true').lower() in ('true', '1', 'yes')
+        self.MAIL_USE_SSL = os.getenv('MAIL_USE_SSL', 'false').lower() in ('true', '1', 'yes')
+        self.MAIL_USERNAME = os.getenv('MAIL_USERNAME', '')
+        self.MAIL_PASSWORD = os.getenv('MAIL_PASSWORD', '')
+        self.MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER', 'SkillFit <noreply@skillfit.com>')
+        
+        # Alternative email credentials (for backward compatibility)
+        self.EMAIL_ADDRESS = os.getenv('EMAIL_ADDRESS', '')
+        self.EMAIL_PASSWORD = os.getenv('EMAIL_PASSWORD', '')
+        
+        # Optional APIs
+        self.OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '')
+        self.GITHUB_API_TOKEN = os.getenv('GITHUB_API_TOKEN', '')
+        
+        # API Keys (from environment only) - backward compatibility
+        if not self.OPENAI_API_KEY:
+            self.OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+        if not self.GITHUB_API_TOKEN:
+            self.GITHUB_API_TOKEN = os.getenv('GITHUB_API_TOKEN')
         
         # Security settings
         self.security = SecurityConfig()
@@ -54,13 +102,9 @@ class Config:
         self.LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO')
         
         # Feature flags
-        self.ROADMAP_SUPPORT = os.getenv('ROADMAP_SUPPORT', 'true').lower() == 'true'
-        self.ML_CLASSIFIER_ENABLED = os.getenv('ML_CLASSIFIER_ENABLED', 'false').lower() == 'true'
-        self.GITHUB_INTEGRATION_ENABLED = os.getenv('GITHUB_INTEGRATION_ENABLED', 'false').lower() == 'true'
-        
-        # Admin credentials for backup access
-        # Set these environment variables for production security
-        
+        self.ROADMAP_SUPPORT = os.getenv('ROADMAP_SUPPORT', 'true').lower() in ('true', '1', 'yes')
+        self.ML_CLASSIFIER_ENABLED = os.getenv('ML_CLASSIFIER_ENABLED', 'false').lower() in ('true', '1', 'yes')
+        self.GITHUB_INTEGRATION_ENABLED = os.getenv('GITHUB_INTEGRATION_ENABLED', 'false').lower() in ('true', '1', 'yes')
         
         # File upload settings
         self.UPLOAD_FOLDER = os.getenv('UPLOAD_FOLDER', self.base_dir / 'uploads')
@@ -68,24 +112,17 @@ class Config:
         
         self._validate_config()
 
-    ADMIN_CREDENTIALS_RAW = os.environ.get('ADMIN_CREDENTIALS', 
-        'admin: admin123,samrudh:sam@2024,manager:mgr@2024,developer:dev@2024,viewer:view@2024'
-    )
-    
     @classmethod
     def get_admin_credentials(cls) -> dict:
         """Parse admin credentials from environment variable"""
         credentials = {}
-        if cls.ADMIN_CREDENTIALS_RAW:
-            for pair in cls.ADMIN_CREDENTIALS_RAW.split(','):
-                if ': ' in pair:
+        admin_creds_raw = os.getenv('ADMIN_CREDENTIALS', '')
+        if admin_creds_raw:
+            for pair in admin_creds_raw.split(','):
+                if ':' in pair:
                     admin_id, password = pair.strip().split(':', 1)
-                    credentials[admin_id. strip()] = password.strip()
+                    credentials[admin_id.strip()] = password.strip()
         return credentials
-    
-    # Keep backward compatibility
-    ADMIN_ID = os.environ. get('ADMIN_ID', 'admin')
-    ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin123')
     
     def _generate_secret_key(self) -> str:
         """Generate a secure secret key if none provided"""
