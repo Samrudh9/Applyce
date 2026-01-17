@@ -86,12 +86,6 @@ class Config:
         self.OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '')
         self.GITHUB_API_TOKEN = os.getenv('GITHUB_API_TOKEN', '')
         
-        # API Keys (from environment only) - backward compatibility
-        if not self.OPENAI_API_KEY:
-            self.OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-        if not self.GITHUB_API_TOKEN:
-            self.GITHUB_API_TOKEN = os.getenv('GITHUB_API_TOKEN')
-        
         # Security settings
         self.security = SecurityConfig()
         
@@ -137,6 +131,14 @@ class Config:
             missing = [var for var in required_vars if not getattr(self, var, None)]
             if missing:
                 raise ValueError(f"Missing required environment variables: {missing}")
+            
+            # Warn about weak default credentials in production
+            if self.ADMIN_PASSWORD == 'changeme':
+                logging.warning("⚠️  WARNING: Using default admin password 'changeme' in production! Change ADMIN_PASSWORD immediately!")
+        
+        # Always warn about insecure defaults in development too
+        if self.ADMIN_PASSWORD in ['changeme', 'admin', 'admin123', 'password']:
+            logging.warning("⚠️  Using weak default admin password. Set ADMIN_PASSWORD in your .env file!")
     
     def get_api_key(self, service: str) -> str:
         """Safely get API key for a service"""
