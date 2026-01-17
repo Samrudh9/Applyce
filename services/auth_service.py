@@ -290,12 +290,19 @@ The Applyce Team
             username: User's username for personalization
         """
         try:
+            smtp_server = os.environ.get('MAIL_SERVER', 'smtp-relay.brevo.com')
+            smtp_port = int(os.environ.get('MAIL_PORT', 587))
             smtp_user = os.environ.get('MAIL_USERNAME')
             smtp_password = os.environ.get('MAIL_PASSWORD')
             sender = os.environ.get('MAIL_DEFAULT_SENDER', smtp_user or '')
 
+            if not smtp_user or not smtp_password:
+                logger.warning("SMTP credentials missing; welcome email not sent.")
+                return
+
             message = MIMEMultipart('alternative')
             message['Subject'] = 'Welcome to Applyce'
+            message['From'] = sender
             message['To'] = recipient_email
 
             text_body = f"""\
@@ -323,29 +330,12 @@ Start analyzing your resume and exploring career paths.
             message.attach(MIMEText(text_body, 'plain'))
             message.attach(MIMEText(html_body, 'html'))
 
-            if smtp_user and smtp_password:
-                smtp_server = os.environ.get('MAIL_SERVER', 'smtp-relay.brevo.com')
-                smtp_port_value = os.environ.get('MAIL_PORT')
-                smtp_port = int(smtp_port_value) if smtp_port_value else 587
-                message['From'] = sender
-                with smtplib.SMTP(smtp_server, smtp_port) as server:
-                    server.starttls()
-                    server.login(smtp_user, smtp_password)
-                    server.sendmail(sender, recipient_email, message.as_string())
-                logger.info("Welcome email sent to %s via SMTP relay", recipient_email)
-                return
+            with smtplib.SMTP(smtp_server, smtp_port) as server:
+                server.starttls()
+                server.login(smtp_user, smtp_password)
+                server.sendmail(sender, recipient_email, message.as_string())
 
-            sender_email = os.environ.get('EMAIL_ADDRESS')
-            sender_password = os.environ.get('EMAIL_PASSWORD')
-            if sender_email and sender_password:
-                message['From'] = sender_email
-                with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
-                    server.login(sender_email, sender_password)
-                    server.sendmail(sender_email, recipient_email, message.as_string())
-                logger.info("Welcome email sent to %s via Gmail SMTP", recipient_email)
-                return
-
-            logger.warning("SMTP credentials missing; welcome email not sent.")
+            logger.info("Welcome email sent to %s", recipient_email)
         except Exception:
             logger.exception("Failed to send welcome email")
     
