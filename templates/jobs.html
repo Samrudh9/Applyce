@@ -1,932 +1,126 @@
-<! DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% if career %}{{ career | title }} Jobs{% else %}Job Search{% endif %} - SkillFit</title>
-    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon. svg') }}">
-    <link href="https://fonts. googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <style>
-        :root {
-            --bg-color: #0a0b0f;
-            --card-bg: #1a1b22;
-            --text-color: #e0e0e0;
-            --text-muted: #888;
-            --accent: #00c2ff;
-            --accent-secondary: #00ffe0;
-            --success: #00ff88;
-            --warning: #ffaa00;
-            --error: #ff4444;
-            --border-color: rgba(255, 255, 255, 0.1);
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-color);
-            color: var(--text-color);
-            min-height: 100vh;
-            padding-top: 80px;
-        }
-
-        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
-
-        .page-header { text-align: center; margin-bottom: 2rem; }
-        
-        .page-header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .page-header p { color: var(--text-muted); }
-
-        /* Search Box */
-        .search-box {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            border: 1px solid var(--border-color);
-        }
-
-        .search-form { display: flex; gap: 1rem; flex-wrap: wrap; }
-
-        .search-input {
-            flex: 1;
-            min-width: 200px;
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text-color);
-            font-size: 1rem;
-        }
-
-        .search-input:focus { outline: none; border-color: var(--accent); }
-
-        .search-btn {
-            padding: 0.75rem 2rem;
-            background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
-            color: #000;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0. 3s ease;
-        }
-
-        .search-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(0, 194, 255, 0.4);
-        }
-
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--text-muted);
-        }
-
-        .checkbox-group input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            accent-color: var(--accent);
-        }
-
-        /* API Status */
-        .api-status {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .api-badge {
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            background: rgba(0, 255, 136, 0.1);
-            color: var(--success);
-            border: 1px solid rgba(0, 255, 136, 0.3);
-        }
-
-        .api-badge.inactive {
-            background: rgba(255, 68, 68, 0.1);
-            color: var(--error);
-            border-color: rgba(255, 68, 68, 0.3);
-        }
-
-        /* Insights Grid */
-        .insights-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .insight-card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 1rem;
-            text-align: center;
-            border: 1px solid var(--border-color);
-        }
-
-        .insight-card .value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--accent);
-        }
-
-        .insight-card .label {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-top: 0.25rem;
-        }
-
-        /* Hot Skills */
-        .hot-skills {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 1. 25rem;
-            border: 1px solid var(--border-color);
-            margin-bottom: 2rem;
-        }
-
-        .hot-skills h3 {
-            color: var(--accent);
-            margin-bottom: 1rem;
-            font-size: 1rem;
-        }
-
-        .skills-list, .companies-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-
-        .hot-skill {
-            padding: 0.4rem 0.8rem;
-            background: rgba(0, 194, 255, 0.1);
-            border: 1px solid rgba(0, 194, 255, 0.3);
-            border-radius: 15px;
-            color: var(--accent);
-            font-size: 0. 85rem;
-        }
-
-        .company-tag {
-            padding: 0.3rem 0.75rem;
-            background: rgba(255, 255, 255, 0. 05);
-            border-radius: 15px;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
-
-        /* Jobs List */
-        .jobs-section h2 {
-            margin-bottom: 1.5rem;
-            color: var(--text-color);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .jobs-section h2 .count {
-            color: var(--accent);
-        }
-
-        .jobs-list { display: flex; flex-direction: column; gap: 1rem; }
-
-        .job-card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 1.5rem;
-            border: 1px solid var(--border-color);
-            transition: all 0. 3s ease;
-        }
-
-        .job-card:hover {
-            border-color: var(--accent);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(0, 194, 255, 0.1);
-        }
-
-        .job-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 1rem;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .job-title {
-            font-size: 1. 25rem;
-            font-weight: 600;
-            color: var(--text-color);
-            margin-bottom: 0.25rem;
-        }
-
-        .job-company {
-            color: var(--accent);
-            font-weight: 500;
-        }
-
-        .job-meta {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
-        }
-
-        .job-meta span {
-            display: flex;
-            align-items: center;
-            gap: 0.35rem;
-        }
-
-        .match-badge {
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            white-space: nowrap;
-        }
-
-        .match-high { background: rgba(0, 255, 136, 0.2); color: var(--success); }
-        .match-medium { background: rgba(255, 170, 0, 0.2); color: var(--warning); }
-        .match-low { background: rgba(255, 68, 68, 0.2); color: var(--error); }
-
-        .remote-badge {
-            padding: 0.25rem 0.5rem;
-            background: rgba(138, 43, 226, 0.2);
-            color: #a855f7;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
-        .job-skills { margin-bottom: 1rem; }
-
-        .skills-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
-        }
-
-        .skill-label {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-bottom: 0.25rem;
-        }
-
-        .skill-tag {
-            padding: 0.3rem 0.75rem;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-
-        .skill-match {
-            background: rgba(0, 255, 136, 0.15);
-            color: var(--success);
-            border: 1px solid rgba(0, 255, 136, 0.3);
-        }
-
-        .skill-missing {
-            background: rgba(255, 68, 68, 0.15);
-            color: var(--error);
-            border: 1px solid rgba(255, 68, 68, 0.3);
-        }
-
-        .job-actions {
-            display: flex;
-            gap: 0.75rem;
-            margin-top: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            padding: 0.6rem 1.25rem;
-            border-radius: 8px;
-            font-weight: 500;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: all 0.3s ease;
-            font-size: 0.9rem;
-        }
-
-        .btn-primary {
-            background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
-            color: #000;
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-color);
-            border: 1px solid var(--border-color);
-        }
-
-        .btn:hover { transform: translateY(-2px); }
-
-        .source-badge {
-            font-size: 0.7rem;
-            padding: 0.2rem 0.5rem;
-            background: rgba(255, 255, 255, 0. 1);
-            border-radius: 4px;
-            color: var(--text-muted);
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 4rem 2rem;
-            color: var(--text-muted);
-        }
-
-        .empty-state i {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            color: var(--border-color);
-        }
-
-        .empty-state h3 {
-            color: var(--text-color);
-            margin-bottom: 0.5rem;
-        }
-
-        .quick-searches {
-            margin-top: 2rem;
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        /* Error Message */
-        .error-message {
-            background: rgba(255, 68, 68, 0.1);
-            border: 1px solid rgba(255, 68, 68, 0.3);
-            border-radius: 8px;
-            padding: 1rem;
-            color: var(--error);
-            text-align: center;
-            margin-bottom: 1rem;
-        }
-
-        /* Loading */
-        .loading {
-            display: flex;
-            justify-content: center;
-            padding: 3rem;
-        }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid var(--border-color);
-            border-top-color: var(--accent);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        @media (max-width: 768px) {
-            .container { padding: 1rem; }
-            .page-header h1 { font-size: 1. 8rem; }
-            .search-form { flex-direction: column; }
-            .search-input, .search-btn { width: 100%; }
-            .job-header { flex-direction: column; }
-            .insights-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Job Search | Applyce</title>
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
-<body>
-    {% include 'components/navbar.html' %}
+<body class="text-slate-100">
+  <header class="max-w-6xl mx-auto px-6 pt-8">
+    <nav class="glass-soft flex items-center justify-between px-6 py-4">
+      <a href="/" class="flex items-center gap-3">
+        <div class="h-10 w-10 rounded-full bg-gradient-to-br from-cyan-400 to-teal-300 glow"></div>
+        <span class="text-lg font-semibold">Applyce</span>
+      </a>
+      <div class="flex items-center gap-6 text-sm text-slate-300">
+        <a href="/dashboard" class="hover:text-white">Dashboard</a>
+        <a href="/jobs" class="text-white">Jobs</a>
+      </div>
+    </nav>
+  </header>
 
-    <div class="container">
-        <div class="page-header">
-            <h1>💼 Find Your Dream Job</h1>
-            <p>Real jobs from LinkedIn, Indeed, Glassdoor & more</p>
+  <main class="max-w-6xl mx-auto px-6 py-12">
+    <section class="glass p-8">
+      <div class="flex flex-wrap items-center justify-between gap-6">
+        <div>
+          <p class="text-cyan-200 uppercase tracking-[0.3em] text-xs">Job search</p>
+          <h1 class="text-3xl font-semibold mt-3">Curated roles with AI match scores.</h1>
+          <p class="text-slate-400 mt-2">Refine filters to see the most relevant opportunities based on your profile.</p>
         </div>
+        <button class="px-5 py-2 rounded-full border border-cyan-300/40 text-cyan-200 hover:bg-cyan-400/10 transition">Save search</button>
+      </div>
 
-        <!-- Search Box -->
-        <div class="search-box">
-            <form class="search-form" action="/jobs" method="GET">
-                <input type="text" name="career" class="search-input" 
-                       placeholder="Job title (e.g., Data Scientist, React Developer)" 
-                       value="{{ career }}" required>
-                <input type="text" name="location" class="search-input" 
-                       placeholder="Location (e.g., Bangalore, Remote)" 
-                       value="{{ location or 'India' }}" style="max-width: 200px;">
-                <label class="checkbox-group">
-                    <input type="checkbox" name="remote" value="true" {% if remote_only %}checked{% endif %}>
-                    Remote only
-                </label>
-                <button type="submit" class="search-btn">
-                    <i class="fas fa-search"></i> Search Jobs
-                </button>
-            </form>
-            
-            <!-- API Status -->
-            <div class="api-status">
-                <span class="api-badge">LinkedIn/Indeed</span>
-                <span class="api-badge">Adzuna</span>
-                <span class="api-badge">RemoteOK</span>
-                <span class="api-badge">Arbeitnow</span>
+      <div class="mt-8 grid lg:grid-cols-[0.35fr_0.65fr] gap-6">
+        <aside class="glass-soft p-6 space-y-4">
+          <h2 class="text-lg font-semibold">Filters</h2>
+          <div>
+            <label class="text-sm text-slate-400">Location</label>
+            <select class="w-full mt-2 px-4 py-2 rounded-xl bg-slate-900/60 border border-slate-700/60 focus-ring">
+              <option>Remote</option>
+              <option>San Francisco</option>
+              <option>New York</option>
+              <option>London</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-sm text-slate-400">Level</label>
+            <select class="w-full mt-2 px-4 py-2 rounded-xl bg-slate-900/60 border border-slate-700/60 focus-ring">
+              <option>Mid-Senior</option>
+              <option>Senior</option>
+              <option>Lead</option>
+              <option>Director</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-sm text-slate-400">Focus area</label>
+            <div class="mt-2 flex flex-wrap gap-2">
+              <span class="badge">Product</span>
+              <span class="badge">AI/ML</span>
+              <span class="badge">Growth</span>
             </div>
+          </div>
+          <button class="w-full px-4 py-3 rounded-full bg-gradient-to-r from-cyan-400 to-teal-300 text-slate-900 font-semibold hover:scale-[1.02] transition">Apply filters</button>
+        </aside>
+
+        <div class="space-y-4">
+          <div class="glass-soft p-6 hover-lift">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-xl font-semibold">Senior Product Strategy Lead</h3>
+                <p class="text-sm text-slate-400">Nova Labs · Remote</p>
+              </div>
+              <div class="progress-ring" style="--value: 94%;">
+                <span class="text-sm">94%</span>
+              </div>
+            </div>
+            <p class="mt-3 text-sm text-slate-300">Drive AI initiatives, set product vision, and scale cross-functional programs.</p>
+            <div class="mt-4 flex flex-wrap gap-2">
+              <span class="badge">$165K-$190K</span>
+              <span class="badge">Equity</span>
+              <span class="badge">Hybrid team</span>
+            </div>
+          </div>
+          <div class="glass-soft p-6 hover-lift">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-xl font-semibold">AI Program Manager</h3>
+                <p class="text-sm text-slate-400">Stellar AI · New York</p>
+              </div>
+              <div class="progress-ring" style="--value: 89%;">
+                <span class="text-sm">89%</span>
+              </div>
+            </div>
+            <p class="mt-3 text-sm text-slate-300">Lead AI deployments, optimize delivery timelines, and partner with stakeholders.</p>
+            <div class="mt-4 flex flex-wrap gap-2">
+              <span class="badge">$150K-$178K</span>
+              <span class="badge">Bonus</span>
+              <span class="badge">Onsite</span>
+            </div>
+          </div>
+          <div class="glass-soft p-6 hover-lift">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-xl font-semibold">Growth Operations Lead</h3>
+                <p class="text-sm text-slate-400">Flux Mobility · London</p>
+              </div>
+              <div class="progress-ring" style="--value: 86%;">
+                <span class="text-sm">86%</span>
+              </div>
+            </div>
+            <p class="mt-3 text-sm text-slate-300">Scale lifecycle campaigns, drive analytics, and optimize growth loops.</p>
+            <div class="mt-4 flex flex-wrap gap-2">
+              <span class="badge">£120K-£140K</span>
+              <span class="badge">Remote</span>
+              <span class="badge">Series B</span>
+            </div>
+          </div>
         </div>
-
-        {% if error_message %}
-        <div class="error-message">
-            <i class="fas fa-exclamation-triangle"></i> {{ error_message }}
-        </div>
-        {% endif %}
-
-        {% if career %}
-            <!-- Market Insights -->
-            {% if insights %}
-            <div class="insights-grid">
-                <div class="insight-card">
-                    <div class="value">{{ "{:,}".format(insights.total_jobs) }}+</div>
-                    <div class="label">Open Positions</div>
-                </div>
-                <div class="insight-card">
-                    <div class="value">{{ insights.growth_rate }}</div>
-                    <div class="label">Growth Rate</div>
-                </div>
-                <div class="insight-card">
-                    <div class="value">{{ insights.demand_level }}</div>
-                    <div class="label">Demand Level</div>
-                </div>
-                <div class="insight-card">
-                    <div class="value">{{ insights.remote_percentage }}%</div>
-                    <div class="label">Remote Jobs</div>
-                </div>
-                <div class="insight-card">
-                    <div class="value">
-                        ₹{{ (insights.avg_salary_min / 100000) | round(0) | int }}-{{ (insights. avg_salary_max / 100000) | round(0) | int }}L
-                    </div>
-                    <div class="label">Salary Range (LPA)</div>
-                </div>
-            </div>
-
-            <!-- Hot Skills & Companies -->
-            <div class="hot-skills">
-                <h3>🔥 In-Demand Skills for {{ career | title }}</h3>
-                <div class="skills-list">
-                    {% for skill in insights.hot_skills[:8] %}
-                        <span class="hot-skill">{{ skill }}</span>
-                    {% endfor %}
-                </div>
-                
-                {% if insights. top_companies %}
-                <h3 style="margin-top: 1. 5rem;">🏢 Top Hiring Companies</h3>
-                <div class="companies-list">
-                    {% for company in insights.top_companies[:6] %}
-                        <span class="company-tag">{{ company }}</span>
-                    {% endfor %}
-                </div>
-                {% endif %}
-            </div>
-            {% endif %}
-
-            <!-- Jobs List -->
-            <div class="jobs-section">
-                <h2>
-                    📋 <span class="count">{{ jobs | length }}</span> Real Jobs Found
-                    {% if insights and insights.jobs_fetched %}
-                        <small style="color: var(--text-muted); font-size: 0.8rem; font-weight: 400;">
-                            (from {{ insights.jobs_fetched }} fetched)
-                        </small>
-                    {% endif %}
-                </h2>
-                
-                {% if jobs %}
-                <div class="jobs-list">
-                    {% for job in jobs %}
-                    <div class="job-card">
-                        <div class="job-header">
-                            <div>
-                                <div class="job-title">
-                                    {{ job.title }}
-                                    {% if job.is_remote %}
-                                        <span class="remote-badge">REMOTE</span>
-                                    {% endif %}
-                                </div>
-                                <div class="job-company">🏢 {{ job.company }}</div>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <div class="match-badge {% if job.match_score >= 70 %}match-high{% elif job.match_score >= 40 %}match-medium{% else %}match-low{% endif %}">
-                                    🎯 {{ job. match_score | round(0) | int }}% Match
-                                </div>
-                                <span class="source-badge">{{ job.source }}</span>
-                            </div>
-                        </div>
-                        
-                        <div class="job-meta">
-                            <span><i class="fas fa-map-marker-alt"></i> {{ job. location }}</span>
-                            {% if job.salary_min and job.salary_max %}
-                            <span><i class="fas fa-rupee-sign"></i> 
-                                {% if job.salary_currency == 'INR' %}
-                                    {{ (job.salary_min / 100000) | round(1) }}-{{ (job. salary_max / 100000) | round(1) }} LPA
-                                {% else %}
-                                    ${{ (job.salary_min / 1000) | round(0) | int }}K-{{ (job.salary_max / 1000) | round(0) | int }}K
-                                {% endif %}
-                            </span>
-                            {% endif %}
-                            <span><i class="fas fa-briefcase"></i> {{ job.job_type }}</span>
-                            <span><i class="fas fa-layer-group"></i> {{ job.experience_level }}</span>
-                        </div>
-
-                        <!-- Skills Match -->
-                        <div class="job-skills">
-                            {% if job.matching_skills %}
-                            <div class="skill-label">✅ Skills You Have:</div>
-                            <div class="skills-row">
-                                {% for skill in job. matching_skills[:6] %}
-                                    <span class="skill-tag skill-match">{{ skill }}</span>
-                                {% endfor %}
-                                {% if job.matching_skills | length > 6 %}
-                                    <span class="skill-tag skill-match">+{{ job. matching_skills | length - 6 }} more</span>
-                                {% endif %}
-                            </div>
-                            {% endif %}
-                            
-                            {% if job.missing_skills %}
-                            <div class="skill-label" style="margin-top: 0.75rem;">❌ Skills to Learn:</div>
-                            <div class="skills-row">
-                                {% for skill in job.missing_skills[:5] %}
-                                    <span class="skill-tag skill-missing">{{ skill }}</span>
-                                {% endfor %}
-                            </div>
-                            {% endif %}
-
-                            {% if not job.matching_skills and not job.missing_skills and job.skills_required %}
-                            <div class="skill-label">📋 Required Skills:</div>
-                            <div class="skills-row">
-                                {% for skill in job.skills_required[:8] %}
-                                    <span class="skill-tag" style="background: rgba(255,255,255,0.1); color: var(--text-color);">{{ skill }}</span>
-                                {% endfor %}
-                            </div>
-                            {% endif %}
-                        </div>
-
-                        <div class="job-actions">
-                            <a href="{{ job.url }}" target="_blank" rel="noopener" class="btn btn-primary">
-                                <i class="fas fa-external-link-alt"></i> Apply Now
-                            </a>
-                            {% if current_user.is_authenticated %}
-                            <button class="btn btn-secondary check-fit-btn" 
-                                    data-job-title="{{ job.title }}"
-                                    data-job-description="{{ job.description }}"
-                                    data-job-skills="{{ job.skills_required | join(',') }}">
-                                <i class="fas fa-chart-line"></i> Check Job Fit
-                            </button>
-                            {% endif %}
-                            {% if job.missing_skills %}
-                            <a href="/roadmap/{{ career | urlencode }}" class="btn btn-secondary">
-                                <i class="fas fa-road"></i> Learn Missing Skills
-                            </a>
-                            {% endif %}
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-                {% else %}
-                <div class="empty-state">
-                    <i class="fas fa-search"></i>
-                    <h3>No jobs found</h3>
-                    <p>Try a different job title or location</p>
-                </div>
-                {% endif %}
-            </div>
-
-        {% else %}
-            <!-- Empty State -->
-            <div class="empty-state">
-                <i class="fas fa-briefcase"></i>
-                <h3>Search for Real Jobs</h3>
-                <p>Enter a job title to find opportunities from LinkedIn, Indeed, Glassdoor & more</p>
-                
-                <div class="quick-searches">
-                    <p style="margin-right: 1rem;">Popular:</p>
-                    <a href="/jobs?career=data+scientist&location=India" class="btn btn-secondary">Data Scientist</a>
-                    <a href="/jobs?career=frontend+developer&location=India" class="btn btn-secondary">Frontend Developer</a>
-                    <a href="/jobs?career=full+stack+developer&location=India" class="btn btn-secondary">Full Stack</a>
-                    <a href="/jobs?career=devops+engineer&location=India" class="btn btn-secondary">DevOps</a>
-                    <a href="/jobs?career=machine+learning&location=Remote&remote=true" class="btn btn-secondary">ML Engineer (Remote)</a>
-                </div>
-            </div>
-        {% endif %}
-    </div>
-
-    <!-- Job Fit Modal -->
-    <div id="jobFitModal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2><i class="fas fa-chart-line"></i> Job Fit Analysis</h2>
-            <div id="jobFitContent">
-                <div class="loading">
-                    <div class="spinner"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <style>
-        .modal {
-            position: fixed;
-            z-index: 9999;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            overflow: auto;
-        }
-
-        .modal-content {
-            background-color: var(--card-bg);
-            margin: 5% auto;
-            padding: 2rem;
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            width: 90%;
-            max-width: 700px;
-            position: relative;
-        }
-
-        .modal-content h2 {
-            color: var(--accent);
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .close {
-            color: var(--text-muted);
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            line-height: 20px;
-        }
-
-        .close:hover,
-        .close:focus {
-            color: var(--accent);
-        }
-
-        .fit-score {
-            text-align: center;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            background: rgba(0, 194, 255, 0.05);
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-        }
-
-        .fit-score .percentage {
-            font-size: 3rem;
-            font-weight: 700;
-            background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .fit-score .label {
-            font-size: 1rem;
-            color: var(--text-muted);
-            margin-top: 0.5rem;
-        }
-
-        .fit-score .recommendation {
-            margin-top: 1rem;
-            padding: 0.75rem;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            font-size: 0.9rem;
-        }
-
-        .fit-details {
-            display: grid;
-            gap: 1.5rem;
-        }
-
-        .fit-section h3 {
-            font-size: 1rem;
-            color: var(--text-color);
-            margin-bottom: 0.75rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .fit-section .skills-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-
-        .check-fit-btn {
-            cursor: pointer;
-        }
-
-        .check-fit-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-    </style>
-
-    <script>
-        // Job Fit Modal functionality
-        const modal = document.getElementById('jobFitModal');
-        const span = document.getElementsByClassName('close')[0];
-        const checkFitButtons = document.querySelectorAll('.check-fit-btn');
-
-        // Close modal when clicking X
-        if (span) {
-            span.onclick = function() {
-                modal.style.display = 'none';
-            }
-        }
-
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                modal.style.display = 'none';
-            }
-        }
-
-        // Handle Check Fit button clicks
-        checkFitButtons.forEach(button => {
-            button.addEventListener('click', async function() {
-                const jobTitle = this.getAttribute('data-job-title');
-                const jobDescription = this.getAttribute('data-job-description');
-                const jobSkills = this.getAttribute('data-job-skills');
-
-                // Show modal with loading state
-                modal.style.display = 'block';
-                document.getElementById('jobFitContent').innerHTML = `
-                    <div class="loading">
-                        <div class="spinner"></div>
-                        <p style="margin-top: 1rem; color: var(--text-muted);">Analyzing job fit...</p>
-                    </div>
-                `;
-
-                try {
-                    // Call the Job Match API
-                    const response = await fetch('/api/job-match', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            resume_id: null, // Will use latest resume from session
-                            job_description: jobDescription,
-                            required_skills: jobSkills ? jobSkills.split(',').map(s => s.trim()) : []
-                        })
-                    });
-
-                    const data = await response.json();
-
-                    if (data.success) {
-                        displayJobFit(data, jobTitle);
-                    } else {
-                        displayError(data.error || 'Failed to analyze job fit');
-                    }
-                } catch (error) {
-                    console.error('Job fit analysis error:', error);
-                    displayError('An error occurred while analyzing job fit. Please try again.');
-                }
-            });
-        });
-
-        function displayJobFit(data, jobTitle) {
-            const matchClass = data.match_percentage >= 70 ? 'match-high' : 
-                              data.match_percentage >= 40 ? 'match-medium' : 'match-low';
-
-            let html = `
-                <div class="fit-score">
-                    <div class="percentage ${matchClass}">${data.match_percentage}%</div>
-                    <div class="label">Job Match Score</div>
-                    <div class="recommendation">${data.recommendation}</div>
-                </div>
-
-                <div class="fit-details">
-            `;
-
-            // Required skills matched
-            if (data.required_matched && data.required_matched.length > 0) {
-                html += `
-                    <div class="fit-section">
-                        <h3><i class="fas fa-check-circle" style="color: var(--success);"></i> Required Skills You Have</h3>
-                        <div class="skills-list">
-                            ${data.required_matched.map(skill => `
-                                <span class="skill-tag skill-match">${skill}</span>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-            }
-
-            // Preferred skills matched
-            if (data.preferred_matched && data.preferred_matched.length > 0) {
-                html += `
-                    <div class="fit-section">
-                        <h3><i class="fas fa-star" style="color: var(--warning);"></i> Preferred Skills You Have</h3>
-                        <div class="skills-list">
-                            ${data.preferred_matched.map(skill => `
-                                <span class="skill-tag skill-match">${skill}</span>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-            }
-
-            // Missing required skills
-            if (data.missing_required && data.missing_required.length > 0) {
-                html += `
-                    <div class="fit-section">
-                        <h3><i class="fas fa-exclamation-triangle" style="color: var(--error);"></i> Required Skills to Learn</h3>
-                        <div class="skills-list">
-                            ${data.missing_required.map(skill => `
-                                <span class="skill-tag skill-missing">${skill}</span>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-            }
-
-            // Missing preferred skills
-            if (data.missing_preferred && data.missing_preferred.length > 0) {
-                html += `
-                    <div class="fit-section">
-                        <h3><i class="fas fa-info-circle" style="color: var(--warning);"></i> Preferred Skills to Learn</h3>
-                        <div class="skills-list">
-                            ${data.missing_preferred.map(skill => `
-                                <span class="skill-tag skill-missing">${skill}</span>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-            }
-
-            // Additional stats
-            html += `
-                <div class="fit-section">
-                    <h3><i class="fas fa-chart-bar"></i> Statistics</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-top: 0.5rem;">
-                        <div style="text-align: center; padding: 0.75rem; background: rgba(255,255,255,0.05); border-radius: 8px;">
-                            <div style="font-size: 1.5rem; font-weight: 600; color: var(--accent);">${data.total_resume_skills}</div>
-                            <div style="font-size: 0.8rem; color: var(--text-muted);">Your Skills</div>
-                        </div>
-                        <div style="text-align: center; padding: 0.75rem; background: rgba(255,255,255,0.05); border-radius: 8px;">
-                            <div style="font-size: 1.5rem; font-weight: 600; color: var(--accent);">${data.total_required_skills}</div>
-                            <div style="font-size: 0.8rem; color: var(--text-muted);">Required</div>
-                        </div>
-                        <div style="text-align: center; padding: 0.75rem; background: rgba(255,255,255,0.05); border-radius: 8px;">
-                            <div style="font-size: 1.5rem; font-weight: 600; color: var(--accent);">${data.semantic_similarity}%</div>
-                            <div style="font-size: 0.8rem; color: var(--text-muted);">Text Similarity</div>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            html += '</div>';
-
-            document.getElementById('jobFitContent').innerHTML = html;
-        }
-
-        function displayError(message) {
-            document.getElementById('jobFitContent').innerHTML = `
-                <div class="error-message" style="margin: 2rem 0;">
-                    <i class="fas fa-exclamation-triangle"></i> ${message}
-                </div>
-                <p style="color: var(--text-muted); text-align: center;">
-                    Make sure you have uploaded a resume first.
-                </p>
-            `;
-        }
-    </script>
-
-    {% include 'components/footer.html' %}
+      </div>
+    </section>
+  </main>
 </body>
 </html>

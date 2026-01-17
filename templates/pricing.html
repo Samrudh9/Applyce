@@ -2,651 +2,74 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Pricing - SkillFit</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pricing | Applyce</title>
   <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    :root {
-      --bg-color: #0a0b0f;
-      --bg-secondary: #12131a;
-      --card-bg: #1a1b22;
-      --text-color: #e0e0e0;
-      --text-muted: #888;
-      --accent: #00c2ff;
-      --accent-secondary: #00ffe0;
-      --success: #00ff88;
-      --warning: #ffaa00;
-      --error: #ff4444;
-      --border-color: rgba(255, 255, 255, 0.08);
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      min-height: 100vh;
-      padding-top: 70px;
-    }
-
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: 
-        radial-gradient(ellipse at 20% 20%, rgba(0, 194, 255, 0.08) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 80%, rgba(0, 255, 224, 0.08) 0%, transparent 50%);
-      pointer-events: none;
-      z-index: -1;
-    }
-
-    .pricing-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 3rem 2rem;
-    }
-
-    .pricing-header {
-      text-align: center;
-      margin-bottom: 4rem;
-    }
-
-    .pricing-header h1 {
-      font-size: 2.5rem;
-      font-weight: 800;
-      margin-bottom: 1rem;
-      background: linear-gradient(135deg, #fff, var(--accent));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .pricing-header p {
-      font-size: 1.1rem;
-      color: var(--text-muted);
-      max-width: 600px;
-      margin: 0 auto;
-    }
-
-    .pricing-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 2rem;
-      align-items: stretch;
-    }
-
-    .pricing-card {
-      background: var(--card-bg);
-      border-radius: 24px;
-      padding: 2.5rem;
-      border: 1px solid var(--border-color);
-      position: relative;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .pricing-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-    }
-
-    .pricing-card.featured {
-      border-color: var(--accent);
-      box-shadow: 0 0 40px rgba(0, 194, 255, 0.15);
-    }
-
-    .featured-badge {
-      position: absolute;
-      top: -12px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
-      color: #000;
-      padding: 0.4rem 1.5rem;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      text-transform: uppercase;
-    }
-
-    .plan-header {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-
-    .plan-icon {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
-    }
-
-    .plan-name {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-    }
-
-    .plan-description {
-      color: var(--text-muted);
-      font-size: 0.9rem;
-    }
-
-    .plan-price {
-      text-align: center;
-      margin-bottom: 2rem;
-      padding: 1.5rem 0;
-      border-top: 1px solid var(--border-color);
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .price-amount {
-      font-size: 3rem;
-      font-weight: 800;
-      color: var(--accent);
-    }
-
-    .price-period {
-      color: var(--text-muted);
-      font-size: 0.9rem;
-    }
-
-    .free-price {
-      font-size: 2.5rem;
-      font-weight: 800;
-      color: var(--success);
-    }
-
-    .features-list {
-      list-style: none;
-      flex: 1;
-      margin-bottom: 2rem;
-    }
-
-    .features-list li {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 0.75rem 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-    }
-
-    .features-list li:last-child {
-      border-bottom: none;
-    }
-
-    .feature-icon {
-      width: 20px;
-      text-align: center;
-    }
-
-    .feature-icon.included {
-      color: var(--success);
-    }
-
-    .feature-icon.not-included {
-      color: var(--text-muted);
-    }
-
-    .feature-text {
-      flex: 1;
-      font-size: 0.95rem;
-    }
-
-    .feature-text.not-included {
-      color: var(--text-muted);
-      text-decoration: line-through;
-    }
-
-    .cta-button {
-      width: 100%;
-      padding: 1rem;
-      border-radius: 12px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-    }
-
-    .cta-button.primary {
-      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
-      color: #000;
-      border: none;
-    }
-
-    .cta-button.primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 30px rgba(0, 194, 255, 0.3);
-    }
-
-    .cta-button.secondary {
-      background: transparent;
-      color: var(--text-color);
-      border: 1px solid var(--border-color);
-    }
-
-    .cta-button.secondary:hover {
-      border-color: var(--accent);
-      background: rgba(0, 194, 255, 0.1);
-    }
-
-    .comparison-section {
-      margin-top: 4rem;
-      background: var(--card-bg);
-      border-radius: 24px;
-      padding: 3rem;
-      border: 1px solid var(--border-color);
-    }
-
-    .comparison-section h2 {
-      text-align: center;
-      font-size: 1.75rem;
-      margin-bottom: 2rem;
-    }
-
-    .comparison-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    .comparison-table th,
-    .comparison-table td {
-      padding: 1rem;
-      text-align: left;
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .comparison-table th {
-      color: var(--text-muted);
-      font-weight: 500;
-      font-size: 0.9rem;
-    }
-
-    .comparison-table th:not(:first-child),
-    .comparison-table td:not(:first-child) {
-      text-align: center;
-    }
-
-    .comparison-table td:first-child {
-      font-weight: 500;
-    }
-
-    .check-mark {
-      color: var(--success);
-      font-size: 1.2rem;
-    }
-
-    .cross-mark {
-      color: var(--text-muted);
-    }
-
-    .faq-section {
-      margin-top: 4rem;
-    }
-
-    .faq-section h2 {
-      text-align: center;
-      font-size: 1.75rem;
-      margin-bottom: 2rem;
-    }
-
-    .faq-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 1.5rem;
-    }
-
-    .faq-item {
-      background: var(--card-bg);
-      border-radius: 16px;
-      padding: 1.5rem;
-      border: 1px solid var(--border-color);
-    }
-
-    .faq-question {
-      font-weight: 600;
-      margin-bottom: 0.75rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .faq-question i {
-      color: var(--accent);
-    }
-
-    .faq-answer {
-      color: var(--text-muted);
-      font-size: 0.9rem;
-      line-height: 1.6;
-    }
-
-    @media (max-width: 768px) {
-      .pricing-header h1 {
-        font-size: 2rem;
-      }
-
-      .pricing-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .comparison-table {
-        font-size: 0.85rem;
-      }
-
-      .comparison-table th,
-      .comparison-table td {
-        padding: 0.75rem 0.5rem;
-      }
-    }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
-<body>
-  {% include 'components/navbar.html' %}
+<body class="text-slate-100">
+  <header class="max-w-6xl mx-auto px-6 pt-8">
+    <nav class="glass-soft flex items-center justify-between px-6 py-4">
+      <a href="/" class="flex items-center gap-3">
+        <div class="h-10 w-10 rounded-full bg-gradient-to-br from-cyan-400 to-teal-300 glow"></div>
+        <span class="text-lg font-semibold">Applyce</span>
+      </a>
+      <div class="flex items-center gap-6 text-sm text-slate-300">
+        <a href="/pricing" class="text-white">Pricing</a>
+        <a href="/login" class="hover:text-white">Login</a>
+      </div>
+    </nav>
+  </header>
 
-  <div class="pricing-container">
-    <div class="pricing-header">
-      <h1>Simple, Transparent Pricing</h1>
-      <p>Choose the plan that works best for you. Upgrade anytime to unlock more features.</p>
-    </div>
+  <main class="max-w-6xl mx-auto px-6 py-16">
+    <section class="text-center">
+      <p class="text-cyan-200 uppercase tracking-[0.3em] text-xs">Pricing</p>
+      <h1 class="text-4xl font-semibold mt-3">Flexible plans built for every career stage.</h1>
+      <p class="text-slate-400 mt-3">Scale from individual growth to enterprise talent intelligence with Applyce.</p>
+    </section>
 
-    <div class="pricing-grid">
-      <!-- Free Plan -->
-      <div class="pricing-card">
-        <div class="plan-header">
-          <div class="plan-icon">🆓</div>
-          <h3 class="plan-name">Free</h3>
-          <p class="plan-description">Perfect for getting started</p>
-        </div>
-
-        <div class="plan-price">
-          <div class="free-price">₹0</div>
-          <div class="price-period">forever</div>
-        </div>
-
-        <ul class="features-list">
-          <li>
-            <span class="feature-icon included"><i class="fas fa-check"></i></span>
-            <span class="feature-text">3 resume scans per day</span>
-          </li>
-          <li>
-            <span class="feature-icon included"><i class="fas fa-check"></i></span>
-            <span class="feature-text">Basic ATS score</span>
-          </li>
-          <li>
-            <span class="feature-icon included"><i class="fas fa-check"></i></span>
-            <span class="feature-text">Skill gap analysis</span>
-          </li>
-          <li>
-            <span class="feature-icon included"><i class="fas fa-check"></i></span>
-            <span class="feature-text">Career roadmap</span>
-          </li>
-          <li>
-            <span class="feature-icon not-included"><i class="fas fa-times"></i></span>
-            <span class="feature-text not-included">Detailed salary insights</span>
-          </li>
-          <li>
-            <span class="feature-icon not-included"><i class="fas fa-times"></i></span>
-            <span class="feature-text not-included">Job matching</span>
-          </li>
-          <li>
-            <span class="feature-icon not-included"><i class="fas fa-times"></i></span>
-            <span class="feature-text not-included">PDF export</span>
-          </li>
-          <li>
-            <span class="feature-icon not-included"><i class="fas fa-times"></i></span>
-            <span class="feature-text not-included">Priority support</span>
-          </li>
+    <section class="grid lg:grid-cols-3 gap-6 mt-12">
+      <div class="glass p-8 hover-lift">
+        <h3 class="text-xl font-semibold">Starter</h3>
+        <p class="text-3xl font-semibold mt-4">$19 <span class="text-sm text-slate-400">/ month</span></p>
+        <p class="text-sm text-slate-400 mt-2">Ideal for early career exploration.</p>
+        <ul class="mt-6 space-y-3 text-sm text-slate-300">
+          <li>AI recommendations</li>
+          <li>Resume scan & score</li>
+          <li>Weekly job matches</li>
         </ul>
-
-        <a href="{{ url_for('upload') }}" class="cta-button secondary">
-          <i class="fas fa-rocket"></i>
-          Get Started Free
-        </a>
+        <button class="mt-8 w-full px-5 py-3 rounded-full border border-cyan-300/40 text-cyan-200 hover:bg-cyan-400/10 transition">Start Starter</button>
       </div>
-
-      <!-- Premium Plan -->
-      <div class="pricing-card featured">
-        <div class="featured-badge">Most Popular</div>
-        <div class="plan-header">
-          <div class="plan-icon">💎</div>
-          <h3 class="plan-name">Premium</h3>
-          <p class="plan-description">For serious job seekers</p>
+      <div class="gradient-border hover-lift">
+        <div class="gradient-border-inner glass p-8">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xl font-semibold">Growth</h3>
+            <span class="badge">Best value</span>
+          </div>
+          <p class="text-3xl font-semibold mt-4">$49 <span class="text-sm text-slate-400">/ month</span></p>
+          <p class="text-sm text-slate-400 mt-2">For ambitious professionals ready to level up.</p>
+          <ul class="mt-6 space-y-3 text-sm text-slate-300">
+            <li>Unlimited AI insights</li>
+            <li>Career roadmap builder</li>
+            <li>Priority job matching</li>
+          </ul>
+          <button class="mt-8 w-full px-5 py-3 rounded-full bg-gradient-to-r from-cyan-400 to-teal-300 text-slate-900 font-semibold hover:scale-105 transition">Start Growth</button>
         </div>
-
-        <div class="plan-price">
-          <div class="price-amount">₹299</div>
-          <div class="price-period">per month</div>
-        </div>
-
-        <ul class="features-list">
-          <li>
-            <span class="feature-icon included"><i class="fas fa-check"></i></span>
-            <span class="feature-text"><strong>50 resume scans</strong> per day</span>
-          </li>
-          <li>
-            <span class="feature-icon included"><i class="fas fa-check"></i></span>
-            <span class="feature-text">Basic ATS score</span>
-          </li>
-          <li>
-            <span class="feature-icon included"><i class="fas fa-check"></i></span>
-            <span class="feature-text">Skill gap analysis</span>
-          </li>
-          <li>
-            <span class="feature-icon included"><i class="fas fa-check"></i></span>
-            <span class="feature-text">Career roadmap</span>
-          </li>
-          <li>
-            <span class="feature-icon included"><i class="fas fa-check"></i></span>
-            <span class="feature-text">Detailed salary insights</span>
-          </li>
-          <li>
-            <span class="feature-icon included"><i class="fas fa-check"></i></span>
-            <span class="feature-text">Job matching</span>
-          </li>
-          <li>
-            <span class="feature-icon included"><i class="fas fa-check"></i></span>
-            <span class="feature-text">PDF export & email reports</span>
-          </li>
-          <li>
-            <span class="feature-icon included"><i class="fas fa-check"></i></span>
-            <span class="feature-text">Priority support</span>
-          </li>
+      </div>
+      <div class="glass p-8 hover-lift">
+        <h3 class="text-xl font-semibold">Enterprise</h3>
+        <p class="text-3xl font-semibold mt-4">$99 <span class="text-sm text-slate-400">/ month</span></p>
+        <p class="text-sm text-slate-400 mt-2">Advanced analytics and team reporting.</p>
+        <ul class="mt-6 space-y-3 text-sm text-slate-300">
+          <li>Team dashboards</li>
+          <li>Custom talent analytics</li>
+          <li>Dedicated success lead</li>
         </ul>
-
-        <a href="#" class="cta-button primary" onclick="alert('Payment integration coming soon!')">
-          <i class="fas fa-crown"></i>
-          Upgrade to Premium
-        </a>
+        <button class="mt-8 w-full px-5 py-3 rounded-full border border-cyan-300/40 text-cyan-200 hover:bg-cyan-400/10 transition">Contact sales</button>
       </div>
-
-      <!-- Enterprise Plan -->
-      <div class="pricing-card">
-        <div class="plan-header">
-          <div class="plan-icon">🏢</div>
-          <h3 class="plan-name">Enterprise</h3>
-          <p class="plan-description">For teams & organizations</p>
-        </div>
-
-        <div class="plan-price">
-          <div class="price-amount">Custom</div>
-          <div class="price-period">contact us</div>
-        </div>
-
-        <ul class="features-list">
-          <li>
-            <span class="feature-icon included"><i class="fas fa-check"></i></span>
-            <span class="feature-text"><strong>Unlimited</strong> resume scans</span>
-          </li>
-          <li>
-            <span class="feature-icon included"><i class="fas fa-check"></i></span>
-            <span class="feature-text">All Premium features</span>
-          </li>
-          <li>
-            <span class="feature-icon included"><i class="fas fa-check"></i></span>
-            <span class="feature-text">Custom integrations</span>
-          </li>
-          <li>
-            <span class="feature-icon included"><i class="fas fa-check"></i></span>
-            <span class="feature-text">Team management</span>
-          </li>
-          <li>
-            <span class="feature-icon included"><i class="fas fa-check"></i></span>
-            <span class="feature-text">API access</span>
-          </li>
-          <li>
-            <span class="feature-icon included"><i class="fas fa-check"></i></span>
-            <span class="feature-text">Dedicated account manager</span>
-          </li>
-          <li>
-            <span class="feature-icon included"><i class="fas fa-check"></i></span>
-            <span class="feature-text">SLA guarantee</span>
-          </li>
-          <li>
-            <span class="feature-icon included"><i class="fas fa-check"></i></span>
-            <span class="feature-text">On-premise deployment</span>
-          </li>
-        </ul>
-
-        <a href="mailto:support@skillfit.app" class="cta-button secondary">
-          <i class="fas fa-envelope"></i>
-          Contact Sales
-        </a>
-      </div>
-    </div>
-
-    <!-- Comparison Section -->
-    <div class="comparison-section">
-      <h2>Feature Comparison</h2>
-      <table class="comparison-table">
-        <thead>
-          <tr>
-            <th>Feature</th>
-            <th>Free</th>
-            <th>Premium</th>
-            <th>Enterprise</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Daily Resume Scans</td>
-            <td>3</td>
-            <td>50</td>
-            <td>Unlimited</td>
-          </tr>
-          <tr>
-            <td>ATS Score Analysis</td>
-            <td><span class="check-mark"><i class="fas fa-check"></i></span></td>
-            <td><span class="check-mark"><i class="fas fa-check"></i></span></td>
-            <td><span class="check-mark"><i class="fas fa-check"></i></span></td>
-          </tr>
-          <tr>
-            <td>Skill Gap Analysis</td>
-            <td><span class="check-mark"><i class="fas fa-check"></i></span></td>
-            <td><span class="check-mark"><i class="fas fa-check"></i></span></td>
-            <td><span class="check-mark"><i class="fas fa-check"></i></span></td>
-          </tr>
-          <tr>
-            <td>Career Roadmap</td>
-            <td><span class="check-mark"><i class="fas fa-check"></i></span></td>
-            <td><span class="check-mark"><i class="fas fa-check"></i></span></td>
-            <td><span class="check-mark"><i class="fas fa-check"></i></span></td>
-          </tr>
-          <tr>
-            <td>Detailed Salary Insights</td>
-            <td><span class="cross-mark"><i class="fas fa-times"></i></span></td>
-            <td><span class="check-mark"><i class="fas fa-check"></i></span></td>
-            <td><span class="check-mark"><i class="fas fa-check"></i></span></td>
-          </tr>
-          <tr>
-            <td>Job Matching</td>
-            <td><span class="cross-mark"><i class="fas fa-times"></i></span></td>
-            <td><span class="check-mark"><i class="fas fa-check"></i></span></td>
-            <td><span class="check-mark"><i class="fas fa-check"></i></span></td>
-          </tr>
-          <tr>
-            <td>PDF Export</td>
-            <td><span class="cross-mark"><i class="fas fa-times"></i></span></td>
-            <td><span class="check-mark"><i class="fas fa-check"></i></span></td>
-            <td><span class="check-mark"><i class="fas fa-check"></i></span></td>
-          </tr>
-          <tr>
-            <td>API Access</td>
-            <td><span class="cross-mark"><i class="fas fa-times"></i></span></td>
-            <td><span class="cross-mark"><i class="fas fa-times"></i></span></td>
-            <td><span class="check-mark"><i class="fas fa-check"></i></span></td>
-          </tr>
-          <tr>
-            <td>Priority Support</td>
-            <td><span class="cross-mark"><i class="fas fa-times"></i></span></td>
-            <td><span class="check-mark"><i class="fas fa-check"></i></span></td>
-            <td><span class="check-mark"><i class="fas fa-check"></i></span></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- FAQ Section -->
-    <div class="faq-section">
-      <h2>Frequently Asked Questions</h2>
-      <div class="faq-grid">
-        <div class="faq-item">
-          <div class="faq-question">
-            <i class="fas fa-question-circle"></i>
-            Can I cancel anytime?
-          </div>
-          <div class="faq-answer">
-            Yes! You can cancel your subscription at any time. You'll continue to have access until the end of your billing period.
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <div class="faq-question">
-            <i class="fas fa-question-circle"></i>
-            What payment methods do you accept?
-          </div>
-          <div class="faq-answer">
-            We accept all major credit cards, debit cards, UPI, and net banking through our secure payment gateway.
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <div class="faq-question">
-            <i class="fas fa-question-circle"></i>
-            Is there a free trial?
-          </div>
-          <div class="faq-answer">
-            Our free plan lets you try all basic features with 3 scans per day. No credit card required to get started!
-          </div>
-        </div>
-
-        <div class="faq-item">
-          <div class="faq-question">
-            <i class="fas fa-question-circle"></i>
-            What counts as a resume scan?
-          </div>
-          <div class="faq-answer">
-            Each time you upload a resume for analysis, it counts as one scan. Re-analyzing the same resume counts as a new scan.
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  {% include 'components/footer.html' %}
+    </section>
+  </main>
 </body>
 </html>
