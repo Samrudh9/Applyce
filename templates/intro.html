@@ -3,550 +3,247 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI Career Guidance - Find Your Perfect Career Path</title>
+  <title>Applyce | AI Career Recommendation Platform</title>
   <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    :root {
-      --bg-color: #0a0b0f;
-      --card-bg: #1a1b22;
-      --text-color: #e0e0e0;
-      --text-muted: #888;
-      --accent: #00c2ff;
-      --accent-secondary: #00ffe0;
-      --success: #00ff88;
-      --warning: #ffaa00;
-      --error: #ff4444;
-      --border-color: rgba(255, 255, 255, 0.1);
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: var(--bg-color);
-      min-height: 100vh;
-      color: var(--text-color);
-      line-height: 1.6;
-    }
-
-    /* Body padding for fixed navbar */
-    body {
-      padding-top: 70px;
-    }
-
-    /* Hero Section */
-    .hero {
-      padding: 10rem 2rem 5rem;
-      text-align: center;
-      color: var(--text-color);
-    }
-
-    .hero-content {
-      max-width: 800px;
-      margin: 0 auto;
-    }
-
-    .hero h1 {
-      font-size: 3.5rem;
-      font-weight: 800;
-      margin-bottom: 1.5rem;
-      line-height: 1.2;
-      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .hero p {
-      font-size: 1.25rem;
-      color: var(--text-muted);
-      margin-bottom: 2.5rem;
-      line-height: 1.6;
-    }
-
-    .cta-buttons {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
-    .btn {
-      padding: 1rem 2rem;
-      border-radius: 30px;
-      font-size: 1rem;
-      font-weight: 600;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      transition: all 0.3s ease;
-      cursor: pointer;
-    }
-
-    .btn-primary {
-      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
-      color: #000;
-      border: none;
-    }
-
-    .btn-primary:hover {
-      transform: scale(1.05);
-      box-shadow: 0 8px 25px rgba(0, 194, 255, 0.4);
-    }
-
-    .btn-secondary {
-      background: transparent;
-      color: var(--accent);
-      border: 2px solid var(--accent);
-    }
-
-    .btn-secondary:hover {
-      background: var(--accent);
-      color: #000;
-    }
-
-    /* Features Section */
-    .features {
-      padding: 5rem 2rem;
-      background: var(--bg-color);
-    }
-
-    .features-container {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .section-title {
-      text-align: center;
-      font-size: 2.5rem;
-      font-weight: 700;
-      margin-bottom: 1rem;
-      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .section-subtitle {
-      text-align: center;
-      font-size: 1.1rem;
-      color: var(--text-muted);
-      margin-bottom: 3rem;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 2rem;
-    }
-
-    .feature-card {
-      background: var(--card-bg);
-      border-radius: 16px;
-      padding: 2rem;
-      transition: all 0.3s ease;
-      border: 1px solid var(--border-color);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    }
-
-    .feature-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 15px 40px rgba(0, 194, 255, 0.2);
-    }
-
-    .feature-icon {
-      width: 60px;
-      height: 60px;
-      background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-      color: #000;
-      margin-bottom: 1.5rem;
-    }
-
-    .feature-card h3 {
-      font-size: 1.25rem;
-      font-weight: 600;
-      margin-bottom: 0.75rem;
-      color: var(--accent);
-    }
-
-    .feature-card p {
-      color: var(--text-muted);
-      line-height: 1.6;
-    }
-
-    /* How It Works Section */
-    .how-it-works {
-      padding: 5rem 2rem;
-      background: var(--card-bg);
-    }
-
-    .how-it-works .section-title {
-      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .how-it-works .section-subtitle {
-      color: var(--text-muted);
-    }
-
-    .steps {
-      display: flex;
-      justify-content: center;
-      gap: 2rem;
-      flex-wrap: wrap;
-      max-width: 1000px;
-      margin: 0 auto;
-    }
-
-    .step {
-      text-align: center;
-      flex: 1;
-      min-width: 250px;
-      max-width: 300px;
-      background: rgba(255, 255, 255, 0.03);
-      padding: 2rem;
-      border-radius: 16px;
-      border: 1px solid var(--border-color);
-      transition: all 0.3s ease;
-    }
-
-    .step:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 15px 40px rgba(0, 194, 255, 0.15);
-    }
-
-    .step-number {
-      width: 60px;
-      height: 60px;
-      background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #000;
-      margin: 0 auto 1.5rem;
-      box-shadow: 0 4px 15px rgba(0, 194, 255, 0.4);
-    }
-
-    .step h3 {
-      font-size: 1.25rem;
-      margin-bottom: 0.75rem;
-      color: var(--text-color);
-    }
-
-    .step p {
-      color: var(--text-muted);
-      line-height: 1.6;
-    }
-
-    /* CTA Section */
-    .cta-section {
-      padding: 5rem 2rem;
-      background: var(--bg-color);
-      text-align: center;
-    }
-
-    .cta-section h2 {
-      font-size: 2.5rem;
-      font-weight: 700;
-      margin-bottom: 1rem;
-      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .cta-section p {
-      font-size: 1.1rem;
-      color: var(--text-muted);
-      margin-bottom: 2rem;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .cta-section .btn-primary {
-      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
-      color: #000;
-    }
-
-    /* Footer */
-    footer {
-      padding: 2rem;
-      background: var(--card-bg);
-      color: var(--text-color);
-      text-align: center;
-      border-top: 1px solid var(--border-color);
-    }
-
-    footer p {
-      color: var(--text-muted);
-    }
-
-    .step {
-      text-align: center;
-      flex:  1;
-      min-width: 200px;  /* Changed from 250px */
-      max-width: 280px;  /* Changed from 300px */
-      background: rgba(255, 255, 255, 0.03);
-      padding: 1.75rem;  /* Slightly smaller padding */
-      border-radius:  16px;
-      border: 1px solid var(--border-color);
-      transition: all 0.3s ease;
-    }
-
-    .step-number {
-      width: 50px;       /* Changed from 60px */
-      height: 50px;      /* Changed from 60px */
-      background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.25rem;  /* Changed from 1.5rem */
-      font-weight: 700;
-      color: #000;
-      margin:  0 auto 1. 25rem;
-      box-shadow: 0 4px 15px rgba(0, 194, 255, 0.4);
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .hero h1 {
-        font-size: 2.5rem;
-      }
-
-      .features-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .steps {
-        flex-direction: column;
-        align-items: center;
-      }
-    }
-
-    /* Back to top button */
-    #backToTop {
-      display: none;
-      position: fixed;
-      bottom: 30px;
-      right: 30px;
-      z-index: 99;
-      border: none;
-      outline: none;
-      background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
-      color: #000;
-      cursor: pointer;
-      padding: 15px 18px;
-      border-radius: 50%;
-      font-size: 16px;
-      box-shadow: 0 5px 20px rgba(0, 194, 255, 0.4);
-      transition: all 0.3s ease;
-    }
-
-    #backToTop:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 25px rgba(0, 194, 255, 0.5);
-    }
-  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
+<body class="text-slate-100">
+  <header class="max-w-6xl mx-auto px-6 pt-8">
+    <nav class="glass-soft flex items-center justify-between px-6 py-4">
+      <div class="flex items-center gap-3">
+        <div class="h-10 w-10 rounded-full bg-gradient-to-br from-cyan-400 to-teal-300 glow"></div>
+        <span class="text-lg font-semibold">Applyce</span>
+      </div>
+      <div class="hidden md:flex items-center gap-8 text-sm text-slate-300">
+        <a href="#features" class="hover:text-white transition">Features</a>
+        <a href="#how" class="hover:text-white transition">How it works</a>
+        <a href="#pricing" class="hover:text-white transition">Pricing</a>
+        <a href="/login" class="hover:text-white transition">Login</a>
+      </div>
+      <a href="/register" class="px-5 py-2 rounded-full bg-gradient-to-r from-cyan-400 to-teal-300 text-slate-900 font-semibold hover:scale-105 transition">Get Started</a>
+    </nav>
+  </header>
 
-<body>
-  <!-- Navigation -->
-  {% include 'components/navbar.html' %}
+  <main class="max-w-6xl mx-auto px-6 pb-16">
+    <section class="grid lg:grid-cols-[1.1fr_0.9fr] gap-12 items-center pt-16">
+      <div>
+        <p class="uppercase tracking-[0.3em] text-xs text-cyan-200/70">AI-Powered Career Engine</p>
+        <h1 class="text-4xl md:text-6xl font-bold leading-tight mt-4 gradient-text">Build the career you were meant for with Applyce.</h1>
+        <p class="mt-6 text-lg text-slate-300">Applyce is a modern SaaS platform that combines AI insights, skill intelligence, and market analytics to recommend your next best career move.</p>
+        <div class="mt-8 flex flex-wrap gap-4">
+          <a href="/register" class="px-6 py-3 rounded-full bg-gradient-to-r from-cyan-400 to-teal-300 text-slate-900 font-semibold hover:scale-105 transition">Start free trial</a>
+          <a href="#how" class="px-6 py-3 rounded-full border border-cyan-300/40 text-cyan-200 hover:bg-cyan-400/10 transition">Watch demo</a>
+        </div>
+        <div class="mt-10 flex flex-wrap gap-6 text-sm text-slate-400">
+          <div>
+            <p class="text-2xl font-semibold text-white">92%</p>
+            <p>match accuracy</p>
+          </div>
+          <div>
+            <p class="text-2xl font-semibold text-white">150K+</p>
+            <p>career paths analyzed</p>
+          </div>
+          <div>
+            <p class="text-2xl font-semibold text-white">4.9/5</p>
+            <p>user satisfaction</p>
+          </div>
+        </div>
+      </div>
+      <div class="relative">
+        <div class="absolute -top-10 -right-10 h-32 w-32 rounded-full bg-cyan-500/20 blur-2xl"></div>
+        <div class="glass p-8 space-y-6 hover-lift">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-slate-400">Recommendation readiness</p>
+              <p class="text-2xl font-semibold">94%</p>
+            </div>
+            <div class="progress-ring" style="--value: 94%;">
+              <span class="text-sm">94%</span>
+            </div>
+          </div>
+          <div class="neon-divider"></div>
+          <div class="space-y-3">
+            <p class="text-sm text-slate-400">Top career match</p>
+            <h3 class="text-xl font-semibold">Product Strategy Lead</h3>
+            <div class="flex flex-wrap gap-2">
+              <span class="badge">AI leadership</span>
+              <span class="badge">Growth analytics</span>
+              <span class="badge">Cross-functional</span>
+            </div>
+          </div>
+          <div class="glass-soft p-4">
+            <p class="text-sm text-slate-400">Next step</p>
+            <p class="text-base font-medium">Complete the leadership assessment to unlock executive tracks.</p>
+          </div>
+        </div>
+      </div>
+    </section>
 
-  <!-- Hero Section -->
-  <section class="hero">
-    <div class="hero-content">
-      <h1>Discover Your Ideal Career Path with AI</h1>
-      <p>Our intelligent career guidance system analyzes your skills, interests, and experience to recommend the perfect career path for you. Get personalized salary estimates, skill gap analysis, and a roadmap to success.</p>
-      <div class="cta-buttons">
-        {% if current_user.is_authenticated %}
-          <a href="{{ url_for('upload') }}" class="btn btn-primary">
-            <i class="fas fa-upload"></i> Upload Resume
-          </a>
-          <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
-            <i class="fas fa-tachometer-alt"></i> My Dashboard
-          </a>
-        {% else %}
-          <a href="{{ url_for('register') }}" class="btn btn-primary">
-            <i class="fas fa-rocket"></i> Get Started Free
-          </a>
-          <a href="{{ url_for('login') }}" class="btn btn-secondary">
-            <i class="fas fa-sign-in-alt"></i> Sign In
-          </a>
-        {% endif %}
+    <section id="features" class="pt-20">
+      <div class="flex items-center justify-between flex-wrap gap-6">
+        <div>
+          <p class="text-cyan-200 text-sm uppercase tracking-[0.3em]">Platform</p>
+          <h2 class="text-3xl md:text-4xl font-semibold mt-3">Intelligent insights across your career lifecycle.</h2>
+        </div>
+        <a href="/dashboard" class="text-sm text-cyan-200 hover:text-white transition">Explore dashboard →</a>
+      </div>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
+        <div class="glass p-6 hover-lift">
+          <h3 class="text-xl font-semibold">Neural skill graph</h3>
+          <p class="mt-2 text-sm text-slate-400">Map your skills to high-growth roles with instant gap analysis and confidence scores.</p>
+        </div>
+        <div class="glass p-6 hover-lift">
+          <h3 class="text-xl font-semibold">AI career simulator</h3>
+          <p class="mt-2 text-sm text-slate-400">Preview how each career choice changes compensation, lifestyle, and success metrics.</p>
+        </div>
+        <div class="glass p-6 hover-lift">
+          <h3 class="text-xl font-semibold">Personalized roadmap</h3>
+          <p class="mt-2 text-sm text-slate-400">Deliver curated learning plans, mentors, and milestones built just for you.</p>
+        </div>
+        <div class="glass p-6 hover-lift">
+          <h3 class="text-xl font-semibold">Job match engine</h3>
+          <p class="mt-2 text-sm text-slate-400">Get live job matches with AI-calculated fit and interview readiness insights.</p>
+        </div>
+        <div class="glass p-6 hover-lift">
+          <h3 class="text-xl font-semibold">Resume intelligence</h3>
+          <p class="mt-2 text-sm text-slate-400">Optimize every resume with ATS scoring, sentiment analysis, and quantifiable impact.</p>
+        </div>
+        <div class="glass p-6 hover-lift">
+          <h3 class="text-xl font-semibold">Talent network</h3>
+          <p class="mt-2 text-sm text-slate-400">Unlock referrals, community sessions, and AI mentoring from industry leaders.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="how" class="pt-20">
+      <div class="grid lg:grid-cols-[0.9fr_1.1fr] gap-10">
+        <div class="glass p-8">
+          <h2 class="text-3xl font-semibold">How Applyce works</h2>
+          <p class="mt-3 text-slate-400">A guided journey from resume upload to AI recommended roles, all delivered in a few minutes.</p>
+          <div class="mt-8 space-y-6">
+            <div class="flex gap-4">
+              <div class="h-10 w-10 rounded-full bg-cyan-400/20 flex items-center justify-center text-cyan-200 font-semibold">1</div>
+              <div>
+                <h4 class="font-semibold">Upload your resume</h4>
+                <p class="text-sm text-slate-400">We ingest your history, achievements, and skill patterns.</p>
+              </div>
+            </div>
+            <div class="flex gap-4">
+              <div class="h-10 w-10 rounded-full bg-cyan-400/20 flex items-center justify-center text-cyan-200 font-semibold">2</div>
+              <div>
+                <h4 class="font-semibold">AI analyzes fit</h4>
+                <p class="text-sm text-slate-400">Our models map you to future-ready roles and talent needs.</p>
+              </div>
+            </div>
+            <div class="flex gap-4">
+              <div class="h-10 w-10 rounded-full bg-cyan-400/20 flex items-center justify-center text-cyan-200 font-semibold">3</div>
+              <div>
+                <h4 class="font-semibold">Act on recommendations</h4>
+                <p class="text-sm text-slate-400">Launch tailored learning, apply to curated jobs, and track progress.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="glass p-8">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xl font-semibold">Live insights preview</h3>
+            <span class="badge">Realtime</span>
+          </div>
+          <div class="mt-6 grid gap-4">
+            <div class="glass-soft p-4 flex items-center justify-between">
+              <div>
+                <p class="text-sm text-slate-400">Career confidence</p>
+                <p class="text-lg font-semibold">86%</p>
+              </div>
+              <div class="h-12 w-12 rounded-full bg-cyan-400/10 flex items-center justify-center text-cyan-200">↑</div>
+            </div>
+            <div class="glass-soft p-4 flex items-center justify-between">
+              <div>
+                <p class="text-sm text-slate-400">Skill gap</p>
+                <p class="text-lg font-semibold">12 points</p>
+              </div>
+              <div class="h-12 w-12 rounded-full bg-teal-300/10 flex items-center justify-center text-teal-200">⚡</div>
+            </div>
+            <div class="glass-soft p-4 flex items-center justify-between">
+              <div>
+                <p class="text-sm text-slate-400">Mentor matches</p>
+                <p class="text-lg font-semibold">4 available</p>
+              </div>
+              <div class="h-12 w-12 rounded-full bg-blue-400/10 flex items-center justify-center text-blue-200">★</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="pricing" class="pt-20">
+      <div class="text-center">
+        <p class="text-cyan-200 text-sm uppercase tracking-[0.3em]">Pricing</p>
+        <h2 class="text-3xl md:text-4xl font-semibold mt-3">Choose the plan that fits your ambition.</h2>
+      </div>
+      <div class="grid lg:grid-cols-3 gap-6 mt-10">
+        <div class="glass p-8 hover-lift">
+          <h3 class="text-xl font-semibold">Starter</h3>
+          <p class="text-3xl font-semibold mt-4">$19 <span class="text-sm text-slate-400">/ month</span></p>
+          <ul class="mt-6 space-y-3 text-sm text-slate-300">
+            <li>AI career recommendations</li>
+            <li>Resume scorecard</li>
+            <li>3 job matches daily</li>
+          </ul>
+          <a href="/register" class="mt-8 inline-flex justify-center w-full px-5 py-3 rounded-full border border-cyan-300/40 text-cyan-200 hover:bg-cyan-400/10 transition">Start Starter</a>
+        </div>
+        <div class="gradient-border hover-lift">
+          <div class="gradient-border-inner glass p-8">
+            <div class="flex items-center justify-between">
+              <h3 class="text-xl font-semibold">Growth</h3>
+              <span class="badge">Most popular</span>
+            </div>
+            <p class="text-3xl font-semibold mt-4">$49 <span class="text-sm text-slate-400">/ month</span></p>
+            <ul class="mt-6 space-y-3 text-sm text-slate-300">
+              <li>Unlimited AI insights</li>
+              <li>Career roadmap builder</li>
+              <li>ATS-optimized resumes</li>
+            </ul>
+            <a href="/register" class="mt-8 inline-flex justify-center w-full px-5 py-3 rounded-full bg-gradient-to-r from-cyan-400 to-teal-300 text-slate-900 font-semibold hover:scale-105 transition">Start Growth</a>
+          </div>
+        </div>
+        <div class="glass p-8 hover-lift">
+          <h3 class="text-xl font-semibold">Enterprise</h3>
+          <p class="text-3xl font-semibold mt-4">$99 <span class="text-sm text-slate-400">/ month</span></p>
+          <ul class="mt-6 space-y-3 text-sm text-slate-300">
+            <li>Team analytics & dashboards</li>
+            <li>Dedicated talent advisor</li>
+            <li>API + SSO access</li>
+          </ul>
+          <a href="/contact" class="mt-8 inline-flex justify-center w-full px-5 py-3 rounded-full border border-cyan-300/40 text-cyan-200 hover:bg-cyan-400/10 transition">Talk to sales</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="pt-20">
+      <div class="glass p-10 text-center hover-lift">
+        <h2 class="text-3xl font-semibold">Ready to navigate your next career move?</h2>
+        <p class="mt-4 text-slate-300">Join Applyce and unlock your personalized AI career recommendation system.</p>
+        <div class="mt-8 flex flex-wrap justify-center gap-4">
+          <a href="/register" class="px-6 py-3 rounded-full bg-gradient-to-r from-cyan-400 to-teal-300 text-slate-900 font-semibold hover:scale-105 transition">Launch Applyce</a>
+          <a href="/about" class="px-6 py-3 rounded-full border border-cyan-300/40 text-cyan-200 hover:bg-cyan-400/10 transition">Meet the team</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="max-w-6xl mx-auto px-6 py-10 text-sm text-slate-500">
+    <div class="neon-divider"></div>
+    <div class="mt-6 flex flex-wrap justify-between gap-4">
+      <p>© 2024 Applyce. AI-powered career recommendations.</p>
+      <div class="flex gap-4">
+        <a href="/about" class="hover:text-white">About</a>
+        <a href="/pricing" class="hover:text-white">Pricing</a>
+        <a href="/login" class="hover:text-white">Login</a>
       </div>
     </div>
-  </section>
-
-  <!-- Features Section -->
-  <section class="features" id="features">
-    <div class="features-container">
-      <h2 class="section-title">What We Offer</h2>
-      <p class="section-subtitle">Comprehensive career guidance powered by machine learning to help you make informed decisions</p>
-      
-      <div class="features-grid">
-        <div class="feature-card">
-          <div class="feature-icon">
-            <i class="fas fa-brain"></i>
-          </div>
-          <h3>🧠 AI Career Matching</h3>
-          <p>Our ML-powered system analyzes your profile and matches you with careers that fit your skills and interests perfectly.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">
-            <i class="fas fa-rupee-sign"></i>
-          </div>
-          <h3>💰 Salary Estimation</h3>
-          <p>Get realistic salary ranges based on your career, experience level, education, and skills for the Indian job market.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">
-            <i class="fas fa-chart-bar"></i>
-          </div>
-          <h3>📊 Skill Gap Analysis</h3>
-          <p>Identify which skills you need to develop to excel in your target career and close the gap effectively.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">
-            <i class="fas fa-road"></i>
-          </div>
-          <h3>🛤️ Career Roadmap</h3>
-          <p>Get a step-by-step learning path with resources, courses, and milestones to achieve your career goals.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">
-            <i class="fas fa-file-alt"></i>
-          </div>
-          <h3>📄 Resume Analysis</h3>
-          <p>Upload your resume and let our system extract skills, education, experience, and certifications automatically.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">
-            <i class="fas fa-lightbulb"></i>
-          </div>
-          <h3>💡 Improvement Tips</h3>
-          <p>Receive personalized suggestions to improve your resume and increase your chances of landing your dream job.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- How It Works Section -->
-<section class="how-it-works" id="how-it-works">
-  <div class="features-container">
-    <h2 class="section-title">How It Works</h2>
-    <p class="section-subtitle">Four simple steps to discover your perfect career path</p>
-    
-    <div class="steps">
-      <div class="step">
-        <div class="step-number">1</div>
-        <h3>🔐 Sign Up Free</h3>
-        <p>Create your free account in seconds to unlock all AI-powered career guidance features</p>
-      </div>
-
-      <div class="step">
-        <div class="step-number">2</div>
-        <h3>📄 Upload Resume</h3>
-        <p>Upload your resume (PDF/DOCX) or manually enter your skills, interests, and qualifications</p>
-      </div>
-
-      <div class="step">
-        <div class="step-number">3</div>
-        <h3>🤖 AI Analysis</h3>
-        <p>Our ML algorithm analyzes your profile, scores your resume for ATS, and matches you with careers</p>
-      </div>
-
-      <div class="step">
-        <div class="step-number">4</div>
-        <h3>🎯 Get Results</h3>
-        <p>Receive career recommendations, ATS score, job matches, salary estimates, and a personalized learning roadmap</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-  <!-- Sign Up CTA Section (show only if not logged in) -->
-  {% if not current_user.is_authenticated %}
-  <section class="signup-cta" style="background: linear-gradient(135deg, rgba(0, 194, 255, 0.1), rgba(0, 255, 224, 0.1)); padding: 4rem 2rem; text-align: center; margin: 2rem 0; border-radius: 20px;">
-    <h2 style="font-size: 2rem; margin-bottom: 1rem; background: linear-gradient(90deg, var(--accent), var(--accent-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-      🚀 Ready to Boost Your Career?
-    </h2>
-    <p style="color: var(--text-muted); margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">
-      Create a free account to unlock all features: AI Resume Analysis, ATS Scoring, Job Matching, Career Roadmaps, and more!
-    </p>
-    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-      <a href="{{ url_for('register') }}" class="btn btn-primary" style="padding: 1rem 2rem; font-size: 1.1rem;">
-        <i class="fas fa-user-plus"></i> Create Free Account
-      </a>
-      <a href="{{ url_for('login') }}" class="btn btn-secondary" style="padding: 1rem 2rem; font-size: 1.1rem;">
-        <i class="fas fa-sign-in-alt"></i> Already have an account?
-      </a>
-    </div>
-  </section>
-  {% endif %}
-
-  <!-- CTA Section -->
-  <section class="cta-section">
-    <h2>Ready to Find Your Dream Career?</h2>
-    <p>Join thousands of users who have discovered their ideal career path using our AI-powered guidance system</p>
-    {% if current_user.is_authenticated %}
-      <a href="{{ url_for('upload') }}" class="btn btn-primary">
-        <i class="fas fa-rocket"></i> Get Started Now
-      </a>
-    {% else %}
-      <a href="{{ url_for('register') }}" class="btn btn-primary">
-        <i class="fas fa-rocket"></i> Get Started Now
-      </a>
-    {% endif %}
-  </section>
-
-  <!-- Footer -->
-  {% include 'components/footer.html' %}
-
-  <!-- Back to Top Button -->
-  <button id="backToTop" title="Go to top"><i class="fas fa-arrow-up"></i></button>
-
-  <script>
-    // Back to top button functionality
-    window.onscroll = function() {
-      const btn = document.getElementById("backToTop");
-      if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
-        btn.style.display = "block";
-      } else {
-        btn.style.display = "none";
-      }
-    };
-
-    document.getElementById("backToTop").addEventListener("click", function() {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    });
-  </script>
+  </footer>
 </body>
 </html>

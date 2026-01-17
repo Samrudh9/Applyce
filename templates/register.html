@@ -3,382 +3,67 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Register - SkillFit</title>
+  <title>Register | Applyce</title>
   <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    :root {
-      --bg-color: #0a0b0f;
-      --bg-secondary: #12131a;
-      --card-bg: #1a1b22;
-      --text-color: #e0e0e0;
-      --text-muted: #888;
-      --accent: #00c2ff;
-      --accent-secondary: #00ffe0;
-      --success: #00ff88;
-      --warning: #ffaa00;
-      --error: #ff4444;
-      --border-color: rgba(255, 255, 255, 0.08);
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      padding-top: 70px;
-    }
-
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: 
-        radial-gradient(ellipse at 20% 20%, rgba(0, 194, 255, 0.08) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 80%, rgba(0, 255, 224, 0.08) 0%, transparent 50%);
-      pointer-events: none;
-      z-index: -1;
-    }
-
-    .auth-container {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
-    }
-
-    .auth-card {
-      background: var(--card-bg);
-      border-radius: 24px;
-      padding: 3rem;
-      width: 100%;
-      max-width: 420px;
-      border: 1px solid var(--border-color);
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-    }
-
-    .auth-header {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-
-    .auth-icon {
-      width: 70px;
-      height: 70px;
-      background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
-      border-radius: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 1.5rem;
-      font-size: 1.75rem;
-    }
-
-    .auth-header h1 {
-      font-size: 1.75rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-      background: linear-gradient(135deg, #fff, var(--accent));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .auth-header p {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-    }
-
-    .form-group {
-      margin-bottom: 1.25rem;
-    }
-
-    .form-label {
-      display: block;
-      font-size: 0.9rem;
-      font-weight: 500;
-      color: var(--text-color);
-      margin-bottom: 0.5rem;
-    }
-
-    .form-input {
-      width: 100%;
-      padding: 1rem 1.25rem;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border-color);
-      border-radius: 12px;
-      color: var(--text-color);
-      font-size: 1rem;
-      font-family: inherit;
-      transition: all 0.3s ease;
-    }
-
-    .form-input:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(0, 194, 255, 0.1);
-    }
-
-    .form-input::placeholder {
-      color: var(--text-muted);
-    }
-
-    .form-hint {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      margin-top: 0.35rem;
-    }
-
-    .submit-btn {
-      width: 100%;
-      padding: 1rem;
-      background: linear-gradient(90deg, var(--accent), var(--accent-secondary));
-      color: #000;
-      border: none;
-      border-radius: 12px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      margin-top: 1.5rem;
-    }
-
-    .submit-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 30px rgba(0, 194, 255, 0.3);
-    }
-
-    .auth-footer {
-      text-align: center;
-      margin-top: 2rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid var(--border-color);
-    }
-
-    .auth-footer p {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-    }
-
-    .auth-footer a {
-      color: var(--accent);
-      text-decoration: none;
-      font-weight: 500;
-      transition: color 0.3s ease;
-    }
-
-    .auth-footer a:hover {
-      color: var(--accent-secondary);
-    }
-
-    .alert {
-      padding: 1rem;
-      border-radius: 10px;
-      margin-bottom: 1.5rem;
-      font-size: 0.9rem;
-    }
-
-    .alert-error {
-      background: rgba(255, 68, 68, 0.1);
-      border: 1px solid rgba(255, 68, 68, 0.3);
-      color: var(--error);
-    }
-
-    .alert-success {
-      background: rgba(0, 255, 136, 0.1);
-      border: 1px solid rgba(0, 255, 136, 0.3);
-      color: var(--success);
-    }
-
-    .password-requirements {
-      background: rgba(255, 255, 255, 0.03);
-      border-radius: 10px;
-      padding: 1rem;
-      margin-top: 0.5rem;
-    }
-
-    .password-requirements h4 {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      margin-bottom: 0.5rem;
-    }
-
-    .password-requirements ul {
-      list-style: none;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-    }
-
-    .password-requirements li {
-      padding: 0.25rem 0;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .password-requirements li i {
-      font-size: 0.7rem;
-    }
-
-    .terms-checkbox {
-      display: flex;
-      align-items: flex-start;
-      gap: 0.75rem;
-      margin-top: 1.25rem;
-    }
-
-    .terms-checkbox input {
-      width: 18px;
-      height: 18px;
-      accent-color: var(--accent);
-      margin-top: 2px;
-    }
-
-    .terms-checkbox label {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      line-height: 1.4;
-    }
-
-    .terms-checkbox a {
-      color: var(--accent);
-      text-decoration: none;
-    }
-  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
-<body>
-  {% include 'components/navbar.html' %}
+<body class="min-h-screen flex flex-col">
+  <header class="max-w-6xl mx-auto w-full px-6 pt-8">
+    <nav class="glass-soft flex items-center justify-between px-6 py-4">
+      <a href="/" class="flex items-center gap-3">
+        <div class="h-10 w-10 rounded-full bg-gradient-to-br from-cyan-400 to-teal-300 glow"></div>
+        <span class="text-lg font-semibold">Applyce</span>
+      </a>
+      <a href="/login" class="text-sm text-cyan-200 hover:text-white transition">Already have an account?</a>
+    </nav>
+  </header>
 
-  <div class="auth-container">
-    <div class="auth-card">
-      <div class="auth-header">
-        <div class="auth-icon">✨</div>
-        <h1>Create Account</h1>
-        <p>Join SkillFit to track your career journey</p>
+  <main class="flex-1 flex items-center justify-center px-6 py-16">
+    <div class="glass w-full max-w-2xl p-10">
+      <div class="text-center">
+        <p class="text-cyan-200 uppercase tracking-[0.3em] text-xs">Start your journey</p>
+        <h1 class="text-3xl font-semibold mt-3">Create your Applyce account</h1>
+        <p class="text-slate-400 mt-2">Build a personalized AI-powered career roadmap in minutes.</p>
       </div>
-
-      {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-          {% for category, message in messages %}
-            <div class="alert alert-{{ 'error' if category == 'error' else 'success' }}">
-              {{ message }}
-            </div>
-          {% endfor %}
-        {% endif %}
-      {% endwith %}
-
-      <form method="POST" action="{{ url_for('register') }}">
-        <div class="form-group">
-          <label class="form-label" for="username">Username</label>
-          <input 
-            type="text" 
-            id="username" 
-            name="username" 
-            class="form-input" 
-            placeholder="Choose a username"
-            pattern="[a-zA-Z0-9_]+"
-            minlength="3"
-            maxlength="80"
-            required
-          >
-          <p class="form-hint">Letters, numbers, and underscores only</p>
+      <form class="mt-8 grid md:grid-cols-2 gap-5">
+        <div>
+          <label class="block text-sm text-slate-300 mb-2">First name</label>
+          <input type="text" placeholder="Jordan" class="w-full px-4 py-3 rounded-2xl bg-slate-900/60 border border-slate-700/60 focus-ring" />
         </div>
-
-        <div class="form-group">
-          <label class="form-label" for="email">Email Address</label>
-          <input 
-            type="email" 
-            id="email" 
-            name="email" 
-            class="form-input" 
-            placeholder="Enter your email"
-            required
-          >
+        <div>
+          <label class="block text-sm text-slate-300 mb-2">Last name</label>
+          <input type="text" placeholder="Lee" class="w-full px-4 py-3 rounded-2xl bg-slate-900/60 border border-slate-700/60 focus-ring" />
         </div>
-
-        <div class="form-group">
-          <label class="form-label" for="password">Password</label>
-          <input 
-            type="password" 
-            id="password" 
-            name="password" 
-            class="form-input" 
-            placeholder="Create a password"
-            minlength="8"
-            required
-          >
-          <div class="password-requirements">
-            <h4>Password must have:</h4>
-            <ul>
-              <li><i class="fas fa-check"></i> At least 8 characters</li>
-            </ul>
-          </div>
+        <div class="md:col-span-2">
+          <label class="block text-sm text-slate-300 mb-2">Work email</label>
+          <input type="email" placeholder="you@applyce.ai" class="w-full px-4 py-3 rounded-2xl bg-slate-900/60 border border-slate-700/60 focus-ring" />
         </div>
-
-        <div class="form-group">
-          <label class="form-label" for="confirm_password">Confirm Password</label>
-          <input 
-            type="password" 
-            id="confirm_password" 
-            name="confirm_password" 
-            class="form-input" 
-            placeholder="Confirm your password"
-            minlength="8"
-            required
-          >
+        <div>
+          <label class="block text-sm text-slate-300 mb-2">Password</label>
+          <input type="password" placeholder="••••••••" class="w-full px-4 py-3 rounded-2xl bg-slate-900/60 border border-slate-700/60 focus-ring" />
         </div>
-
-        <button type="submit" class="submit-btn">
-          <i class="fas fa-user-plus"></i>
-          Create Account
-        </button>
+        <div>
+          <label class="block text-sm text-slate-300 mb-2">Role focus</label>
+          <select class="w-full px-4 py-3 rounded-2xl bg-slate-900/60 border border-slate-700/60 focus-ring">
+            <option>Product & Strategy</option>
+            <option>Data & Analytics</option>
+            <option>Design & Creative</option>
+            <option>Engineering</option>
+          </select>
+        </div>
+        <div class="md:col-span-2">
+          <label class="flex items-start gap-3 text-sm text-slate-400">
+            <input type="checkbox" class="mt-1 rounded border-slate-700 bg-slate-900/60" />
+            I agree to the Applyce terms and want to receive career insights.
+          </label>
+        </div>
+        <div class="md:col-span-2">
+          <button type="submit" class="w-full px-5 py-3 rounded-full bg-gradient-to-r from-cyan-400 to-teal-300 text-slate-900 font-semibold hover:scale-[1.02] transition">Create account</button>
+        </div>
       </form>
-
-      <div class="auth-footer">
-        <p>Already have an account? <a href="{{ url_for('login') }}">Sign in</a></p>
-      </div>
     </div>
-  </div>
-
-  <script>
-    // Password match validation with inline error display
-    document.querySelector('form').addEventListener('submit', function(e) {
-      const password = document.getElementById('password').value;
-      const confirmPassword = document.getElementById('confirm_password').value;
-      const confirmField = document.getElementById('confirm_password');
-      
-      // Remove any existing error message
-      const existingError = document.querySelector('.password-error');
-      if (existingError) existingError.remove();
-      
-      if (password !== confirmPassword) {
-        e.preventDefault();
-        // Create inline error message
-        const errorDiv = document.createElement('div');
-        errorDiv.className = 'password-error';
-        errorDiv.style.cssText = 'color: var(--error); font-size: 0.85rem; margin-top: 0.5rem;';
-        errorDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> Passwords do not match';
-        confirmField.parentNode.appendChild(errorDiv);
-        confirmField.focus();
-      }
-    });
-  </script>
+  </main>
 </body>
 </html>
