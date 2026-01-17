@@ -92,7 +92,7 @@ print("✅ All imports loaded successfully")
 app = Flask(__name__)
 
 # Set secret key for session and flash messages
-app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
+app.secret_key = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
 
 # ===== Database Configuration =====
 
