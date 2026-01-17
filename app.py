@@ -122,10 +122,10 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 from models import db, User, Feedback, SkillPattern, ResumeHistory
 db.init_app(app)
 migrate = Migrate(app, db)
-# Create tables on startup (needed for Render)
-# with app.app_context():
-#     db. create_all()
-#     print("✅ Database tables created!")
+# Create tables on startup if they don't exist
+with app.app_context():
+    db.create_all()
+    print("✅ Database tables created!")
     
 # Initialize Flask-Login
 login_manager = LoginManager()
@@ -438,9 +438,9 @@ def login():
         return redirect(url_for('home'))
     
     if request.method == 'POST':
-        username_or_email = request.form.get('username', '').strip()
+        username_or_email = request.form.get('email_or_username', '').strip()
         password = request.form.get('password', '')
-        remember = request.form.get('remember', False)
+        remember = request.form.get('remember_me', False)
         
         if not username_or_email or not password:
             flash('Please enter both username/email and password.', 'error')
@@ -471,9 +471,9 @@ def register():
     if request.method == 'POST':
         try:
             username = request.form.get('username', '').strip()
-            email = request. form.get('email', '').strip()
+            email = request.form.get('email', '').strip()
             password = request.form.get('password', '')
-            confirm_password = request. form.get('confirm_password', '')
+            confirm_password = request.form.get('confirm_password', '')
             
             if not all([username, email, password, confirm_password]):
                 flash('Please fill in all fields. ', 'error')
