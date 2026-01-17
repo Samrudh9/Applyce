@@ -77,8 +77,11 @@ celerybeat-schedule
 # SageMath parsed files
 *.sage.py
 
-# Environments
+# Environments (NEVER commit real secrets!)
 .env
+.env.local
+.env.production
+.env.*.local
 .venv
 env/
 venv/
