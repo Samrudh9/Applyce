@@ -9,6 +9,8 @@ import functools
 import json
 from typing import List
 from services.job_service import job_service, Job
+from dotenv import load_dotenv
+load_dotenv()
 from dataclasses import asdict
 from datetime import datetime
 from flask_migrate import Migrate

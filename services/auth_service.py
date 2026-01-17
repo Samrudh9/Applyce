@@ -6,8 +6,10 @@ import re
 import os
 import smtplib
 import logging
-from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from models import db
+from models.user import User
 from flask import current_app, url_for
 from flask_login import login_user, logout_user
 from models import db
@@ -204,7 +206,7 @@ class AuthService:
         
         # Create email message
         message = MIMEMultipart('alternative')
-        message['Subject'] = 'SkillFit - Password Reset Request'
+        message['Subject'] = 'Account - Password Reset Request'
         message['From'] = sender_email
         message['To'] = email
         
@@ -212,7 +214,7 @@ class AuthService:
         text_content = f"""
 Hello {username},
 
-You requested a password reset for your SkillFit account.
+You requested a password reset for your Applyce account.
 
 Click the link below to reset your password:
 {reset_url}
@@ -222,7 +224,7 @@ This link will expire in 1 hour.
 If you didn't request this reset, you can safely ignore this email.
 
 Best regards,
-The SkillFit Team
+The Applyce Team
         """
         
         # HTML version
@@ -243,11 +245,11 @@ The SkillFit Team
 <body>
     <div class="container">
         <div class="header">
-            <div class="logo">🚀 SkillFit</div>
+            <div class="logo">🚀 Applyce</div>
         </div>
         <div class="content">
             <p>Hello <strong>{username}</strong>,</p>
-            <p>You requested a password reset for your SkillFit account.</p>
+            <p>You requested a password reset for your Applyce account.</p>
             <p>Click the button below to reset your password:</p>
             <p style="text-align: center;">
                 <a href="{reset_url}" class="button">Reset Password</a>
@@ -257,7 +259,7 @@ The SkillFit Team
             </p>
         </div>
         <div class="footer">
-            <p>Best regards,<br>The SkillFit Team</p>
+            <p>Best regards,<br>The Applyce Team</p>
         </div>
     </div>
 </body>
@@ -317,3 +319,76 @@ The SkillFit Team
             User or None
         """
         return User.query.filter_by(reset_token=token).first()
+     
+    @classmethod
+    def register_user(cls, username, email, password):
+
+        # (validate input and create user)
+        user = User(username=username, email=email)
+        user.set_password(password)
+        db.session.add(user)
+        db.session.commit()
+
+        # Send welcome email; log but don’t block registration on errors
+        try:
+            cls._send_welcome_email(user.email, user.username)
+        except Exception as e:
+            logger.error(f"Failed to send welcome email: {e}")
+        return True, user
+
+    @staticmethod
+    def _send_welcome_email(recipient_email: str, username: str) -> None:
+        """
+        Compose and send a welcome email using Brevo’s SMTP relay.
+        Reads the SMTP configuration from environment variables.
+        """
+        smtp_server = os.environ.get('MAIL_SERVER', 'smtp-relay.brevo.com')
+        smtp_port = int(os.environ.get('MAIL_PORT', 587))
+        smtp_user = os.environ.get('MAIL_USERNAME')
+        smtp_password = os.environ.get('MAIL_PASSWORD')
+        sender = os.environ.get('MAIL_DEFAULT_SENDER', smtp_user or '')
+
+        if not smtp_user or not smtp_password:
+            logger.warning("SMTP credentials missing; welcome email not sent.")
+            return
+
+        # Create email content
+        message = MIMEMultipart('alternative')
+        message['Subject'] = 'Welcome to Applyce '
+        message['From'] = sender
+        message['To'] = recipient_email
+
+        # Plain text fallback
+        text_body = f"""\
+Hi {username},
+
+Welcome to Applyce 
+
+Your account has been successfully created.
+Start analyzing your resume and exploring career paths.
+
+– Applyce Team
+"""
+        # Simple HTML version
+        html_body = f"""\
+<!DOCTYPE html>
+<html>
+<body>
+  <p>Hi <strong>{username}</strong>,</p>
+  <p>Welcome to Applyce 🎯</p>
+  <p>Your account has been successfully created.<br>
+     Start analyzing your resume and exploring career paths.</p>
+  <p>– Applyce Team</p>
+</body>
+</html>
+"""
+        message.attach(MIMEText(text_body, 'plain'))
+        message.attach(MIMEText(html_body, 'html'))
+
+        # Send via SMTP
+        with smtplib.SMTP(smtp_server, smtp_port) as server:
+            server.starttls()  # enable TLS
+            server.login(smtp_user, smtp_password)
+            server.sendmail(sender, recipient_email, message.as_string())
+
+        logger.info(f"Welcome email sent to {recipient_email}")
