@@ -38,7 +38,7 @@
             <label class="checkbox-row">
               <input type="checkbox" name="remember_me" /> Remember me
             </label>
-            <a href="/forgot_password" style="color:var(--accent); font-size:0.9rem;">Forgot Password?</a>
+            <a href="{{ url_for('forgot_password') }}" style="color:var(--accent); font-size:0.9rem;">Forgot Password?</a>
           </div>
           <button type="submit" class="btn btn-primary" style="width:100%;">Sign In</button>
         </form>
