@@ -40,7 +40,6 @@ An intelligent, self-learning career recommendation platform that analyzes resum
 ### Public Pages (No Login)
 - `/` - Landing page
 - `/about` - About page
-- `/pricing` - Pricing information
 - `/login` - Sign in
 - `/register` - Sign up
 
@@ -192,7 +191,6 @@ Career-Recommendation-demo/
 │   ├── ats_report.html         # ATS detailed report
 │   ├── checklist.html          # Resume checklist
 │   ├── roadmap.html            # Career roadmap
-│   ├── pricing.html            # Pricing page
 │   ├── about.html              # About page
 │   ├── admin/                  # Admin panel templates
 │   │   ├── login.html

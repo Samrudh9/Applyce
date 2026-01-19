@@ -151,7 +151,6 @@ PUBLIC_ENDPOINTS = {
     'about',             # About page
     'login',             # Login page
     'register',          # Register page
-    'pricing',           # Pricing page
     'forgot_password',   # Forgot password
     'reset_password',    # Reset password with token
     'static',            # Static files (CSS, JS, images)
@@ -167,7 +166,7 @@ def require_login_for_features():
     """
     Global authentication check.
     Requires users to sign in before accessing any feature.
-    Only public pages (landing, about, login, register, pricing) are accessible without auth.
+    Only public pages (landing, about, login, register) are accessible without auth.
     """
     # Skip authentication check for public endpoints
     if request.endpoint in PUBLIC_ENDPOINTS:
@@ -567,13 +566,6 @@ def reset_password(token):
     return render_template('reset_password.html', valid_token=valid_token, token=token)
 
 
-# ===== Pricing Route =====
-@app.route('/pricing')
-def pricing():
-    """Display pricing page with plan comparison"""
-    return render_template('pricing.html')
-
-
 # ===== Freemium Decorator =====
 def check_scan_limit(f):
     """Decorator to check if user has remaining scans"""
@@ -582,7 +574,7 @@ def check_scan_limit(f):
         if current_user.is_authenticated:
             if not current_user.can_scan_resume():
                 flash('You have reached your daily scan limit. Upgrade to Premium for more scans!', 'warning')
-                return redirect(url_for('pricing'))
+                return redirect(url_for('home'))
         return f(*args, **kwargs)
     return decorated_function
 
