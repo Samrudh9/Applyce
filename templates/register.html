@@ -25,6 +25,17 @@
           <h1 class="section-title" style="margin-top:0.5rem;">Create Your Account</h1>
           <p class="helper-text">Join Applyce to unlock AI career matching, ATS insights, and custom roadmaps.</p>
         </div>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="flash-messages" style="margin-bottom:1.5rem;">
+              {% for category, message in messages %}
+                <div class="flash-message {{ category }}" style="margin-bottom:0.75rem;">
+                  {{ message }}
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
         <form method="POST" action="{{ url_for('register') }}">
           <div class="input-group">
             <input class="input-field" type="text" name="username" placeholder=" " required />
