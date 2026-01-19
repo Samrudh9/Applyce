@@ -486,8 +486,9 @@ def register():
             success, result = AuthService.register_user(username, email, password)
             
             if success:
-                flash('Registration successful! Please log in.', 'success')
-                return redirect(url_for('login'))
+                AuthService.login(result)
+                flash(f'Welcome, {result.username}! Your account is ready.', 'success')
+                return redirect(url_for('home'))
             else:
                 flash(result, 'error')
         
