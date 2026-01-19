@@ -8,6 +8,7 @@ import smtplib
 import logging
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from sqlalchemy import func
 from models import db
 from models.user import User
 from flask import url_for
@@ -45,6 +46,16 @@ class AuthService:
         if not password or len(password) < AuthService.MIN_PASSWORD_LENGTH:
             return False, f"Password must be at least {AuthService.MIN_PASSWORD_LENGTH} characters"
         return True, None
+
+    @staticmethod
+    def normalize_username(username):
+        """Normalize username for consistent storage and lookup."""
+        return (username or "").strip().lower()
+
+    @staticmethod
+    def normalize_email(email):
+        """Normalize email for consistent storage and lookup."""
+        return (email or "").strip().lower()
     
     @classmethod
     def register_user(cls, username, email, password):
@@ -56,11 +67,14 @@ class AuthService:
         """
         try:
             # Validate input
-            valid, error = cls.validate_username(username)
+            normalized_username = cls.normalize_username(username)
+            normalized_email = cls.normalize_email(email)
+
+            valid, error = cls.validate_username(normalized_username)
             if not valid:
                 return False, error
 
-            if not cls.validate_email(email):
+            if not cls.validate_email(normalized_email):
                 return False, "Invalid email format"
 
             valid, error = cls.validate_password(password)
@@ -68,14 +82,14 @@ class AuthService:
                 return False, error
 
             # Check if user already exists
-            if User.query.filter_by(username=username).first():
+            if User.query.filter(func.lower(User.username) == normalized_username).first():
                 return False, "Username already taken"
 
-            if User.query.filter_by(email=email).first():
+            if User.query.filter(func.lower(User.email) == normalized_email).first():
                 return False, "Email already registered"
 
             # Create new user
-            user = User(username=username, email=email)
+            user = User(username=normalized_username, email=normalized_email)
             user.set_password(password)
             db.session.add(user)
             db.session.commit()
@@ -98,9 +112,10 @@ class AuthService:
             tuple: (success: bool, user_or_error: User or str)
         """
         # Try to find user by username or email
+        normalized_identifier = (username_or_email or "").strip().lower()
         user = User.query.filter(
-            (User.username == username_or_email) | 
-            (User.email == username_or_email)
+            (func.lower(User.username) == normalized_identifier) |
+            (func.lower(User.email) == normalized_identifier)
         ).first()
         
         if not user:
