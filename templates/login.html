@@ -25,6 +25,17 @@
           <h1 class="section-title" style="margin-top:0.5rem;">Welcome Back</h1>
           <p class="helper-text">Sign in to access your AI-powered career dashboard.</p>
         </div>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="flash-messages" style="margin-bottom:1.5rem;">
+              {% for category, message in messages %}
+                <div class="flash-message {{ category }}" style="margin-bottom:0.75rem;">
+                  {{ message }}
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
         <form method="POST" action="{{ url_for('login') }}">
           <div class="input-group">
             <input class="input-field" type="text" name="email_or_username" placeholder=" " required />
