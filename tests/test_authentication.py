@@ -148,7 +148,7 @@ class TestGlobalAuthentication:
         
         # Now login
         response = client.post('/login?next=/upload', data={
-            'username': 'testuser',
+            'email_or_username': 'testuser',
             'password': 'testpass123'
         }, follow_redirects=False)
         
@@ -160,7 +160,7 @@ class TestGlobalAuthentication:
         """Login should validate that next parameter starts with /"""
         # Try to login with external URL (security check)
         response = client.post('/login?next=https://evil.com', data={
-            'username': 'testuser',
+            'email_or_username': 'testuser',
             'password': 'testpass123'
         }, follow_redirects=False)
         

@@ -12,6 +12,7 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app import app
+from models import db
 
 
 class TestExplainableScorer:
@@ -113,8 +114,14 @@ class TestForgotPasswordRoutes:
     @pytest.fixture
     def client(self):
         app.config['TESTING'] = True
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+        app.config['WTF_CSRF_ENABLED'] = False
         with app.test_client() as client:
-            yield client
+            with app.app_context():
+                db.create_all()
+                yield client
+                db.session.remove()
+                db.drop_all()
     
     def test_forgot_password_page_loads(self, client):
         """Test forgot password page loads"""
@@ -239,8 +246,28 @@ class TestExplainableScoreAPI:
     @pytest.fixture
     def client(self):
         app.config['TESTING'] = True
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+        app.config['WTF_CSRF_ENABLED'] = False
         with app.test_client() as client:
-            yield client
+            with app.app_context():
+                db.create_all()
+                from models.user import User
+                from werkzeug.security import generate_password_hash
+                test_user = User(
+                    username='testuser',
+                    email='test@example.com',
+                    password_hash=generate_password_hash('testpass123')
+                )
+                db.session.add(test_user)
+                db.session.commit()
+                # Log in the test user
+                client.post('/login', data={
+                    'email_or_username': 'testuser',
+                    'password': 'testpass123'
+                })
+                yield client
+                db.session.remove()
+                db.drop_all()
     
     def test_explainable_score_api_requires_data(self, client):
         """Test API requires data"""

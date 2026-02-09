@@ -7,6 +7,7 @@ from pathlib import Path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app import app
+from models import db
 
 
 class TestBackupService:
@@ -69,8 +70,24 @@ class TestAdminBackupRoutes:
     @pytest.fixture
     def client(self):
         app.config['TESTING'] = True
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+        app.config['WTF_CSRF_ENABLED'] = False
         with app.test_client() as client:
-            yield client
+            with app.app_context():
+                db.create_all()
+                from models.admin import Admin
+                admin = Admin(
+                    username='testadmin',
+                    email='testadmin@example.com',
+                    role='superadmin',
+                    is_active=True
+                )
+                admin.set_password('testpass123')
+                db.session.add(admin)
+                db.session.commit()
+                yield client
+                db.session.remove()
+                db.drop_all()
     
     def test_admin_login_page(self, client):
         """Test admin login page loads"""
@@ -89,10 +106,9 @@ class TestAdminBackupRoutes:
     
     def test_admin_login_valid_credentials(self, client):
         """Test admin login with valid credentials"""
-        from config import config
         response = client.post('/admin/login', data={
-            'admin_id': config.ADMIN_ID,
-            'admin_password': config.ADMIN_PASSWORD
+            'admin_id': 'testadmin',
+            'admin_password': 'testpass123'
         }, follow_redirects=True)
         assert response.status_code == 200
         # Should redirect to backup page
@@ -107,11 +123,10 @@ class TestAdminBackupRoutes:
     
     def test_admin_backup_page_with_auth(self, client):
         """Test backup page with authentication"""
-        from config import config
         # Login first
         client.post('/admin/login', data={
-            'admin_id': config.ADMIN_ID,
-            'admin_password': config.ADMIN_PASSWORD
+            'admin_id': 'testadmin',
+            'admin_password': 'testpass123'
         })
         # Now access backup page
         response = client.get('/admin/backup')
@@ -120,11 +135,10 @@ class TestAdminBackupRoutes:
     
     def test_create_backup_json(self, client):
         """Test creating a JSON backup"""
-        from config import config
         # Login first
         client.post('/admin/login', data={
-            'admin_id': config.ADMIN_ID,
-            'admin_password': config.ADMIN_PASSWORD
+            'admin_id': 'testadmin',
+            'admin_password': 'testpass123'
         })
         # Create backup
         response = client.post('/admin/backup/create', data={'format': 'json'})
@@ -137,11 +151,10 @@ class TestAdminBackupRoutes:
     
     def test_create_backup_csv(self, client):
         """Test creating a CSV backup"""
-        from config import config
         # Login first
         client.post('/admin/login', data={
-            'admin_id': config.ADMIN_ID,
-            'admin_password': config.ADMIN_PASSWORD
+            'admin_id': 'testadmin',
+            'admin_password': 'testpass123'
         })
         # Create backup
         response = client.post('/admin/backup/create', data={'format': 'csv'})
@@ -150,11 +163,10 @@ class TestAdminBackupRoutes:
     
     def test_admin_logout(self, client):
         """Test admin logout"""
-        from config import config
         # Login first
         client.post('/admin/login', data={
-            'admin_id': config.ADMIN_ID,
-            'admin_password': config.ADMIN_PASSWORD
+            'admin_id': 'testadmin',
+            'admin_password': 'testpass123'
         })
         # Logout
         response = client.get('/admin/logout', follow_redirects=True)
@@ -171,11 +183,10 @@ class TestAdminBackupRoutes:
     
     def test_api_admin_stats_with_auth(self, client):
         """Test API stats endpoint with authentication"""
-        from config import config
         # Login first
         client.post('/admin/login', data={
-            'admin_id': config.ADMIN_ID,
-            'admin_password': config.ADMIN_PASSWORD
+            'admin_id': 'testadmin',
+            'admin_password': 'testpass123'
         })
         # Get stats
         response = client.get('/api/admin/stats')
