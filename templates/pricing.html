@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pricing | Applyce</title>
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+  {% include 'components/navbar.html' %}
+
+  <main>
+    <section class="hero">
+      <div class="hero-orb orb-1"></div>
+      <div class="hero-orb orb-2"></div>
+      <div class="container hero-grid">
+        <div class="hero-content">
+          <p class="section-subtitle">Pricing</p>
+          <h1 class="hero-title">Choose the plan that fits your career goals.</h1>
+          <p class="hero-description">Start free, upgrade when you're ready for more.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="container" style="padding: 2rem 0 4rem;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; max-width: 1000px; margin: 0 auto;">
+
+        <div class="glass card" style="padding: 2rem; text-align: center;">
+          <h3>Free</h3>
+          <p style="font-size: 2rem; font-weight: 700; margin: 1rem 0;">$0</p>
+          <p>per month</p>
+          <ul style="text-align: left; margin: 1.5rem 0; list-style: none; padding: 0;">
+            <li>✅ {{ tier_limits.free.daily_scans }} resume scans per day</li>
+            <li>✅ Basic ATS score</li>
+            <li>✅ Skill gap analysis</li>
+            <li>✅ Career roadmap</li>
+          </ul>
+          <a class="btn btn-primary" href="/register">Get Started</a>
+        </div>
+
+        <div class="glass card" style="padding: 2rem; text-align: center; border: 2px solid var(--primary, #6366f1);">
+          <h3>Premium</h3>
+          <p style="font-size: 2rem; font-weight: 700; margin: 1rem 0;">$19</p>
+          <p>per month</p>
+          <ul style="text-align: left; margin: 1.5rem 0; list-style: none; padding: 0;">
+            <li>✅ {{ tier_limits.premium.daily_scans }} resume scans per day</li>
+            <li>✅ All Free features</li>
+            <li>✅ Detailed salary insights</li>
+            <li>✅ Job matching</li>
+            <li>✅ PDF export</li>
+            <li>✅ Priority support</li>
+          </ul>
+          <a class="btn btn-primary" href="/register">Upgrade</a>
+        </div>
+
+        <div class="glass card" style="padding: 2rem; text-align: center;">
+          <h3>Enterprise</h3>
+          <p style="font-size: 2rem; font-weight: 700; margin: 1rem 0;">Custom</p>
+          <p>contact us</p>
+          <ul style="text-align: left; margin: 1.5rem 0; list-style: none; padding: 0;">
+            <li>✅ Unlimited resume scans</li>
+            <li>✅ All Premium features</li>
+            <li>✅ Team management</li>
+            <li>✅ Dedicated support</li>
+          </ul>
+          <a class="btn btn-primary" href="/about">Contact Us</a>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  {% include 'components/footer.html' %}
+</body>
+</html>

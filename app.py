@@ -149,6 +149,7 @@ from services.learning_engine import LearningEngine
 PUBLIC_ENDPOINTS = {
     'home',              # Landing page (/)
     'about',             # About page
+    'pricing',           # Pricing page
     'login',             # Login page
     'register',          # Register page
     'forgot_password',   # Forgot password
@@ -177,7 +178,7 @@ def require_login_for_features():
         return None
     
     # Allow admin routes (they have separate admin authentication)
-    if request.path.startswith('/admin'):
+    if request.path.startswith('/admin') or request.path.startswith('/api/admin'):
         return None
     
     # Check if user is authenticated
@@ -194,7 +195,7 @@ def require_login_for_features():
         flash('🔐 Please sign in to access this feature.', 'info')
         
         # Remember the page they wanted to visit
-        next_url = request.url
+        next_url = request.path
         return redirect(url_for('login', next=next_url))
     
     # User is authenticated, allow request
@@ -428,6 +429,12 @@ def form():
 @app.route('/about')
 def about():
     return render_template('about.html')
+
+@app.route('/pricing')
+def pricing():
+    """Show pricing plans"""
+    from models.user import TIER_LIMITS
+    return render_template('pricing.html', tier_limits=TIER_LIMITS)
 
 # ===== Authentication Routes =====
 @app.route('/login', methods=['GET', 'POST'])
@@ -1903,7 +1910,7 @@ def api_job_match():
     from services.job_match_service import job_match_service
     
     try:
-        data = request.get_json()
+        data = request.get_json(silent=True)
         if not data:
             return jsonify({
                 'success': False,

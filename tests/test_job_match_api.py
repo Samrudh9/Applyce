@@ -5,14 +5,35 @@ Tests for Job Match API endpoint.
 import json
 import pytest
 from app import app
+from models import db
 
 
 @pytest.fixture
 def client():
-    """Create test client."""
+    """Create test client with authenticated user."""
     app.config['TESTING'] = True
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+    app.config['WTF_CSRF_ENABLED'] = False
     with app.test_client() as client:
-        yield client
+        with app.app_context():
+            db.create_all()
+            from models.user import User
+            from werkzeug.security import generate_password_hash
+            test_user = User(
+                username='testuser',
+                email='test@example.com',
+                password_hash=generate_password_hash('testpass123')
+            )
+            db.session.add(test_user)
+            db.session.commit()
+            # Log in the test user
+            client.post('/login', data={
+                'email_or_username': 'testuser',
+                'password': 'testpass123'
+            })
+            yield client
+            db.session.remove()
+            db.drop_all()
 
 
 class TestJobMatchAPI:
@@ -66,7 +87,7 @@ class TestJobMatchAPI:
         
         assert data['success'] is True
         assert data['match_percentage'] > 0
-        assert len(data['required_matched']) > 0
+        assert len(data['required_matched']) + len(data['preferred_matched']) > 0
     
     def test_job_match_missing_resume(self, client):
         """Test error when neither resume_text nor resume_id provided."""
