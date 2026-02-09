@@ -1,4 +1,4 @@
-# 🎯 SkillFit - AI-Powered Career Intelligence Platform
+git checkout maingit checkout main# 🎯 SkillFit - AI-Powered Career Intelligence Platform
 
 An intelligent, self-learning career recommendation platform that analyzes resumes, predicts optimal career paths, evaluates ATS compatibility, and continuously improves through user feedback.
 
