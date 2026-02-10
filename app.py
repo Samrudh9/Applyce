@@ -151,6 +151,8 @@ PUBLIC_ENDPOINTS = {
     'about',             # About page
     'pricing',           # Pricing page
     'health',            # Health check endpoint
+    'robots_txt',        # Robots.txt for SEO
+    'favicon',           # Favicon
     'login',             # Login page
     'register',          # Register page
     'forgot_password',   # Forgot password
@@ -176,6 +178,11 @@ def require_login_for_features():
     
     # Allow static files
     if request.path.startswith('/static/'):
+        return None
+    
+    # Allow common public resources (favicon, robots.txt, sitemap, etc.)
+    public_resources = ['/favicon.ico', '/robots.txt', '/sitemap.xml', '/ads.txt']
+    if request.path in public_resources:
         return None
     
     # Allow admin routes (they have separate admin authentication)
@@ -457,6 +464,26 @@ def health():
     status_code = 200 if db_status == 'healthy' else 503
     return jsonify(health_data), status_code
 
+@app.route('/robots.txt')
+def robots_txt():
+    """Serve robots.txt for search engine crawlers"""
+    robots_content = """User-agent: *
+Allow: /
+Allow: /about
+Allow: /pricing
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /upload
+
+Sitemap: https://applyce.tech/sitemap.xml
+"""
+    return Response(robots_content, mimetype='text/plain')
+
+@app.route('/favicon.ico')
+def favicon():
+    """Serve favicon - redirect to static file if it exists"""
+    return redirect(url_for('static', filename='favicon.svg'), code=301)
+
 # ===== Authentication Routes =====
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -470,7 +497,8 @@ def login():
             password = request.form.get('password', '')
             remember = request.form.get('remember_me', False)
             
-            logger.info(f"Login attempt for user: {username_or_email}")
+            # Log login attempt without exposing sensitive info
+            logger.info("Login attempt received")
             
             if not username_or_email or not password:
                 flash('Please enter both username/email and password.', 'error')
@@ -480,7 +508,7 @@ def login():
             
             if success:
                 AuthService.login(result, remember=bool(remember))
-                logger.info(f"Successful login for user: {result.username}")
+                logger.info(f"Successful login for user ID: {result.id}")
                 flash(f'Welcome back, {result.username}!', 'success')
                 
                 # Redirect to the page they originally wanted, or home
@@ -489,13 +517,13 @@ def login():
                     return redirect(next_page)
                 return redirect(url_for('home'))
             else:
-                logger.warning(f"Failed login attempt for: {username_or_email}")
+                logger.warning("Failed login attempt")
                 flash(result, 'error')
         
         return render_template('login.html')
     except Exception as e:
         logger.error(f"Login error: {str(e)}", exc_info=True)
-        flash('An error occurred during login. Please try again.', 'error')
+        flash('An error occurred during login. Please try again or contact support if the issue persists.', 'error')
         return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
