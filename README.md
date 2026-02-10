@@ -8,7 +8,7 @@ An intelligent, self-learning career recommendation platform that analyzes resum
 ![ML](https://img.shields.io/badge/Machine%20Learning-Scikit--learn-orange.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-🌐 **Live Demo**: [https://skillfit.onrender.com](https://skillfit.onrender.com)
+🌐 **Live Demo**: [Applyce.tech](https://applyce.tech)
 
 ---
 
