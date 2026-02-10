@@ -150,6 +150,9 @@ PUBLIC_ENDPOINTS = {
     'home',              # Landing page (/)
     'about',             # About page
     'pricing',           # Pricing page
+    'health',            # Health check endpoint
+    'robots_txt',        # Robots.txt for SEO
+    'favicon',           # Favicon
     'login',             # Login page
     'register',          # Register page
     'forgot_password',   # Forgot password
@@ -175,6 +178,11 @@ def require_login_for_features():
     
     # Allow static files
     if request.path.startswith('/static/'):
+        return None
+    
+    # Allow common public resources (favicon, robots.txt, sitemap, etc.)
+    public_resources = ['/favicon.ico', '/robots.txt', '/sitemap.xml', '/ads.txt']
+    if request.path in public_resources:
         return None
     
     # Allow admin routes (they have separate admin authentication)
@@ -436,37 +444,90 @@ def pricing():
     from models.user import TIER_LIMITS
     return render_template('pricing.html', tier_limits=TIER_LIMITS)
 
+@app.route('/health')
+def health():
+    """Health check endpoint for deployment monitoring"""
+    try:
+        # Check database connection
+        db.session.execute(db.text('SELECT 1'))
+        db_status = 'healthy'
+    except Exception as e:
+        logger.error(f"Database health check failed: {e}")
+        db_status = 'unhealthy'
+    
+    health_data = {
+        'status': 'ok' if db_status == 'healthy' else 'error',
+        'database': db_status,
+        'timestamp': datetime.utcnow().isoformat()
+    }
+    
+    status_code = 200 if db_status == 'healthy' else 503
+    return jsonify(health_data), status_code
+
+@app.route('/robots.txt')
+def robots_txt():
+    """Serve robots.txt for search engine crawlers"""
+    # Use BASE_URL from environment or request.url_root for sitemap URL
+    base_url = os.environ.get('BASE_URL', request.url_root.rstrip('/'))
+    
+    robots_content = f"""User-agent: *
+Allow: /
+Allow: /about
+Allow: /pricing
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /upload
+
+Sitemap: {base_url}/sitemap.xml
+"""
+    return Response(robots_content, mimetype='text/plain')
+
+@app.route('/favicon.ico')
+def favicon():
+    """Serve favicon - redirect to static file if it exists"""
+    return redirect(url_for('static', filename='favicon.svg'), code=301)
+
 # ===== Authentication Routes =====
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     """Handle user login"""
-    if current_user.is_authenticated:
-        return redirect(url_for('home'))
-    
-    if request.method == 'POST':
-        username_or_email = request.form.get('email_or_username', '').strip()
-        password = request.form.get('password', '')
-        remember = request.form.get('remember_me', False)
-        
-        if not username_or_email or not password:
-            flash('Please enter both username/email and password.', 'error')
-            return render_template('login.html')
-        
-        success, result = AuthService.authenticate_user(username_or_email, password)
-        
-        if success:
-            AuthService.login(result, remember=bool(remember))
-            flash(f'Welcome back, {result.username}!', 'success')
-            
-            # Redirect to the page they originally wanted, or home
-            next_page = request.args.get('next')
-            if next_page and next_page.startswith('/'):
-                return redirect(next_page)
+    try:
+        if current_user.is_authenticated:
             return redirect(url_for('home'))
-        else:
-            flash(result, 'error')
-    
-    return render_template('login.html')
+        
+        if request.method == 'POST':
+            username_or_email = request.form.get('email_or_username', '').strip()
+            password = request.form.get('password', '')
+            remember = request.form.get('remember_me', False)
+            
+            # Log login attempt without exposing sensitive info
+            logger.info("Login attempt received")
+            
+            if not username_or_email or not password:
+                flash('Please enter both username/email and password.', 'error')
+                return render_template('login.html')
+            
+            success, result = AuthService.authenticate_user(username_or_email, password)
+            
+            if success:
+                AuthService.login(result, remember=bool(remember))
+                logger.info(f"Successful login for user ID: {result.id}")
+                flash(f'Welcome back, {result.username}!', 'success')
+                
+                # Redirect to the page they originally wanted, or home
+                next_page = request.args.get('next')
+                if next_page and next_page.startswith('/'):
+                    return redirect(next_page)
+                return redirect(url_for('home'))
+            else:
+                logger.warning("Failed login attempt")
+                flash(result, 'error')
+        
+        return render_template('login.html')
+    except Exception as e:
+        logger.error(f"Login error: {str(e)}", exc_info=True)
+        flash('An error occurred during login. Please try again or contact support if the issue persists.', 'error')
+        return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():

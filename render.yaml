@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: applyce
+    runtime: python
+    plan: free
+    buildCommand: pip install -r REQUIREMENTS.txt && python init_db.py
+    startCommand: gunicorn app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: applyce-db
+          property: connectionString
+      - key: FLASK_ENV
+        value: production
+
+databases:
+  - name: applyce-db
+    plan: free
+    databaseName: applyce
+    user: applyce
