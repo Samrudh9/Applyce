@@ -23,17 +23,17 @@ def init_database():
             db.create_all()
             print("✅ Database tables created successfully!")
             
-            # Verify tables were created
+            # Verify tables exist
             from sqlalchemy import inspect
             inspector = inspect(db.engine)
             tables = inspector.get_table_names()
             
             if tables:
-                print(f"📋 Created {len(tables)} table(s):")
+                print(f"📋 Database has {len(tables)} table(s):")
                 for table in sorted(tables):
                     print(f"   - {table}")
             else:
-                print("⚠️  Warning: No tables were created")
+                print("⚠️  Warning: No tables found in database")
                 
             return True
             

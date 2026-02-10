@@ -467,7 +467,10 @@ def health():
 @app.route('/robots.txt')
 def robots_txt():
     """Serve robots.txt for search engine crawlers"""
-    robots_content = """User-agent: *
+    # Use BASE_URL from environment or request.url_root for sitemap URL
+    base_url = os.environ.get('BASE_URL', request.url_root.rstrip('/'))
+    
+    robots_content = f"""User-agent: *
 Allow: /
 Allow: /about
 Allow: /pricing
@@ -475,7 +478,7 @@ Disallow: /admin
 Disallow: /dashboard
 Disallow: /upload
 
-Sitemap: https://applyce.tech/sitemap.xml
+Sitemap: {base_url}/sitemap.xml
 """
     return Response(robots_content, mimetype='text/plain')
 
