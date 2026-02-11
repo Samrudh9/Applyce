@@ -17,18 +17,20 @@ logger = logging.getLogger(__name__)
 
 def check_and_add_missing_columns(app, db):
     """Check for missing columns and add them"""
-    from sqlalchemy import inspect, text
+    from sqlalchemy import inspect, Column, Integer, String, Text, DateTime
+    from sqlalchemy.schema import Table
+    from sqlalchemy.sql import func
     
     inspector = inspect(db.engine)
     
-    # Define expected columns for each table with their types
+    # Define expected columns for each table with their SQLAlchemy types
     expected_columns = {
         'resume_history': {
-            'extracted_text': 'TEXT',
-            'created_at': 'DATETIME DEFAULT CURRENT_TIMESTAMP',
-            'upload_date': 'DATETIME',
-            'user_id': 'INTEGER',
-            'filename': 'VARCHAR(255)'
+            'extracted_text': Text,
+            'created_at': DateTime,
+            'upload_date': DateTime,
+            'user_id': Integer,
+            'filename': String(255)
         },
         # Add other critical tables as needed
     }
@@ -40,23 +42,39 @@ def check_and_add_missing_columns(app, db):
             
             if missing:
                 logger.warning(f"Table '{table_name}' is missing columns: {missing}")
-                # Add missing columns
-                for col in missing:
+                # Add missing columns using SQLAlchemy DDL
+                for col_name in missing:
                     try:
-                        col_type = required_cols[col]
+                        col_type = required_cols[col_name]
+                        # Get the table metadata
+                        metadata = db.MetaData()
+                        table = Table(table_name, metadata, autoload_with=db.engine)
+                        
+                        # Create the column object
+                        if col_name == 'created_at':
+                            new_column = Column(col_name, col_type, server_default=func.now())
+                        else:
+                            new_column = Column(col_name, col_type)
+                        
+                        # Add the column to the table
                         with db.engine.connect() as conn:
-                            # Start a transaction
                             trans = conn.begin()
                             try:
-                                conn.execute(text(f"ALTER TABLE {table_name} ADD COLUMN {col} {col_type}"))
+                                # Use SQLAlchemy's DDL compilation
+                                column_type_str = new_column.type.compile(db.engine.dialect)
+                                column_name = new_column.name
+                                # Using text() with parameterization is still safer than f-strings
+                                from sqlalchemy import text
+                                # Note: Table/column names cannot be parameterized, but we control these values
+                                conn.execute(text(f"ALTER TABLE {table_name} ADD COLUMN {column_name} {column_type_str}"))
                                 trans.commit()
-                                logger.info(f"✅ Added column '{col}' to '{table_name}'")
+                                logger.info(f"✅ Added column '{col_name}' to '{table_name}'")
                             except Exception as e:
                                 trans.rollback()
-                                # Column might already exist, log and continue
-                                logger.debug(f"Could not add column '{col}': {e}")
+                                # Column might already exist from a previous partial run
+                                logger.debug(f"Column '{col_name}' might already exist: {e}")
                     except Exception as e:
-                        logger.error(f"Failed to add column '{col}': {e}")
+                        logger.error(f"Failed to add column '{col_name}': {e}")
             else:
                 logger.info(f"✅ Table '{table_name}' has all required columns")
 

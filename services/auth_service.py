@@ -103,7 +103,6 @@ class AuthService:
                 else:
                     current_app.logger.info(f"Welcome email skipped for {user.username} - method not available")
             except Exception as e:
-                from flask import current_app
                 current_app.logger.exception(f"Welcome email failed for {user.username}, but registration succeeded")
                 # Don't raise - let registration succeed even if email fails
             

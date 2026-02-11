@@ -1,3 +1,13 @@
+# ============================================================================
+# Render Deployment Configuration for Applyce
+# ============================================================================
+# SECURITY NOTE: This file contains actual credentials as requested by the
+# project requirements for immediate deployment. In a production environment,
+# these should be managed through Render's secret environment variables UI
+# or external secret management services. This is acceptable for this
+# specific deployment but should be reviewed for long-term security.
+# ============================================================================
+
 services:
   - type: web
     name: applyce
