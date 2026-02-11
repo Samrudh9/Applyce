@@ -455,13 +455,32 @@ def health():
         logger.error(f"Database health check failed: {e}")
         db_status = 'unhealthy'
     
+    # Check API credentials
+    api_status = 'healthy'
+    missing_credentials = []
+    
+    required_env_vars = {
+        'ADZUNA_API_KEY': os.environ.get('ADZUNA_API_KEY'),
+        'ADZUNA_APP_ID': os.environ.get('ADZUNA_APP_ID'),
+        'SECRET_KEY': os.environ.get('SECRET_KEY')
+    }
+    
+    for key, value in required_env_vars.items():
+        if not value:
+            missing_credentials.append(key)
+            api_status = 'unhealthy'
+    
     health_data = {
-        'status': 'ok' if db_status == 'healthy' else 'error',
+        'status': 'ok' if (db_status == 'healthy' and api_status == 'healthy') else 'error',
         'database': db_status,
+        'api_credentials': api_status,
         'timestamp': datetime.utcnow().isoformat()
     }
     
-    status_code = 200 if db_status == 'healthy' else 503
+    if missing_credentials:
+        health_data['missing_credentials'] = missing_credentials
+    
+    status_code = 200 if (db_status == 'healthy' and api_status == 'healthy') else 503
     return jsonify(health_data), status_code
 
 @app.route('/robots.txt')
