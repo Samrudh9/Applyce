@@ -494,6 +494,26 @@ def health():
         logger.error(f"Database health check failed: {e}")
         db_status = 'unhealthy'
     
+    # Check critical tables and columns
+    table_status = {}
+    if db_status == 'healthy':
+        try:
+            from sqlalchemy import inspect
+            inspector = inspect(db.engine)
+            
+            # Check if resume_history table exists
+            if 'resume_history' in inspector.get_table_names():
+                columns = [col['name'] for col in inspector.get_columns('resume_history')]
+                if 'extracted_text' in columns:
+                    table_status['resume_history'] = 'ok'
+                else:
+                    table_status['resume_history'] = 'missing_extracted_text_column'
+            else:
+                table_status['resume_history'] = 'table_not_found'
+        except Exception as e:
+            logger.error(f"Table check failed: {e}")
+            table_status['error'] = str(e)
+    
     # Check API credentials
     api_status = 'healthy'
     missing_credentials = []
@@ -515,6 +535,9 @@ def health():
         'api_credentials': api_status,
         'timestamp': datetime.utcnow().isoformat()
     }
+    
+    if table_status:
+        health_data['table_status'] = table_status
     
     if missing_credentials:
         health_data['missing_credentials'] = missing_credentials
@@ -713,156 +736,156 @@ def dashboard():
         from models.resume_history import ResumeHistory
         import json
     
-    # Get user's resume history
-    history = ResumeHistory.query.filter_by(user_id=current_user.id)\
-        .order_by(ResumeHistory.upload_date.desc()).all()
-    
-    # Calculate stats
-    total_resumes = len(history)
-    
-    # Initialize all variables
-    latest_score = 0
-    latest_ats_score = 0
-    best_score = 0
-    improvement = 0
-    ats_improvement = 0
-    score_history = []
-    all_skills = set()
-    top_career = None
-    career_confidence = 0
-    missing_skills = []
-    roadmap_data = None
-    roadmap_progress = []
-    
-    if history:
-        latest = history[0]
-        latest_score = latest.overall_score or 0
-        latest_ats_score = latest.ats_score or latest_score
-        best_score = max((h.overall_score or 0) for h in history)
+        # Get user's resume history
+        history = ResumeHistory.query.filter_by(user_id=current_user.id)\
+            .order_by(ResumeHistory.upload_date.desc()).all()
         
-        # Calculate improvement (compare with previous upload, not oldest)
-        if len(history) >= 2:
-            improvement = (latest.overall_score or 0) - (history[1].overall_score or 0)
-            ats_improvement = (latest.ats_score or 0) - (history[1].ats_score or 0)
-        else:
-            improvement = 0
-            ats_improvement = 0
+        # Calculate stats
+        total_resumes = len(history)
         
-        # Get score history for chart (includes both resume and ATS scores)
-        score_history = [
-            {
-                'date': h.upload_date.strftime('%b %d'),
-                'score': h.overall_score or 0,
-                'ats_score': h.ats_score or h.overall_score or 0
-            }
-            for h in reversed(history[-10:])  # Last 10 entries
-        ]
+        # Initialize all variables
+        latest_score = 0
+        latest_ats_score = 0
+        best_score = 0
+        improvement = 0
+        ats_improvement = 0
+        score_history = []
+        all_skills = set()
+        top_career = None
+        career_confidence = 0
+        missing_skills = []
+        roadmap_data = None
+        roadmap_progress = []
         
-        # Get all detected skills across all resumes
-        for h in history:
-            if h.skills_detected:
+        if history:
+            latest = history[0]
+            latest_score = latest.overall_score or 0
+            latest_ats_score = latest.ats_score or latest_score
+            best_score = max((h.overall_score or 0) for h in history)
+            
+            # Calculate improvement (compare with previous upload, not oldest)
+            if len(history) >= 2:
+                improvement = (latest.overall_score or 0) - (history[1].overall_score or 0)
+                ats_improvement = (latest.ats_score or 0) - (history[1].ats_score or 0)
+            else:
+                improvement = 0
+                ats_improvement = 0
+            
+            # Get score history for chart (includes both resume and ATS scores)
+            score_history = [
+                {
+                    'date': h.upload_date.strftime('%b %d'),
+                    'score': h.overall_score or 0,
+                    'ats_score': h.ats_score or h.overall_score or 0
+                }
+                for h in reversed(history[-10:])  # Last 10 entries
+            ]
+            
+            # Get all detected skills across all resumes
+            for h in history:
+                if h.skills_detected:
+                    try:
+                        skills = json.loads(h.skills_detected)
+                        all_skills.update(skills)
+                    except json.JSONDecodeError as e:
+                        logging.warning(f"Failed to parse skills JSON for history id {h.id}: {e}")
+            
+            top_career = latest.predicted_career
+            career_confidence = latest.career_confidence or 0
+            
+            # Get missing skills from the latest resume
+            if latest.skills_missing:
                 try:
-                    skills = json.loads(h.skills_detected)
-                    all_skills.update(skills)
-                except json.JSONDecodeError as e:
-                    logging.warning(f"Failed to parse skills JSON for history id {h.id}: {e}")
+                    missing_skills = json.loads(latest.skills_missing)
+                except json.JSONDecodeError:
+                    missing_skills = []
+            
+            # If no missing skills stored, calculate from skill gap analyzer
+            if not missing_skills and top_career and all_skills:
+                try:
+                    skill_gap_result = skill_gap_analyzer.analyze_skill_gap(list(all_skills), top_career)
+                    missing_skills = skill_gap_result.get('missing_skills', [])[:10]  # Top 10 missing skills
+                except Exception as e:
+                    logging.warning(f"Skill gap analysis error: {e}")
+            
+            # Get roadmap data for the top career
+            if top_career:
+                try:
+                    roadmap_data = get_career_roadmap(top_career)
+                    
+                    # Calculate roadmap progress based on detected skills
+                    if roadmap_data and 'phases' in roadmap_data:
+                        skills_lower = set(s.lower() for s in all_skills)
+                        for phase in roadmap_data['phases']:
+                            phase_skills = [s.lower() for s in phase.get('skills', [])]
+                            if phase_skills:
+                                # Use set intersection for exact matches first
+                                phase_skills_set = set(phase_skills)
+                                exact_matches = len(skills_lower & phase_skills_set)
+                                
+                                # For partial matches, use a more efficient approach
+                                # Only check unmatched phase skills
+                                unmatched_phase_skills = phase_skills_set - skills_lower
+                                partial_matches = 0
+                                for ps in unmatched_phase_skills:
+                                    # Check if any user skill contains this phase skill or vice versa
+                                    for us in skills_lower:
+                                        if ps in us or us in ps:
+                                            partial_matches += 1
+                                            break
+                                
+                                matching = exact_matches + partial_matches
+                                progress = min(100, int((matching / len(phase_skills)) * 100))
+                            else:
+                                progress = 0
+                            
+                            roadmap_progress.append({
+                                'name': phase.get('name', 'Phase'),
+                                'duration': phase.get('duration', ''),
+                                'progress': progress,
+                                'skills': phase.get('skills', [])
+                            })
+                except Exception as e:
+                    logging.warning(f"Roadmap calculation error: {e}")
         
-        top_career = latest.predicted_career
-        career_confidence = latest.career_confidence or 0
-        
-        # Get missing skills from the latest resume
-        if latest.skills_missing:
-            try:
-                missing_skills = json.loads(latest.skills_missing)
-            except json.JSONDecodeError:
-                missing_skills = []
-        
-        # If no missing skills stored, calculate from skill gap analyzer
-        if not missing_skills and top_career and all_skills:
-            try:
-                skill_gap_result = skill_gap_analyzer.analyze_skill_gap(list(all_skills), top_career)
-                missing_skills = skill_gap_result.get('missing_skills', [])[:10]  # Top 10 missing skills
-            except Exception as e:
-                logging.warning(f"Skill gap analysis error: {e}")
-        
-        # Get roadmap data for the top career
+        # Fetch matching jobs based on user's predicted career
+        matching_jobs = []
         if top_career:
             try:
-                roadmap_data = get_career_roadmap(top_career)
-                
-                # Calculate roadmap progress based on detected skills
-                if roadmap_data and 'phases' in roadmap_data:
-                    skills_lower = set(s.lower() for s in all_skills)
-                    for phase in roadmap_data['phases']:
-                        phase_skills = [s.lower() for s in phase.get('skills', [])]
-                        if phase_skills:
-                            # Use set intersection for exact matches first
-                            phase_skills_set = set(phase_skills)
-                            exact_matches = len(skills_lower & phase_skills_set)
-                            
-                            # For partial matches, use a more efficient approach
-                            # Only check unmatched phase skills
-                            unmatched_phase_skills = phase_skills_set - skills_lower
-                            partial_matches = 0
-                            for ps in unmatched_phase_skills:
-                                # Check if any user skill contains this phase skill or vice versa
-                                for us in skills_lower:
-                                    if ps in us or us in ps:
-                                        partial_matches += 1
-                                        break
-                            
-                            matching = exact_matches + partial_matches
-                            progress = min(100, int((matching / len(phase_skills)) * 100))
-                        else:
-                            progress = 0
-                        
-                        roadmap_progress.append({
-                            'name': phase.get('name', 'Phase'),
-                            'duration': phase.get('duration', ''),
-                            'progress': progress,
-                            'skills': phase.get('skills', [])
-                        })
+                # Fetch jobs matching the user's career
+                jobs = job_service.search_jobs(
+                    career=top_career,
+                    location="India",
+                    user_skills=list(all_skills),
+                    limit=20
+                )
+                matching_jobs = jobs[:5]  # Top 5 jobs for dashboard
+                logger.info(f"Fetched {len(matching_jobs)} matching jobs for {top_career}")
             except Exception as e:
-                logging.warning(f"Roadmap calculation error: {e}")
-    
-    # Fetch matching jobs based on user's predicted career
-    matching_jobs = []
-    if top_career:
-        try:
-            # Fetch jobs matching the user's career
-            jobs = job_service.search_jobs(
-                career=top_career,
-                location="India",
-                user_skills=list(all_skills),
-                limit=20
+                logger.warning(f"Failed to fetch matching jobs: {e}")
+                matching_jobs = []
+        
+            return render_template('dashboard.html',
+                user=current_user,
+                history=history,
+                total_resumes=total_resumes,
+                latest_score=latest_score,
+                latest_ats_score=latest_ats_score,
+                best_score=best_score,
+                improvement=improvement,
+                ats_improvement=ats_improvement,
+                score_history=score_history,
+                all_skills=list(all_skills),
+                top_career=top_career,
+                career_confidence=career_confidence,
+                missing_skills=missing_skills,
+                roadmap_data=roadmap_data,
+                roadmap_progress=roadmap_progress,
+                matching_jobs=matching_jobs
             )
-            matching_jobs = jobs[:5]  # Top 5 jobs for dashboard
-            logger.info(f"Fetched {len(matching_jobs)} matching jobs for {top_career}")
-        except Exception as e:
-            logger.warning(f"Failed to fetch matching jobs: {e}")
-            matching_jobs = []
-    
-        return render_template('dashboard.html',
-            user=current_user,
-            history=history,
-            total_resumes=total_resumes,
-            latest_score=latest_score,
-            latest_ats_score=latest_ats_score,
-            best_score=best_score,
-            improvement=improvement,
-            ats_improvement=ats_improvement,
-            score_history=score_history,
-            all_skills=list(all_skills),
-            top_career=top_career,
-            career_confidence=career_confidence,
-            missing_skills=missing_skills,
-            roadmap_data=roadmap_data,
-            roadmap_progress=roadmap_progress,
-            matching_jobs=matching_jobs
-        )
-    except Exception as e:
+    except Exception:
         logger.exception("Dashboard error")
-        flash('An error occurred loading the dashboard. Please try again.', 'error')
+        flash("An error occurred loading the dashboard. Please try again.", 'error')
         return redirect(url_for('index'))
 
 
@@ -1942,9 +1965,9 @@ def jobs_page():
                               insights=insights,
                               user_skills=user_skills,
                               error_message=error_message)
-    except Exception as e:
+    except Exception:
         logger.exception("Jobs page error")
-        flash('An error occurred loading jobs. Please try again.', 'error')
+        flash("An error occurred loading jobs. Please try again.", 'error')
         if current_user.is_authenticated:
             return redirect(url_for('dashboard'))
         else:
