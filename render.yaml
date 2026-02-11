@@ -20,3 +20,19 @@ services:
         value: 0f396d0c
       - key: RAPIDAPI_KEY
         value: 89b90bf114msh0e973f8198f5bdfp1a7024jsne784128c9363
+      - key: MAIL_SERVER
+        value: smtp.zoho.com
+      - key: MAIL_PORT
+        value: 587
+      - key: MAIL_USE_TLS
+        value: true
+      - key: MAIL_USERNAME
+        value: samrudh@applyce.tech
+      - key: MAIL_PASSWORD
+        value: Applyce@admin2025
+      - key: MAIL_DEFAULT_SENDER
+        value: samrudh@applyce.tech
+      - key: EMAIL_ADDRESS
+        value: samrudh@applyce.tech
+      - key: EMAIL_PASSWORD
+        value: Applyce@admin2025

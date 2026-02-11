@@ -430,6 +430,45 @@ def recommend_resources(career):
 def home():
     return render_template('intro.html')
 
+@app.route('/health')
+def health_check():
+    """Health check endpoint that tests all critical services"""
+    from datetime import datetime
+    
+    status = {
+        'status': 'healthy',
+        'database': 'unknown',
+        'models': 'unknown',
+        'timestamp': datetime.utcnow().isoformat()
+    }
+    
+    try:
+        # Test database connection
+        db.session.execute(db.text('SELECT 1'))
+        status['database'] = 'connected'
+        
+        # Test if critical tables exist
+        from sqlalchemy import inspect
+        inspector = inspect(db.engine)
+        tables = inspector.get_table_names()
+        status['tables'] = tables
+        status['tables_count'] = len(tables)
+        status['models'] = 'ok' if 'users' in tables else 'missing_tables'
+        
+        # Check for resume_history table and columns
+        if 'resume_history' in tables:
+            columns = [col['name'] for col in inspector.get_columns('resume_history')]
+            status['resume_history_columns'] = columns
+            status['has_extracted_text'] = 'extracted_text' in columns
+        
+    except Exception as e:
+        status['status'] = 'unhealthy'
+        status['error'] = str(e)
+        logger.exception("Health check failed")
+        return jsonify(status), 500
+    
+    return jsonify(status), 200
+
 @app.route('/form')
 def form():
     return render_template('form.html')
@@ -670,8 +709,9 @@ def check_scan_limit(f):
 @login_required
 def dashboard():
     """User dashboard with resume history and progress tracking"""
-    from models.resume_history import ResumeHistory
-    import json
+    try:
+        from models.resume_history import ResumeHistory
+        import json
     
     # Get user's resume history
     history = ResumeHistory.query.filter_by(user_id=current_user.id)\
@@ -802,24 +842,28 @@ def dashboard():
             logger.warning(f"Failed to fetch matching jobs: {e}")
             matching_jobs = []
     
-    return render_template('dashboard.html',
-        user=current_user,
-        history=history,
-        total_resumes=total_resumes,
-        latest_score=latest_score,
-        latest_ats_score=latest_ats_score,
-        best_score=best_score,
-        improvement=improvement,
-        ats_improvement=ats_improvement,
-        score_history=score_history,
-        all_skills=list(all_skills),
-        top_career=top_career,
-        career_confidence=career_confidence,
-        missing_skills=missing_skills,
-        roadmap_data=roadmap_data,
-        roadmap_progress=roadmap_progress,
-        matching_jobs=matching_jobs
-    )
+        return render_template('dashboard.html',
+            user=current_user,
+            history=history,
+            total_resumes=total_resumes,
+            latest_score=latest_score,
+            latest_ats_score=latest_ats_score,
+            best_score=best_score,
+            improvement=improvement,
+            ats_improvement=ats_improvement,
+            score_history=score_history,
+            all_skills=list(all_skills),
+            top_career=top_career,
+            career_confidence=career_confidence,
+            missing_skills=missing_skills,
+            roadmap_data=roadmap_data,
+            roadmap_progress=roadmap_progress,
+            matching_jobs=matching_jobs
+        )
+    except Exception as e:
+        logger.exception("Dashboard error")
+        flash('An error occurred loading the dashboard. Please try again.', 'error')
+        return redirect(url_for('index'))
 
 
 @app.route('/dashboard/delete/<int:history_id>', methods=['POST'])
@@ -1853,50 +1897,59 @@ def api_skill_gap():
 @app.route('/jobs')
 def jobs_page():
     """Job search page with real job listings"""
-    career = request.args. get('career', '').strip()
-    location = request.args.get('location', 'India').strip()
-    remote_only = request. args.get('remote', 'false').lower() == 'true'
-    
-    # Get user skills from session if logged in
-    user_skills = []
-    if current_user.is_authenticated:
-        from models.resume_history import ResumeHistory
-        last_resume = ResumeHistory.query.filter_by(
-            user_id=current_user.id
-        ).order_by(ResumeHistory.upload_date.desc()). first()
+    try:
+        career = request.args. get('career', '').strip()
+        location = request.args.get('location', 'India').strip()
+        remote_only = request. args.get('remote', 'false').lower() == 'true'
         
-        if last_resume and last_resume.skills_detected:
+        # Get user skills from session if logged in
+        user_skills = []
+        if current_user.is_authenticated:
+            from models.resume_history import ResumeHistory
+            last_resume = ResumeHistory.query.filter_by(
+                user_id=current_user.id
+            ).order_by(ResumeHistory.upload_date.desc()). first()
+            
+            if last_resume and last_resume.skills_detected:
+                try:
+                    user_skills = json.loads(last_resume.skills_detected)
+                except:
+                    user_skills = []
+        
+        jobs = []
+        insights = {}
+        error_message = None
+        
+        if career:
             try:
-                user_skills = json.loads(last_resume.skills_detected)
-            except:
-                user_skills = []
-    
-    jobs = []
-    insights = {}
-    error_message = None
-    
-    if career:
-        try:
-            jobs = job_service. search_jobs(
-                career=career,
-                location=location,
-                user_skills=user_skills,
-                limit=20,
-                remote_only=remote_only
-            )
-            insights = job_service.get_market_insights(career, location)
-        except Exception as e:
-            logger.error(f"Job search error: {e}")
-            error_message = "Unable to fetch jobs. Please try again later."
-    
-    return render_template('jobs.html',
-                          jobs=jobs,
-                          career=career,
-                          location=location,
-                          remote_only=remote_only,
-                          insights=insights,
-                          user_skills=user_skills,
-                          error_message=error_message)
+                jobs = job_service. search_jobs(
+                    career=career,
+                    location=location,
+                    user_skills=user_skills,
+                    limit=20,
+                    remote_only=remote_only
+                )
+                insights = job_service.get_market_insights(career, location)
+            except Exception as e:
+                logger.error(f"Job search error: {e}")
+                error_message = "Unable to fetch jobs. Please try again later."
+        
+        return render_template('jobs.html',
+                              jobs=jobs,
+                              career=career,
+                              location=location,
+                              remote_only=remote_only,
+                              insights=insights,
+                              user_skills=user_skills,
+                              error_message=error_message)
+    except Exception as e:
+        logger.exception("Jobs page error")
+        flash('An error occurred loading jobs. Please try again.', 'error')
+        if current_user.is_authenticated:
+            return redirect(url_for('dashboard'))
+        else:
+            return redirect(url_for('index'))
+
 
 
 @app.route('/api/jobs/search')
