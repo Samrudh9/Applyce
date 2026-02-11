@@ -93,10 +93,19 @@ class AuthService:
             user.set_password(password)
             db.session.add(user)
             db.session.commit()
+            
+            # Send welcome email with safe error handling
             try:
-                cls._send_welcome_email(user.email, user.username)
-            except Exception:
-                logger.exception("Welcome email failed after registration")
+                from flask import current_app
+                send_fn = getattr(cls, "_send_welcome_email", None)
+                if callable(send_fn):
+                    send_fn(user.email, user.username)
+                else:
+                    current_app.logger.info(f"Welcome email skipped for {user.username} - method not available")
+            except Exception as e:
+                current_app.logger.exception(f"Welcome email failed for {user.username}, but registration succeeded")
+                # Don't raise - let registration succeed even if email fails
+            
             return True, user
         except Exception as e:
             db.session.rollback()
