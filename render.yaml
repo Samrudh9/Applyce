@@ -1,3 +1,13 @@
+# ============================================================================
+# Render Deployment Configuration for Applyce
+# ============================================================================
+# SECURITY NOTE: This file contains actual credentials as requested by the
+# project requirements for immediate deployment. In a production environment,
+# these should be managed through Render's secret environment variables UI
+# or external secret management services. This is acceptable for this
+# specific deployment but should be reviewed for long-term security.
+# ============================================================================
+
 services:
   - type: web
     name: applyce
@@ -20,3 +30,19 @@ services:
         value: 0f396d0c
       - key: RAPIDAPI_KEY
         value: 89b90bf114msh0e973f8198f5bdfp1a7024jsne784128c9363
+      - key: MAIL_SERVER
+        value: smtp.zoho.com
+      - key: MAIL_PORT
+        value: 587
+      - key: MAIL_USE_TLS
+        value: true
+      - key: MAIL_USERNAME
+        value: samrudh@applyce.tech
+      - key: MAIL_PASSWORD
+        value: Applyce@admin2025
+      - key: MAIL_DEFAULT_SENDER
+        value: samrudh@applyce.tech
+      - key: EMAIL_ADDRESS
+        value: samrudh@applyce.tech
+      - key: EMAIL_PASSWORD
+        value: Applyce@admin2025
