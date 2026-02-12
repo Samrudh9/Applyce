@@ -3,6 +3,7 @@ User model for authentication.
 """
 
 import secrets
+import hashlib
 from datetime import datetime, timedelta, date
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -30,6 +31,11 @@ TIER_LIMITS = {
 # Password reset token configuration
 RESET_TOKEN_BYTES = 32  # Length of secure token in bytes
 RESET_TOKEN_EXPIRY_HOURS = 1  # Token expires after 1 hour
+
+
+def _hash_token(token: str) -> str:
+    """Hash a reset token for safe storage."""
+    return hashlib.sha256(token.encode("utf-8")).hexdigest()
 
 
 class User(UserMixin, db.Model):
@@ -81,15 +87,17 @@ class User(UserMixin, db.Model):
     def generate_reset_token(self) -> str:
         """
         Generate a secure password reset token.
-        Token expires based on RESET_TOKEN_EXPIRY_HOURS constant.
+        The raw token is returned for emailing, while only a hash is stored
+        in the database for security.
         
         Returns:
-            str: The generated reset token
+            str: The raw reset token
         """
-        self.reset_token = secrets.token_urlsafe(RESET_TOKEN_BYTES)
+        raw_token = secrets.token_urlsafe(RESET_TOKEN_BYTES)
+        self.reset_token = _hash_token(raw_token)
         self.reset_token_expiry = datetime.utcnow() + timedelta(hours=RESET_TOKEN_EXPIRY_HOURS)
         db.session.commit()
-        return self.reset_token
+        return raw_token
     
     def verify_reset_token(self, token: str) -> bool:
         """
@@ -104,7 +112,7 @@ class User(UserMixin, db.Model):
         if not self.reset_token or not self.reset_token_expiry:
             return False
         
-        if self.reset_token != token:
+        if _hash_token(token) != self.reset_token:
             return False
         
         if datetime.utcnow() > self.reset_token_expiry:
@@ -131,6 +139,18 @@ class User(UserMixin, db.Model):
         self.set_password(new_password)
         self.clear_reset_token()
         return True
+
+    @classmethod
+    def get_by_reset_token(cls, token: str):
+        """
+        Look up a user by a raw reset token.
+        
+        The token is hashed before querying so the database
+        never stores raw reset tokens.
+        """
+        if not token:
+            return None
+        return cls.query.filter_by(reset_token=_hash_token(token)).first()
     
     # ===== Freemium Methods =====
     

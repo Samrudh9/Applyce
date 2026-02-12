@@ -6,8 +6,10 @@ import re
 import os
 import smtplib
 import logging
+import threading
+import time
 from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
+from email.mime_text import MIMEText
 from sqlalchemy import func
 from models import db
 from models.user import User
@@ -17,6 +19,10 @@ from models import db
 from models.user import User
 
 logger = logging.getLogger(__name__)
+
+# In‑memory cooldowns for password reset requests
+_password_reset_cooldowns = {}
+PASSWORD_RESET_COOLDOWN_SECONDS = int(os.environ.get("PASSWORD_RESET_COOLDOWN_SECONDS", "300"))
 
 
 class AuthService:
@@ -93,10 +99,16 @@ class AuthService:
             user.set_password(password)
             db.session.add(user)
             db.session.commit()
+
+            # Fire‑and‑forget welcome email; registration must not block on SMTP.
             try:
-                cls._send_welcome_email(user.email, user.username)
+                threading.Thread(
+                    target=cls._send_welcome_email,
+                    args=(user.email, user.username),
+                    daemon=True,
+                ).start()
             except Exception:
-                logger.exception("Welcome email failed after registration")
+                logger.exception("Failed to start welcome email thread")
             return True, user
         except Exception as e:
             db.session.rollback()
@@ -172,8 +184,22 @@ class AuthService:
         Returns:
             tuple: (success: bool, message: str)
         """
-        # Find user by email
-        user = User.query.filter_by(email=email).first()
+        # Normalize email and apply simple cooldown to reduce abuse
+        normalized_email = cls.normalize_email(email)
+
+        if not normalized_email:
+            return True, "If this email is registered, you will receive a password reset link."
+
+        now = time.time()
+        last_request = _password_reset_cooldowns.get(normalized_email)
+        if last_request and now - last_request < PASSWORD_RESET_COOLDOWN_SECONDS:
+            logger.info("Password reset cooldown active for %s", normalized_email)
+            return True, "If this email is registered, you will receive a password reset link shortly."
+
+        _password_reset_cooldowns[normalized_email] = now
+
+        # Find user by email (case‑insensitive)
+        user = User.query.filter(func.lower(User.email) == normalized_email).first()
         
         if not user:
             # Don't reveal if email exists for security
@@ -182,19 +208,18 @@ class AuthService:
         if not user.is_active:
             return True, "If this email is registered, you will receive a password reset link."
         
-        # Generate reset token
+        # Generate reset token (raw token is returned, hash stored in DB)
         token = user.generate_reset_token()
         
-        # Send reset email
+        # Send reset email; failures are logged but do not surface detailed errors
         try:
             cls._send_reset_email(user.email, user.username, token)
-            logger.info(f"Password reset email sent to {email}")
-            return True, "If this email is registered, you will receive a password reset link."
+            logger.info("Password reset email sent to %s", email)
         except Exception as e:
-            logger.error(f"Failed to send password reset email: {e}")
-            # Clear the token since email failed
-            user.clear_reset_token()
-            return False, "Failed to send reset email. Please try again later."
+            logger.warning("Failed to send password reset email: %s", e)
+        
+        # Always return a generic success message to avoid account enumeration
+        return True, "If this email is registered, you will receive a password reset link."
     
     @classmethod
     def _send_reset_email(cls, email: str, username: str, token: str):
@@ -290,8 +315,9 @@ The Applyce Team
         message.attach(MIMEText(text_content, 'plain'))
         message.attach(MIMEText(html_content, 'html'))
 
-        # Send email via Gmail SMTP
-        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
+        # Send email via Gmail SMTP with a short timeout
+        timeout = int(os.environ.get("SMTP_TIMEOUT_SECONDS", "10"))
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=timeout) as server:
             server.login(sender_email, sender_password)
             server.sendmail(sender_email, email, message.as_string())
 
@@ -344,8 +370,9 @@ Start analyzing your resume and exploring career paths.
 """
             message.attach(MIMEText(text_body, 'plain'))
             message.attach(MIMEText(html_body, 'html'))
-
-            with smtplib.SMTP(smtp_server, smtp_port) as server:
+            
+            timeout = int(os.environ.get("SMTP_TIMEOUT_SECONDS", "10"))
+            with smtplib.SMTP(smtp_server, smtp_port, timeout=timeout) as server:
                 server.starttls()
                 server.login(smtp_user, smtp_password)
                 server.sendmail(sender, recipient_email, message.as_string())
@@ -371,8 +398,8 @@ Start analyzing your resume and exploring career paths.
         if not valid:
             return False, error
         
-        # Find user with this token
-        user = User.query.filter_by(reset_token=token).first()
+        # Find user with this token (lookup by hashed token in the model)
+        user = User.get_by_reset_token(token)
         
         if not user:
             return False, "Invalid or expired reset link."
@@ -392,10 +419,10 @@ Start analyzing your resume and exploring career paths.
         Get user by reset token for verification.
         
         Args:
-            token: The reset token
+            token: The raw reset token from the URL
             
         Returns:
             User or None
         """
-        return User.query.filter_by(reset_token=token).first()
+        return User.get_by_reset_token(token)
      

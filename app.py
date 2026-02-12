@@ -13,6 +13,7 @@ from dotenv import load_dotenv
 load_dotenv()
 from dataclasses import asdict
 from datetime import datetime
+from urllib.parse import urlparse, urlunparse, parse_qsl, urlencode
 from flask_migrate import Migrate
 from flask import Flask, request, render_template, jsonify, redirect, url_for, flash, session, Response
 from werkzeug.utils import secure_filename
@@ -104,28 +105,57 @@ if not os.path.exists(instance_path):
     os.makedirs(instance_path)
 
 # Get database URL from environment or use SQLite (local)
-database_url = os.environ.get('DATABASE_URL')
+database_url = os.environ.get('DATABASE_URL') or config.DATABASE_URL
 
 if database_url:
-    
+    # Normalize for SQLAlchemy and ensure SSL where appropriate
     if database_url.startswith('postgres://'):
         database_url = database_url.replace('postgres://', 'postgresql://', 1)
-    print("📦 Using PostgreSQL (Supabase/Render)")
+
+    parsed = urlparse(database_url)
+    if parsed.scheme.startswith('postgresql'):
+        query = dict(parse_qsl(parsed.query))
+        sslmode = query.get('sslmode') or os.environ.get('DB_SSLMODE', 'require')
+        query['sslmode'] = sslmode
+        database_url = urlunparse(parsed._replace(query=urlencode(query)))
+
+    parsed = urlparse(database_url)
+    logger.info(
+        "Using database: scheme=%s host=%s port=%s db=%s",
+        parsed.scheme,
+        parsed.hostname,
+        parsed.port or "",
+        (parsed.path or "").lstrip("/") or None,
+    )
 else:
     # Local: Use SQLite
     database_url = f'sqlite:///{os.path.join(instance_path, "skillfit.db")}'
-    print("📦 Using SQLite (Local)")
+    logger.info("Using SQLite database at %s", database_url)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-# Initialize database
+
+# Connection pool configuration to avoid stale SSL connections on Render
+engine_options = {
+    "pool_pre_ping": True,
+    "pool_recycle": int(os.environ.get("SQLALCHEMY_POOL_RECYCLE", "600")),
+}
+
+# Only apply pool sizing options for non-SQLite databases
+if not database_url.startswith("sqlite:"):
+    engine_options.update(
+        {
+            "pool_size": int(os.environ.get("SQLALCHEMY_POOL_SIZE", "5")),
+            "max_overflow": int(os.environ.get("SQLALCHEMY_MAX_OVERFLOW", "10")),
+        }
+    )
+
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = engine_options
+
+# Initialize database (tables are managed via Flask-Migrate; no implicit create_all here)
 from models import db, User, Feedback, SkillPattern, ResumeHistory
 db.init_app(app)
 migrate = Migrate(app, db)
-# Create tables on startup if they don't exist
-with app.app_context():
-    db.create_all()
-    print("✅ Database tables created!")
     
 # Initialize Flask-Login
 login_manager = LoginManager()
@@ -446,42 +476,58 @@ def pricing():
 
 @app.route('/health')
 def health():
-    """Health check endpoint for deployment monitoring"""
+    """Liveness probe that does not depend on external services."""
+    return jsonify(
+        {
+            "status": "ok",
+            "timestamp": datetime.utcnow().isoformat(),
+        }
+    ), 200
+
+
+@app.route('/ready')
+def ready():
+    """
+    Readiness probe for deployment monitoring.
+
+    This can be used by Render or other platforms to determine if the app
+    is ready to receive traffic. It checks database connectivity and the
+    presence of critical configuration, but keeps failures isolated here
+    instead of impacting the /health endpoint.
+    """
+    # Database readiness
     try:
-        # Check database connection
-        db.session.execute(db.text('SELECT 1'))
-        db_status = 'healthy'
+        db.session.execute(db.text("SELECT 1"))
+        db_status = "healthy"
     except Exception as e:
-        logger.error(f"Database health check failed: {e}")
-        db_status = 'unhealthy'
-    
-    # Check API credentials
-    api_status = 'healthy'
-    missing_credentials = []
-    
+        logger.error(f"Database readiness check failed: {e}")
+        db_status = "unhealthy"
+
+    # Basic config readiness (do not require third‑party APIs)
+    config_status = "healthy"
+    missing_config = []
+
     required_env_vars = {
-        'ADZUNA_API_KEY': os.environ.get('ADZUNA_API_KEY'),
-        'ADZUNA_APP_ID': os.environ.get('ADZUNA_APP_ID'),
-        'SECRET_KEY': os.environ.get('SECRET_KEY')
+        "SECRET_KEY": os.environ.get("SECRET_KEY"),
     }
-    
+
     for key, value in required_env_vars.items():
         if not value:
-            missing_credentials.append(key)
-            api_status = 'unhealthy'
-    
-    health_data = {
-        'status': 'ok' if (db_status == 'healthy' and api_status == 'healthy') else 'error',
-        'database': db_status,
-        'api_credentials': api_status,
-        'timestamp': datetime.utcnow().isoformat()
+            missing_config.append(key)
+            config_status = "unhealthy"
+
+    ready_data = {
+        "status": "ok" if (db_status == "healthy" and config_status == "healthy") else "error",
+        "database": db_status,
+        "config": config_status,
+        "timestamp": datetime.utcnow().isoformat(),
     }
-    
-    if missing_credentials:
-        health_data['missing_credentials'] = missing_credentials
-    
-    status_code = 200 if (db_status == 'healthy' and api_status == 'healthy') else 503
-    return jsonify(health_data), status_code
+
+    if missing_config:
+        ready_data["missing_config"] = missing_config
+
+    status_code = 200 if ready_data["status"] == "ok" else 503
+    return jsonify(ready_data), status_code
 
 @app.route('/robots.txt')
 def robots_txt():
