@@ -9,7 +9,7 @@ import logging
 import threading
 import time
 from email.mime.multipart import MIMEMultipart
-from email.mime_text import MIMEText
+from email.mime.text import MIMEText
 from sqlalchemy import func
 from models import db
 from models.user import User
