@@ -657,7 +657,13 @@ def logout():
     AuthService.logout()
     flash('You have been logged out.', 'info')
     return redirect(url_for('home'))
-
+@app.before_request
+def maintenance_mode():
+    if os.getenv("MAINTENANCE_MODE", "0") == "1":
+        # allow static files so CSS/logo can load
+        if request.path.startswith("/static/"):
+            return None
+        return render_template("maintenance.html"), 503
 
 # ===== Forgot Password Routes =====
 @app.route('/forgot-password', methods=['GET', 'POST'])
