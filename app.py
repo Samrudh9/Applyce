@@ -5,6 +5,7 @@ import random
 import tempfile
 import uuid
 import re
+import secrets
 import functools
 import json
 from typing import List
@@ -15,6 +16,7 @@ from dataclasses import asdict
 from datetime import datetime
 from urllib.parse import urlparse, urlunparse, parse_qsl, urlencode
 from flask_migrate import Migrate
+from authlib.integrations.flask_client import OAuth
 from flask import Flask, request, render_template, jsonify, redirect, url_for, flash, session, Response
 from werkzeug.utils import secure_filename
 import logging
@@ -146,7 +148,8 @@ if not database_url.startswith("sqlite:"):
     engine_options.update(
         {
             "pool_size": int(os.environ.get("SQLALCHEMY_POOL_SIZE", "5")),
-            "max_overflow": int(os.environ.get("SQLALCHEMY_MAX_OVERFLOW", "10")),
+            "max_overflow": int(os.environ.get("SQLALCHEMY_MAX_OVERFLOW", "5")),
+            "connect_args": {"sslmode": os.environ.get("DB_SSLMODE", "require")},
         }
     )
 
@@ -170,9 +173,20 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 # Import services after app and db initialization
-from services.auth_service import AuthService
+from services.auth_service import AuthService, OAuthLinkConflict, OAuthNeedsLinking
 from services.feedback_service import FeedbackService
 from services.learning_engine import LearningEngine
+
+oauth = OAuth(app)
+github_oauth = oauth.register(
+    name='github',
+    client_id=os.environ.get('GITHUB_CLIENT_ID'),
+    client_secret=os.environ.get('GITHUB_CLIENT_SECRET'),
+    access_token_url='https://github.com/login/oauth/access_token',
+    authorize_url='https://github.com/login/oauth/authorize',
+    api_base_url='https://api.github.com/',
+    client_kwargs={'scope': 'read:user user:email'},
+)
 
 # ===== Global Authentication Requirement =====
 # Routes that DON'T require login (public pages)
@@ -181,6 +195,9 @@ PUBLIC_ENDPOINTS = {
     'about',             # About page
     'pricing',           # Pricing page
     'health',            # Health check endpoint
+    'ready',             # Readiness endpoint
+    'login_github',      # OAuth login start
+    'auth_github_callback',  # OAuth callback
     'robots_txt',        # Robots.txt for SEO
     'favicon',           # Favicon
     'login',             # Login page
@@ -460,45 +477,6 @@ def recommend_resources(career):
 def home():
     return render_template('intro.html')
 
-@app.route('/health')
-def health_check():
-    """Health check endpoint that tests all critical services"""
-    from datetime import datetime
-    
-    status = {
-        'status': 'healthy',
-        'database': 'unknown',
-        'models': 'unknown',
-        'timestamp': datetime.utcnow().isoformat()
-    }
-    
-    try:
-        # Test database connection
-        db.session.execute(db.text('SELECT 1'))
-        status['database'] = 'connected'
-        
-        # Test if critical tables exist
-        from sqlalchemy import inspect
-        inspector = inspect(db.engine)
-        tables = inspector.get_table_names()
-        status['tables'] = tables
-        status['tables_count'] = len(tables)
-        status['models'] = 'ok' if 'users' in tables else 'missing_tables'
-        
-        # Check for resume_history table and columns
-        if 'resume_history' in tables:
-            columns = [col['name'] for col in inspector.get_columns('resume_history')]
-            status['resume_history_columns'] = columns
-            status['has_extracted_text'] = 'extracted_text' in columns
-        
-    except Exception as e:
-        status['status'] = 'unhealthy'
-        status['error'] = str(e)
-        logger.exception("Health check failed")
-        return jsonify(status), 500
-    
-    return jsonify(status), 200
-
 @app.route('/form')
 def form():
     return render_template('form.html')
@@ -565,8 +543,7 @@ def ready():
     if missing_config:
         ready_data["missing_config"] = missing_config
 
-    status_code = 200 if ready_data["status"] == "ok" else 503
-    return jsonify(ready_data), status_code
+    return jsonify(ready_data), 200
 
 @app.route('/robots.txt')
 def robots_txt():
@@ -664,14 +641,101 @@ def register():
                 flash(result, 'error')
         
         except Exception as e:
-            import traceback
-            print(f"❌ REGISTRATION ERROR: {e}")           # DEBUG
-            print(f"❌ ERROR TYPE: {type(e).__name__}")    # DEBUG
-            traceback.print_exc()                          # DEBUG - Full stack trace
+            logger.warning('Registration failed at route layer: %s', e)
             db.session.rollback()
             flash('An error occurred. Please try again.', 'error')
     
     return render_template('register.html')
+
+@app.route('/login/github')
+def login_github():
+    """Start GitHub OAuth login flow with CSRF state protection."""
+    link_mode = request.args.get('link') == '1' and current_user.is_authenticated
+    if not os.environ.get('GITHUB_CLIENT_ID') or not os.environ.get('GITHUB_CLIENT_SECRET'):
+        flash('GitHub login is not configured.', 'warning')
+        return redirect(url_for('login'))
+
+    session['oauth_link_mode'] = bool(link_mode)
+    state = secrets.token_urlsafe(24)
+    session['github_oauth_state'] = state
+    redirect_uri = os.environ.get('OAUTH_REDIRECT_URL') or url_for('auth_github_callback', _external=True)
+    return github_oauth.authorize_redirect(redirect_uri, state=state)
+
+
+@app.route('/auth/github/callback')
+def auth_github_callback():
+    """GitHub OAuth callback: create or link account by provider id / safe rules."""
+    state = request.args.get('state')
+    expected_state = session.pop('github_oauth_state', None)
+    if not state or not expected_state or state != expected_state:
+        flash('Invalid OAuth state. Please try signing in again.', 'error')
+        return redirect(url_for('login'))
+
+    try:
+        token = github_oauth.authorize_access_token()
+        if not token:
+            flash('GitHub login failed. Please try again.', 'error')
+            return redirect(url_for('login'))
+
+        profile = github_oauth.get('user').json()
+
+        emails = []
+        try:
+            emails_response = github_oauth.get('user/emails')
+            emails_json = emails_response.json() if emails_response is not None else []
+            if isinstance(emails_json, list):
+                emails = emails_json
+        except Exception as exc:
+            logger.warning('GitHub emails endpoint failed: %s', exc)
+
+        primary_email = next((e.get('email') for e in emails if e.get('primary') and e.get('verified')), None)
+        fallback_email = next((e.get('email') for e in emails if e.get('verified')), None)
+        email = primary_email or fallback_email or profile.get('email')
+
+        if not profile.get('id'):
+            flash('GitHub response missing account id.', 'error')
+            return redirect(url_for('login'))
+
+        provider_user_id = str(profile.get('id'))
+        if session.pop('oauth_link_mode', False) and current_user.is_authenticated:
+            try:
+                AuthService.link_oauth_account(current_user, 'github', provider_user_id, provider_email=email)
+                flash('GitHub account linked successfully.', 'success')
+            except OAuthLinkConflict:
+                flash('This GitHub account is already linked to another user.', 'error')
+            return redirect(url_for('dashboard'))
+
+        user = AuthService.get_or_create_oauth_user(
+            provider='github',
+            provider_user_id=provider_user_id,
+            email=email,
+            username_hint=profile.get('login') or (email.split('@')[0] if email else 'githubuser'),
+        )
+        AuthService.login(user)
+        flash('Signed in with GitHub successfully.', 'success')
+        return redirect(url_for('home'))
+    except OAuthNeedsLinking:
+        flash('An account with this email already exists. Please log in first, then link GitHub from your dashboard.', 'warning')
+        return redirect(url_for('login'))
+    except Exception as exc:
+        logger.warning('GitHub OAuth failed: %s', exc)
+        flash('GitHub login failed. Please try again.', 'error')
+        return redirect(url_for('login'))
+
+
+@app.route('/account/set-password', methods=['POST'])
+@login_required
+def set_password_for_linked_account():
+    """Allow OAuth users to add email/password login later."""
+    password = request.form.get('password', '')
+    confirm_password = request.form.get('confirm_password', '')
+    if password != confirm_password:
+        flash('Passwords do not match.', 'error')
+        return redirect(url_for('dashboard'))
+    success, message = AuthService.set_password_for_user(current_user, password)
+    flash(message, 'success' if success else 'error')
+    return redirect(url_for('dashboard'))
+
 
 @app.route('/logout')
 @login_required
@@ -702,7 +766,7 @@ def forgot_password():
             flash('Please enter your email address.', 'error')
             return render_template('forgot_password.html')
         
-        success, message = AuthService.initiate_password_reset(email)
+        success, message = AuthService.initiate_password_reset(email, client_ip=request.remote_addr or 'unknown')
         
         if success:
             flash(message, 'success')
@@ -893,29 +957,29 @@ def dashboard():
             except Exception as e:
                 logger.warning(f"Failed to fetch matching jobs: {e}")
                 matching_jobs = []
-        
-            return render_template('dashboard.html',
-                user=current_user,
-                history=history,
-                total_resumes=total_resumes,
-                latest_score=latest_score,
-                latest_ats_score=latest_ats_score,
-                best_score=best_score,
-                improvement=improvement,
-                ats_improvement=ats_improvement,
-                score_history=score_history,
-                all_skills=list(all_skills),
-                top_career=top_career,
-                career_confidence=career_confidence,
-                missing_skills=missing_skills,
-                roadmap_data=roadmap_data,
-                roadmap_progress=roadmap_progress,
-                matching_jobs=matching_jobs
-            )
+
+        return render_template('dashboard.html',
+            user=current_user,
+            history=history,
+            total_resumes=total_resumes,
+            latest_score=latest_score,
+            latest_ats_score=latest_ats_score,
+            best_score=best_score,
+            improvement=improvement,
+            ats_improvement=ats_improvement,
+            score_history=score_history,
+            all_skills=list(all_skills),
+            top_career=top_career,
+            career_confidence=career_confidence,
+            missing_skills=missing_skills,
+            roadmap_data=roadmap_data,
+            roadmap_progress=roadmap_progress,
+            matching_jobs=matching_jobs
+        )
     except Exception:
         logger.exception("Dashboard error")
         flash("An error occurred loading the dashboard. Please try again.", 'error')
-        return redirect(url_for('index'))
+        return redirect(url_for('home'))
 
 
 @app.route('/dashboard/delete/<int:history_id>', methods=['POST'])
@@ -2871,15 +2935,6 @@ def init_db():
         logger.error(f"⚠️ Database setup error: {e}")
 
 
-# Call init_db
-init_db()
 if __name__ == '__main__':
-    import os
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
-
-if __name__ == "__main__":
-    from os import environ
-
-    port = int(environ.get("PORT", 5000))  # Default to 5000 if PORT is not set
-    app.run(host="0.0.0.0", port=port)  # Bind to all available IPs

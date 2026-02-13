@@ -8,6 +8,7 @@ import logging
 from typing import Dict, Any
 from dataclasses import dataclass
 from pathlib import Path
+from urllib.parse import urlparse, urlunparse, parse_qsl, urlencode
 
 # Try to load .env file for local development
 try:
@@ -53,9 +54,10 @@ class Config:
         self.BASE_URL = os.getenv('BASE_URL', 'http://localhost:5000')
         
         # Database
-        self.DATABASE_URL = os.getenv('DATABASE_URL', '')
+        self.DATABASE_URL = self._normalize_database_url(os.getenv('DATABASE_URL', ''))
         self.SQLALCHEMY_DATABASE_URI = self.DATABASE_URL if self.DATABASE_URL else 'sqlite:///skillfit.db'
         self.SQLALCHEMY_TRACK_MODIFICATIONS = False
+        self.SQLALCHEMY_ENGINE_OPTIONS = self._engine_options(self.SQLALCHEMY_DATABASE_URI)
         
         # Admin credentials - MUST be set via environment variables in production
         self.ADMIN_ID = os.getenv('ADMIN_ID', 'admin@skillfit.com')
@@ -85,6 +87,11 @@ class Config:
         # Optional APIs
         self.OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '')
         self.GITHUB_API_TOKEN = os.getenv('GITHUB_API_TOKEN', '')
+
+        # OAuth
+        self.GITHUB_CLIENT_ID = os.getenv('GITHUB_CLIENT_ID', '')
+        self.GITHUB_CLIENT_SECRET = os.getenv('GITHUB_CLIENT_SECRET', '')
+        self.OAUTH_REDIRECT_URL = os.getenv('OAUTH_REDIRECT_URL', '')
         
         # Security settings
         self.security = SecurityConfig()
@@ -155,6 +162,32 @@ class Config:
     def get(self, key: str, default=None):
         """Get configuration value with default fallback"""
         return getattr(self, key, default)
+
+    def _normalize_database_url(self, raw_url: str) -> str:
+        if not raw_url:
+            return ''
+        url = raw_url.strip()
+        if url.startswith('postgres://'):
+            url = url.replace('postgres://', 'postgresql://', 1)
+        parsed = urlparse(url)
+        if parsed.scheme.startswith('postgresql'):
+            query = dict(parse_qsl(parsed.query))
+            query['sslmode'] = query.get('sslmode') or os.getenv('DB_SSLMODE', 'require')
+            url = urlunparse(parsed._replace(query=urlencode(query)))
+        return url
+
+    def _engine_options(self, db_uri: str) -> dict:
+        opts = {
+            'pool_pre_ping': True,
+            'pool_recycle': int(os.getenv('SQLALCHEMY_POOL_RECYCLE', '300')),
+        }
+        if db_uri and db_uri.startswith('postgresql'):
+            opts.update({
+                'pool_size': int(os.getenv('SQLALCHEMY_POOL_SIZE', '5')),
+                'max_overflow': int(os.getenv('SQLALCHEMY_MAX_OVERFLOW', '5')),
+                'connect_args': {'sslmode': os.getenv('DB_SSLMODE', 'require')},
+            })
+        return opts
 
 # Global config instance
 config = Config()
