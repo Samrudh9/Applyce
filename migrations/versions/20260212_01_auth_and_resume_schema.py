@@ -65,5 +65,8 @@ def downgrade():
     if 'users' in tables:
         user_columns = {c['name'] for c in inspector.get_columns('users')}
         if 'password_hash' in user_columns:
-            with op.batch_alter_table('users', schema=None) as batch_op:
-                batch_op.alter_column('password_hash', existing_type=sa.String(length=256), nullable=False)
+            # Intentionally do not revert password_hash to non-nullable here.
+            # OAuth-only users may have NULL password_hash values, and enforcing
+            # a NOT NULL constraint during downgrade could cause a constraint
+            # violation. To keep downgrades safe, we leave the column nullable.
+            pass
