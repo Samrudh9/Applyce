@@ -138,6 +138,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Connection pool configuration to avoid stale SSL connections on Render
+# pool_recycle=300 (5 minutes) ensures connections are recycled before they become stale
+# This matches the default in config.py for consistency
 engine_options = {
     "pool_pre_ping": True,
     "pool_recycle": int(os.environ.get("SQLALCHEMY_POOL_RECYCLE", "300")),

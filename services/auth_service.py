@@ -331,7 +331,7 @@ class AuthService:
         if username_hint:
             username_seed = username_hint
         elif email_norm and '@' in email_norm:
-            username_seed = email_norm.split('@')[0]
+            username_seed = email_norm.split('@', 1)[0]
         else:
             username_seed = f'{provider}_user'
         
@@ -342,9 +342,11 @@ class AuthService:
         for attempt in range(max_retries):
             try:
                 username = cls._make_unique_username(username_seed, provider)
+                # Sanitize provider for use in email domain
+                safe_provider = re.sub(r'[^a-z0-9]+', '', provider.lower()) or 'oauth'
                 user = User(
                     username=username,
-                    email=email_norm or f"{username}@users.noreply.{provider}.local",
+                    email=email_norm or f"{username}@users.noreply.{safe_provider}.local",
                     is_active=True,
                     password_hash=None,
                 )
