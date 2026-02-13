@@ -1,6 +1,7 @@
 import pytest
 import sys
 import os
+from pathlib import Path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app import app
@@ -21,7 +22,29 @@ class TestFlaskApp:
         response = client.get('/upload', follow_redirects=False)
         assert response.status_code == 302
         assert '/login' in response.location
+
+    def test_upload_form_posts_to_resume_endpoint(self, client):
+        """Upload form should submit to the resume processing endpoint."""
+        template_source = Path("templates/upload_form.html").read_text(encoding="utf-8")
+        assert "url_for('handle_resume_upload')" in template_source
     
+
+    def test_navigation_links_use_valid_routes(self):
+        """Shared nav/footer links should not point to missing routes."""
+        navbar = Path("templates/components/navbar.html").read_text(encoding="utf-8")
+        footer = Path("templates/components/footer.html").read_text(encoding="utf-8")
+
+        assert "url_for('guide')" in navbar
+        assert "url_for('guide')" in footer
+        assert 'href="/roadmap"' not in navbar
+        assert 'href="/roadmap"' not in footer
+
+    def test_about_page_contact_link_is_actionable(self):
+        """About page CTA should use a valid contact action."""
+        about = Path("templates/about.html").read_text(encoding="utf-8")
+        assert 'href="mailto:hello@applyce.tech"' in about
+        assert 'href="/contact"' not in about
+
     def test_about_page(self, client):
         response = client.get('/about')
         assert response.status_code == 200

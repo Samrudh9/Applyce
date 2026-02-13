@@ -8,7 +8,7 @@ import re
 import logging
 import requests
 import hashlib
-from typing import Dict, List, Optional, Self, Tuple
+from typing import Dict, List, Optional, Tuple
 from datetime import datetime, timedelta
 from dataclasses import dataclass, field, asdict
 
