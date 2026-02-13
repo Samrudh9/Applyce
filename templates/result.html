@@ -87,7 +87,7 @@
                 <div class="progress" style="margin-top:0.75rem;">
                   <div class="progress-bar" style="width: {{ career.confidence }}%;"></div>
                 </div>
-                <a class="btn btn-secondary" href="/roadmap">View Roadmap</a>
+                <a class="btn btn-secondary" href="{{ url_for('show_roadmap', career=career.career) }}">View Roadmap</a>
               </div>
               {% endfor %}
             {% else %}
@@ -98,7 +98,7 @@
                 <div class="progress" style="margin-top:0.75rem;">
                   <div class="progress-bar" style="width: {{ confidence }}%;"></div>
                 </div>
-                <a class="btn btn-secondary" href="/roadmap">View Roadmap</a>
+                <a class="btn btn-secondary" href="{{ url_for('show_roadmap', career=career) }}">View Roadmap</a>
               </div>
               {% endfor %}
             {% endif %}
@@ -188,7 +188,7 @@
           <div style="display:flex; gap:1rem; flex-wrap:wrap;">
             <a class="btn btn-primary" href="#">Download Report</a>
             <a class="btn btn-secondary" href="/jobs">Search Jobs</a>
-            <a class="btn btn-outline" href="/roadmap">View Roadmap</a>
+            <a class="btn btn-outline" href="{{ url_for('guide') }}">View Roadmap</a>
           </div>
         </div>
       </div>
