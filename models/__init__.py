@@ -16,6 +16,7 @@ from models.skill_pattern import SkillPattern
 from models.resume_history import ResumeHistory
 from models.user_preferences import UserPreferences
 from models.job_pattern import JobPattern
+from models.oauth_account import OAuthAccount
 
 __all__ = [
     'db', 
@@ -27,5 +28,6 @@ __all__ = [
     'SkillPattern', 
     'ResumeHistory',
     'UserPreferences',
-    'JobPattern'
+    'JobPattern',
+    'OAuthAccount'
 ]
