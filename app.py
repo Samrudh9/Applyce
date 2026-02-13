@@ -140,7 +140,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # Connection pool configuration to avoid stale SSL connections on Render
 engine_options = {
     "pool_pre_ping": True,
-    "pool_recycle": int(os.environ.get("SQLALCHEMY_POOL_RECYCLE", "600")),
+    "pool_recycle": int(os.environ.get("SQLALCHEMY_POOL_RECYCLE", "300")),
 }
 
 # Only apply pool sizing options for non-SQLite databases
@@ -543,7 +543,8 @@ def ready():
     if missing_config:
         ready_data["missing_config"] = missing_config
 
-    return jsonify(ready_data), 200
+    status_code = 200 if ready_data["status"] == "ok" else 503
+    return jsonify(ready_data), status_code
 
 @app.route('/robots.txt')
 def robots_txt():
@@ -667,7 +668,17 @@ def auth_github_callback():
     """GitHub OAuth callback: create or link account by provider id / safe rules."""
     state = request.args.get('state')
     expected_state = session.pop('github_oauth_state', None)
-    if not state or not expected_state or state != expected_state:
+    
+    if not state:
+        logger.warning('GitHub OAuth callback received without state parameter; possible CSRF or misconfigured client.')
+        flash('Invalid OAuth state. Please try signing in again.', 'error')
+        return redirect(url_for('login'))
+    if expected_state is None:
+        logger.warning('GitHub OAuth callback had no stored state in session; possible CSRF, session expiration, or tampering.')
+        flash('Invalid OAuth state. Please try signing in again.', 'error')
+        return redirect(url_for('login'))
+    if state != expected_state:
+        logger.warning('GitHub OAuth callback state mismatch: expected %s, got %s; possible CSRF attempt.', expected_state, state)
         flash('Invalid OAuth state. Please try signing in again.', 'error')
         return redirect(url_for('login'))
 
@@ -713,13 +724,16 @@ def auth_github_callback():
         )
         AuthService.login(user)
         flash('Signed in with GitHub successfully.', 'success')
-        return redirect(url_for('home'))
+        return redirect(url_for('dashboard'))
     except OAuthNeedsLinking:
         flash('An account with this email already exists. Please log in first, then link GitHub from your dashboard.', 'warning')
         return redirect(url_for('login'))
+    except OAuthLinkConflict:
+        flash('This GitHub account is already linked to another user.', 'error')
+        return redirect(url_for('login'))
     except Exception as exc:
-        logger.warning('GitHub OAuth failed: %s', exc)
-        flash('GitHub login failed. Please try again.', 'error')
+        logger.exception('GitHub OAuth failed with an unexpected error during callback handling')
+        flash('GitHub login failed due to an unexpected error. Please try again later.', 'error')
         return redirect(url_for('login'))
 
 

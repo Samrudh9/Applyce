@@ -13,7 +13,7 @@ from email.mime.text import MIMEText
 from flask import url_for
 from flask_login import login_user, logout_user
 from sqlalchemy import func
-from sqlalchemy.exc import OperationalError
+from sqlalchemy.exc import OperationalError, IntegrityError
 
 from models import db
 from models.oauth_account import OAuthAccount
@@ -63,15 +63,16 @@ class AuthService:
         return (email or "").strip().lower()
 
     @classmethod
-    def sanitize_oauth_username(cls, username_hint: str) -> str:
+    def sanitize_oauth_username(cls, username_hint: str, provider_prefix: str = "oauth") -> str:
         """Sanitize OAuth username to local username rules (letters/numbers/underscore)."""
         candidate = cls.normalize_username(username_hint)
         candidate = re.sub(r'[^a-z0-9_]+', '_', candidate)
         candidate = re.sub(r'_+', '_', candidate).strip('_')
+        prefix = cls.normalize_username(provider_prefix or "oauth") or "oauth"
         if len(candidate) < 3:
-            candidate = f"github_{candidate}".strip('_')
+            candidate = f"{prefix}_{candidate}".strip('_')
         if len(candidate) < 3:
-            candidate = "github_user"
+            candidate = f"{prefix}_user"
         return candidate[:80]
 
     @staticmethod
@@ -131,7 +132,9 @@ class AuthService:
         ).first()
         if not user or not user.is_active:
             return False, "Invalid username/email or password"
-        if not user.password_hash or not user.check_password(password):
+        if not user.password_hash:
+            return False, "This account uses GitHub login. Please sign in with GitHub."
+        if not user.check_password(password):
             return False, "Invalid username/email or password"
         return True, user
 
@@ -297,8 +300,8 @@ class AuthService:
         return oauth_account
 
     @classmethod
-    def _make_unique_username(cls, username_hint: str) -> str:
-        base = cls.sanitize_oauth_username(username_hint)
+    def _make_unique_username(cls, username_hint: str, provider: str = "oauth") -> str:
+        base = cls.sanitize_oauth_username(username_hint, provider)
         candidate = base
         idx = 1
         while User.query.filter(func.lower(User.username) == candidate).first():
@@ -323,16 +326,31 @@ class AuthService:
             cls.link_oauth_account(candidate_user, provider, provider_user_id, provider_email=email_norm)
             return candidate_user
 
-        username_seed = username_hint or (email_norm.split('@')[0] if email_norm else 'github_user')
-        username = cls._make_unique_username(username_seed)
-        user = User(
-            username=username,
-            email=email_norm or f"{username}@users.noreply.github.com",
-            is_active=True,
-            password_hash=None,
-        )
-        db.session.add(user)
-        db.session.commit()
-
-        cls.link_oauth_account(user, provider, provider_user_id, provider_email=email_norm)
-        return user
+        username_seed = username_hint or (email_norm.split('@')[0] if email_norm and '@' in email_norm else 'github_user')
+        
+        # Handle race condition in username generation by retrying with a random suffix
+        max_retries = 5
+        for attempt in range(max_retries):
+            try:
+                username = cls._make_unique_username(username_seed, provider)
+                user = User(
+                    username=username,
+                    email=email_norm or f"{username}@users.noreply.github.com",
+                    is_active=True,
+                    password_hash=None,
+                )
+                db.session.add(user)
+                db.session.commit()
+                
+                cls.link_oauth_account(user, provider, provider_user_id, provider_email=email_norm)
+                return user
+            except IntegrityError as exc:
+                db.session.rollback()
+                if attempt < max_retries - 1:
+                    logger.warning("Username collision during OAuth user creation (attempt %s/%s), retrying...", attempt + 1, max_retries)
+                    # Add some randomness to avoid repeated collisions
+                    import random
+                    username_seed = f"{username_seed}_{random.randint(1000, 9999)}"
+                else:
+                    logger.error("Failed to create OAuth user after %s attempts due to IntegrityError: %s", max_retries, exc)
+                    raise
