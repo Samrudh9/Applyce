@@ -46,7 +46,7 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False, index=True)
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)
-    password_hash = db.Column(db.String(256), nullable=False)
+    password_hash = db.Column(db.String(256), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     last_login = db.Column(db.DateTime)
     is_active = db.Column(db.Boolean, default=True)
@@ -65,6 +65,7 @@ class User(UserMixin, db.Model):
     # Relationships
     resumes = db.relationship('Resume', backref='user', lazy='dynamic')
     feedbacks = db.relationship('Feedback', backref='user', lazy='dynamic')
+    oauth_accounts = db.relationship('OAuthAccount', backref='user', lazy='dynamic', cascade='all, delete-orphan')
     
     def __repr__(self):
         return f'<User {self.username}>'
