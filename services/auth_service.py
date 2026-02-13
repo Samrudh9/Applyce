@@ -327,7 +327,14 @@ class AuthService:
             cls.link_oauth_account(candidate_user, provider, provider_user_id, provider_email=email_norm)
             return candidate_user
 
-        username_seed = username_hint or (email_norm.split('@')[0] if email_norm and '@' in email_norm else f'{provider}_user')
+        # Determine username seed with fallback logic
+        if username_hint:
+            username_seed = username_hint
+        elif email_norm and '@' in email_norm:
+            username_seed = email_norm.split('@')[0]
+        else:
+            username_seed = f'{provider}_user'
+        
         original_seed = username_seed
         
         # Handle race condition in username generation by retrying with a random suffix
@@ -337,7 +344,7 @@ class AuthService:
                 username = cls._make_unique_username(username_seed, provider)
                 user = User(
                     username=username,
-                    email=email_norm or f"{username}@users.noreply.github.com",
+                    email=email_norm or f"{username}@users.noreply.{provider}.local",
                     is_active=True,
                     password_hash=None,
                 )

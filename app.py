@@ -732,7 +732,7 @@ def auth_github_callback():
         flash('This GitHub account is already linked to another user.', 'error')
         return redirect(url_for('login'))
     except Exception as exc:
-        logger.exception('GitHub OAuth failed with an unexpected error during callback handling')
+        logger.exception('OAuth callback failed with an unexpected error during processing')
         flash('GitHub login failed due to an unexpected error. Please try again later.', 'error')
         return redirect(url_for('login'))
 
