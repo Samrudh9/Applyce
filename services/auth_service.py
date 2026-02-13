@@ -69,7 +69,7 @@ class AuthService:
         candidate = cls.normalize_username(username_hint)
         candidate = re.sub(r'[^a-z0-9_]+', '_', candidate)
         candidate = re.sub(r'_+', '_', candidate).strip('_')
-        prefix = cls.normalize_username(provider_prefix or "oauth") or "oauth"
+        prefix = cls.normalize_username(provider_prefix) or "oauth"
         if len(candidate) < 3:
             candidate = f"{prefix}_{candidate}".strip('_')
         if len(candidate) < 3:
@@ -328,6 +328,7 @@ class AuthService:
             return candidate_user
 
         username_seed = username_hint or (email_norm.split('@')[0] if email_norm and '@' in email_norm else f'{provider}_user')
+        original_seed = username_seed
         
         # Handle race condition in username generation by retrying with a random suffix
         max_retries = 5
@@ -349,8 +350,8 @@ class AuthService:
                 db.session.rollback()
                 if attempt < max_retries - 1:
                     logger.warning("Username collision during OAuth user creation (attempt %s/%s), retrying...", attempt + 1, max_retries)
-                    # Add some randomness to avoid repeated collisions
-                    username_seed = f"{username_seed}_{random.randint(1000, 9999)}"
+                    # Reset to original seed with a random suffix to avoid compounding
+                    username_seed = f"{original_seed}_{random.randint(1000, 9999)}"
                 else:
                     logger.error("Failed to create OAuth user after %s attempts due to IntegrityError: %s", max_retries, exc)
                     raise

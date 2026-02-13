@@ -678,7 +678,7 @@ def auth_github_callback():
         flash('Invalid OAuth state. Please try signing in again.', 'error')
         return redirect(url_for('login'))
     if state != expected_state:
-        logger.warning('GitHub OAuth callback state mismatch: expected %s, got %s; possible CSRF attempt.', expected_state, state)
+        logger.warning('GitHub OAuth callback state mismatch; possible CSRF attempt.')
         flash('Invalid OAuth state. Please try signing in again.', 'error')
         return redirect(url_for('login'))
 
