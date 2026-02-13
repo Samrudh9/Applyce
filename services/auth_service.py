@@ -3,6 +3,7 @@
 import html
 import logging
 import os
+import random
 import re
 import smtplib
 import threading
@@ -326,7 +327,7 @@ class AuthService:
             cls.link_oauth_account(candidate_user, provider, provider_user_id, provider_email=email_norm)
             return candidate_user
 
-        username_seed = username_hint or (email_norm.split('@')[0] if email_norm and '@' in email_norm else 'github_user')
+        username_seed = username_hint or (email_norm.split('@')[0] if email_norm and '@' in email_norm else f'{provider}_user')
         
         # Handle race condition in username generation by retrying with a random suffix
         max_retries = 5
@@ -349,7 +350,6 @@ class AuthService:
                 if attempt < max_retries - 1:
                     logger.warning("Username collision during OAuth user creation (attempt %s/%s), retrying...", attempt + 1, max_retries)
                     # Add some randomness to avoid repeated collisions
-                    import random
                     username_seed = f"{username_seed}_{random.randint(1000, 9999)}"
                 else:
                     logger.error("Failed to create OAuth user after %s attempts due to IntegrityError: %s", max_retries, exc)
